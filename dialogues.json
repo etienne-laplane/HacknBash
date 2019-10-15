@@ -1,0 +1,11 @@
+{
+	"init": "Hack'n'Bash est un jeu d'aventure discord, basé sur la chance et les décisions. Chaque événement est basé sur de l'aléatoire et il n'y a aucun moyen de manipuler ceci par le contenu des messages. Certains événements demandent aux joueurs (membres du discord) de répondre à des questions. Ces moments sont les seuls pendant lesquels le contenu du message est analysé. Il n'existe pas de commande cachée et il n'y a aucun moyen d'arrêter l'aventure avant la victoire ou la défaite du groupe. Si vous acceptez ces règles, et que vous concevez que l'anarchie règnera, que tout le monde peut prendre les décisions pour tout le monde, tapez 'start'.",
+	"start": "Votre groupe d'aventurier se réveille lourd des aventures de la veille. Vous vous trouvez à la lisière d'une forêt, au loin de dessinent les contours d'un imposant chateau. Une sépulture sans aucune inscription se dresse à coté de vous. Votre groupe est tapageur, anarchiste, et chaque mot peut entrainer une dispute sans fin. Vous avez même récemment dû bricoler une cage qui sert de prison dans lequel vous enfermez les plus tapageurs. Pour l'instant celle ci est vide...",
+	"dragon_nom": "Pour une raison étrange, le dragon lui semblait vraiment familier, et son nom lui était revenu immédiatement à l'esprit",
+	"knight_nom": "",
+	"prison_sortie": " fini par sortir de la cage. Un autre lui aurait-il ouvert, ou alors la porte était-elle juste mal fermée ?",
+	"prison_non": "le groupe ne met pas en prison",
+	"prison_oui": "le groupe met en prison",
+	"horrible_experience":"Essayant de manipuler les éléments au dela du possible, un événement dramatique survient",
+	"choix_element":"Level up : Un palier a été atteint, dans quelle voie voulez-vous vous spécialiser ? [feu/terre/eau]"
+}

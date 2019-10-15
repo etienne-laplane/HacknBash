@@ -1,0 +1,28 @@
+{
+	"Gourdin":
+		{"atk":15,"def":1},
+	"Bouclier":
+		{"atk":1,"def":10},
+	"Caillou":
+		{"atk":20,"def":0},
+	"Sabre Magique":
+		{"atk":75,"def":10},
+	"Haubert Magique":
+		{"atk":5,"def":50},
+	"Bouclier à pointes":
+		{"atk":15,"def":20},
+	"Crocs de Dragon":
+		{"atk":50,"def":10},
+	"Miroir magique":
+		{"atk":0,"def":0},
+	"Arc Elfique":
+		{"atk":20,"def":10},
+	"Kriss Divin":
+		{"atk":10000,"def":10},
+	"Bouclier Impénétrable":
+		{"atk":10,"def":10000},
+	"Coup Divin":
+		{"atk":0,"def":0},	
+	"Bouclier Divin":
+		{"atk":0,"def":0}	
+}
