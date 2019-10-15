@@ -4,6 +4,8 @@ var conf = require('./conf.json');
 const bot = new Discord.Client();
 var fs = require('fs');
 
+
+
 var install = false;
 var init = false;
 var event_classe = false;
@@ -15,6 +17,8 @@ var races = require('./races.json');
 var teams = require('./teams.json');
 var miniboss = require('./miniboss.json');
 var adj = require('./adjectif_masc.json');
+var dieu = require('./dieu.json');
+var god=[];
 var pieges = require('./pieges.json');
 var adj_pieg = require('./adjectif_fem.json');
 var piege_safe;
@@ -30,6 +34,9 @@ var players=[];
 var levels=[];
 var folies=[]
 var floor=0;
+var minijeu_type="";
+var minijeu_status=false;
+var miniboss_nom="";
 //factions
 var chaos=[]; //agent du chars
 var heros=[]; //heros
@@ -746,7 +753,7 @@ function minijeu(msg){
 			}
 		}
 	}
-	if(minijeu_type=="Mini-boss"){
+	else if(minijeu_type=="Mini-boss"){
 		alive=true;
 		if(msg.channel.id==channel_id){
 			r=Math.random();
@@ -774,6 +781,32 @@ function minijeu(msg){
 				msg.reply("frappe le "+miniboss_nom + " mais le rate");
 			}
 		}
+	} else if(minijeu_type=="Dieu"){
+		if(msg.cleanContent.toLowerCase=="prier"){
+			//3 solutions :
+			if (god[msg.author.id]!=undefined){
+				if (god[msg.author.id]==miniboss_nom){
+					//levelup
+					//5% drop divin
+				}
+				else {
+					// colere du dieu !
+					//folie up ET level up
+				}
+			}
+			else{
+				god.push({
+					key: msg.author.id,
+					value: miniboss_nom
+				});
+				//levelup
+			}
+		} else {
+			if (god[msg.author.id]==miniboss_nom){
+				//le fidele ne s'agenouille pas ? CHATIMENT
+				//level down
+			}
+		}
 	}
 }
 
@@ -782,7 +815,10 @@ function initminijeu(msg){
 		//type de mini jeu
 		var r=Math.random();
 		if(r<0.01){
-			
+			later_minijeu_type="Dieu";
+			var nom = dieu[Math.floor(Math.random()*dieu.length)];
+			miniboss_nom = nom;
+			msg.channel.send("Une apparition divine de "+nom+" vous frappe tous. Vous agenouillez-vous ?");
 		}else if(r<0.06){
 			
 		}else if(r<0.41){
@@ -791,14 +827,12 @@ function initminijeu(msg){
 			var adject = adj[Math.floor(Math.random()*adj.length)];
 			miniboss_nom = nom + " " + adject;
 			msg.channel.send("Un "+miniboss_nom+" apparait !");
-			miniboss_count++;
 		}else{
 			later_minijeu_type="Piege";
 			var nom = pieges[Math.floor(Math.random()*pieges.length)];
 			var adject = adj_pieg[Math.floor(Math.random()*adj_pieg.length)];
 			miniboss_nom = nom + " " + adject;
 			msg.channel.send("Une "+miniboss_nom+" prend "+msg.author.username+" par surprise !");
-			piege_count++;
 		}
 		msg.guild.createChannel(miniboss_nom,'text').then(function(result){
 			channel_id = result.id;
