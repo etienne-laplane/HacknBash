@@ -1,3 +1,9 @@
+const Discord = require('discord.js');
+var auth = require('./auth.json');
+var conf = require('./conf.json');
+const bot = new Discord.Client();
+var fs = require('fs');
+
 var install = false;
 var init = false;
 var event_classe = false;
@@ -15,6 +21,11 @@ var piege_safe;
 var msg_precedent;
 var minijeu_status=false;
 
+//reserve levels
+var bank_levels=0;
+var bank_folie=0;
+
+var day=0;
 var players=[];
 var levels=[];
 var folies=[]
@@ -68,6 +79,27 @@ bot.on('message', msg => {
 	
 });
 
+function day_night(msg){
+	r=math.random();
+	if (day<0){
+		setTimeout(function(){ 
+			day=Math.random(); 
+			day_night(msg);
+			msg.guild.channels.find(function(channel){
+				return channel.name=="niveau-ni-cochon";
+				}).send("C'est la nuit",{code:true});
+		}, 800000*r+100000);
+	} else {
+			setTimeout(function(){ 
+			day=-Math.random(); 
+			day_night(msg);
+			msg.guild.channels.find(function(channel){
+				return channel.name=="niveau-ni-cochon";
+				}).send("C'est le jour",{code:true});
+		}, 800000*r+100000);
+	}
+	
+}
 //fonction principale : return true si qqch se passe, false sinon.
 function attaque(msg){
 	var r=Math.random();
@@ -535,6 +567,7 @@ function check_dm(msg){
 function add_player(msg){
 	if(!find_player(msg)){
 		players.push(msg.author.id);
+		//offrir race.
 	}
 }
 
@@ -683,6 +716,7 @@ function install(msg){
 			.then(channel=>channel.send(str+"\n"+msg.cleanContent,{code:true}))
 		.catch(error);
 	}
+	day_night(msg);
 }
 
 function minijeu(msg){
@@ -747,7 +781,11 @@ function initminijeu(msg){
 	piege_safe=Array();
 		//type de mini jeu
 		var r=Math.random();
-		if(r<0.35){
+		if(r<0.01){
+			
+		}else if(r<0.06){
+			
+		}else if(r<0.41){
 			later_minijeu_type="Mini-boss";
 			var nom = miniboss[Math.floor(Math.random()*miniboss.length)];
 			var adject = adj[Math.floor(Math.random()*adj.length)];
