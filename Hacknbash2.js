@@ -796,8 +796,7 @@ function minijeu(msg){
 			}
 			else{
 				god.push({
-					key: msg.author.id,
-					value: miniboss_nom
+					msg.author.id:miniboss_nom
 				});
 				//levelup
 			}
