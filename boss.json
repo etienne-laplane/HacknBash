@@ -1,0 +1,18 @@
+{
+    "Yurgen le Kraken":{
+        "Apparition":"dialogue d'apparition",
+        "Ours":{
+            "Victoire":{
+                "normal":"dialogue de victoire",
+                "critique":"dialogue de victoire critique",
+                "loot":"Levelup/folieup/leveldown/foliedown/itemname"
+                }
+            "Défaite":{
+                "normal":"dialogue de défaite",
+                "critique":"dialogue de défaite critique",
+                "loot":"Levelup/folieup/leveldown/foliedown/itemname"
+                }
+            }
+
+    }
+}

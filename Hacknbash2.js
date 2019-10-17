@@ -270,9 +270,8 @@ function event_prison(msg){
 		if(prison_id!=0){
 			msg.channel.send("La sentence est tombée : " +msg_precedent.author.username+" prend la place de "+prison_name+" en prison !");
 		}else {
-			msg.channel.send("La sentence est tombée : " +msg_precedent.aut
+			msg.channel.send("La sentence est tombée : " +msg_precedent.author.username+" doit aller en prison.");
 				folieup(msg);
-			
 		}
 		to_prison(msg_precedent);
 		prison=false;
@@ -314,7 +313,7 @@ function team_level_up(nom){
 
 function event_race(msg){
 	if(msg.author.id==id_race){
-		switch msg.cleanContent.toLowerCase(){
+		switch (msg.cleanContent.toLowerCase()){
 			case humain:
 				give_race("Humain",msg);
 				event_race=false;
@@ -370,7 +369,7 @@ function raceplayer(msg){
 //fonction principale : return true si qqch se passe, false sinon.
 function event_specialization(msg){
 	if(msg.author.id==id_classe){
-		switch msg.cleanContent.toLowerCase(){
+		switch (msg.cleanContent.toLowerCase()){
 			case feu:
 				spe=get_spe(msg);
 				spe=add_spe(1,spe);
@@ -504,9 +503,9 @@ function offer_join_lunatics(msg){
 	var offer={};
 	msg.author.createDM().then(function(channel){
 		offer={
-			channelid=id,
-			Type="fou",
-			authorid=msg.author.id
+			"channelid":id,
+			"Type":"fou",
+			"authorid":msg.author.id
 		};
 		MP.push(offer);
 		channel.send("Une étrange voix intérieure commence à suggérer des idées étranges. La folie vous a atteint bien plus que vous ne le croyiez. Voulez vous y succomber et rejoindre le culte des fanatiques ? [oui/non]");
@@ -561,7 +560,7 @@ function check_dm(msg){
 			return offer.channelid==msg.channel.id;
 		});
 		if(msg.cleanContent.toLowerCase()=="oui"){
-			switch offer.Type{
+			switch (offer.Type){
 				case 'Fou':
 					join_lunatics(msg);
 					msg.channel.send("Bienvenue chez les lunatiques ! Votre objectif est de refaire descendre le groupe le plus vite possible à l'entrée du donjon ! Clairement c'est la meilleure solution. Mélanger les éléments sera votre meilleure solution : Eau avec Feu et Air avec Terre. Conservez cette information pour vous et restez cachés !");
@@ -575,7 +574,7 @@ function check_dm(msg){
 				break;
 			}
 		} else if(msg.cleanContent.toLowerCase()=="non"){
-			switch offer.Type{
+			switch (offer.Type){
 				case 'Fou':
 					join_heros(msg);
 					msg.channel.send("Bienvenue chez les heros ! Votre mission reste la même : guider le groupe d'aventuriers jusqu'au sommet de la tour. Attention, les lunatiques qui se cachent parmis vous vont tout faire pour saboter la mission.");
@@ -692,37 +691,37 @@ function floordown(msg){
 function log_levelup(msg){
 	msg.guild.channels.find(function(channel){
 		return channel.name=="niveau-ni-cochon";
-	}).send(msg.author.username+" gagne un niveau : "+levelplayer(msg)+\n\""+msg.cleanContent+"\"",{code:true});
+	}).send(msg.author.username+" gagne un niveau : "+levelplayer(msg)+"\n\""+msg.cleanContent+"\"",{code:true});
 }
 
 function log_leveldown(msg){
 	msg.guild.channels.find(function(channel){
 		return channel.name=="niveau-ni-cochon";
-	}).send(msg.author.username+" perd un niveau : "+levelplayer(msg)+\n\""+msg.cleanContent+"\"",{code:true});
+	}).send(msg.author.username+" perd un niveau : "+levelplayer(msg)+"\n\""+msg.cleanContent+"\"",{code:true});
 }
 
 function log_spe(msg,spe){
 	msg.guild.channels.find(function(channel){
 		return channel.name=="niveau-ni-cochon";
-	}).send(msg.author.username+" devient : "+spe+\n\""+msg.cleanContent+"\"",{code:true});
+	}).send(msg.author.username+" devient : "+spe+"\n\""+msg.cleanContent+"\"",{code:true});
 }
 
 function log_race(msg,race){
 	msg.guild.channels.find(function(channel){
 		return channel.name=="niveau-ni-cochon";
-	}).send(msg.author.username+" fait partie du clan : "+race+\n\""+msg.cleanContent+"\"",{code:true});
+	}).send(msg.author.username+" fait partie du clan : "+race+"\n\""+msg.cleanContent+"\"",{code:true});
 }
 
 function log_folieup(msg){
 	msg.guild.channels.find(function(channel){
 		return channel.name=="niveau-ni-cochon";
-	}).send(msg.author.username+" tombe un peu plus profond dans la folie : "+folieplayer(msg)+\n\""+msg.cleanContent+"\"",{code:true});
+	}).send(msg.author.username+" tombe un peu plus profond dans la folie : "+folieplayer(msg)+"\n\""+msg.cleanContent+"\"",{code:true});
 }
 
 function log_foliedown(msg){
 	msg.guild.channels.find(function(channel){
 		return channel.name=="niveau-ni-cochon";
-	}).send(msg.author.username+" regagne un petit peu ses esprits : "+folieplayer(msg)+\n\""+msg.cleanContent+"\"",{code:true});
+	}).send(msg.author.username+" regagne un petit peu ses esprits : "+folieplayer(msg)+"\n\""+msg.cleanContent+"\"",{code:true});
 }
 
 function log_floorup(msg){
@@ -807,9 +806,17 @@ function minijeu(msg){
 		}
 	} else if(minijeu_type=="Dieu"){
 		if(msg.channel.id==channel_id){
+		var id_msg=undefined;
+			var go_msg=undefined;
+			for(var exKey in god){
+				if(god[exKey]["id"]==msg.author.id){
+					id_msg=god[exKey]["id"];
+					go_msg=god[exKey]["d"];
+				}
+			}
 			if(msg.cleanContent.toLowerCase=="prier"){
-				if (god[msg.author.id]!=undefined){
-					if (god[msg.author.id]==miniboss_nom){
+				if (id_msg!=undefined){
+					if (go_msg==miniboss_nom){
 						msg.channel.send(msg.author.username+", fidèlement, s'agenouille devant l'avatar de "+nom+".");
 						if(get_faction(msg)=="lunatiques"){
 							folieup(msg);
@@ -819,7 +826,7 @@ function minijeu(msg){
 						//5% drop divin
 					}
 					else {
-						msg.channel.send("Les cieux se déchirèrent et la voix de "+god[msg.author.id]+"retenti : \"Tu oses t'agenouiller devant "+nom" ? Puisque c'est ainsi, souffre mon couroux !");
+						msg.channel.send("Les cieux se déchirèrent et la voix de "+go_msg+"retenti : \"Tu oses t'agenouiller devant "+nom+" ? Puisque c'est ainsi, souffre mon couroux !");
 						if(get_faction(msg)=="lunatiques"){
 							leveldown();
 						} else {
@@ -830,15 +837,16 @@ function minijeu(msg){
 				}
 				else{
 					god.push({
-						msg.author.id:miniboss_nom
+						"id":msg.author.id,
+						"d":miniboss_nom
 					});
-					msg.channel.send("Bienvenue parmi mes fidèles "+god[msg.author.id]+"dit "+nom+" d'une voix bienveillante");
+					msg.channel.send("Bienvenue parmi mes fidèles "+msg.author.username+" dit "+nom+" d'une voix bienveillante");
 					levelup(msg);
 					folieup(msg);
 				}
 			} else {
-				if (god[msg.author.id]==miniboss_nom){
-					msg.channel.send("Et bien, "msg.author.username+" tu ne te prosternes pas devant ton dieu ?");
+				if (go_msg==miniboss_nom){
+					msg.channel.send("Et bien, "+msg.author.username+" tu ne te prosternes pas devant ton dieu ?");
 					leveldown(msg);
 				}
 			}
@@ -849,9 +857,9 @@ function minijeu(msg){
 			var offer={};
 			msg.author.createDM().then(function(channel){
 				offer={
-					channelid=id,
-					Type="deal_devil",
-					authorid=msg.author.id
+					"channelid":"id",
+					"Type":"deal_devil",
+					"authorid":msg.author.id
 				};
 				MP.push(offer);
 				channel.send("Le chaos vous propose deux choix : voulez vous faire perdre au groupe des niveaux et plonger tout le monde dans la folie ? [oui/non]");
