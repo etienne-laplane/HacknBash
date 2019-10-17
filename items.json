@@ -1,0 +1,50 @@
+{
+	"com":{
+	"Gourdin":{
+		"desc":"Augmente légèrement l'attaque",
+			"atk":1,
+			"def":3,
+			"mad":0,
+			"drop":1,
+			"levelup":0,
+			"leveldown":-3,
+			"prison":0
+		}
+	},
+	"mag":{
+	"Gourdin":{
+		"desc":"Augmente légèrement l'attaque",
+			"atk":1,
+			"def":3,
+			"mad":0,
+			"drop":1,
+			"levelup":0,
+			"leveldown":-3,
+			"prison":0
+		}
+	},
+	"rar":{
+	"Gourdin":{
+		"desc":"Augmente légèrement l'attaque",
+			"atk":1,
+			"def":3,
+			"mad":0,
+			"drop":1,
+			"levelup":0,
+			"leveldown":-3,
+			"prison":0
+		}
+	},
+	"leg":{
+	"Gourdin":{
+		"desc":"Augmente légèrement l'attaque",
+			"atk":1,
+			"def":3,
+			"mad":0,
+			"drop":1,
+			"levelup":0,
+			"leveldown":-3,
+			"prison":0
+		}
+	}
+}

@@ -15,20 +15,23 @@ var id_race = 0;
 var spes = require('./spes.json');
 var races = require('./races.json');
 var teams = require('./teams.json');
-var miniboss = require('./miniboss.json');
-var adj = require('./adjectif_masc.json');
-var dieu = require('./dieu.json');
+//var miniboss = require('./miniboss.json');
+var names = require('./names.json');
+var miniboss = names["miniboss"];
+var adj = names["adj-masc"];
+var dieu = names["dieux"];
 var god=[];
-var pieges = require('./pieges.json');
-var adj_pieg = require('./adjectif_fem.json');
+var pieges = names["pieges"];
+var adj_pieg = names["adj-fem"];
 var piege_safe;
 var msg_precedent;
 var minijeu_status=false;
-
+var prison=false;
 //reserve levels
 var bank_levels=0;
 var bank_folie=0;
-
+var prison_id=0;
+var prison_msg;
 var day=0;
 var players=[];
 var levels=[];
@@ -37,6 +40,7 @@ var floor=0;
 var minijeu_type="";
 var minijeu_status=false;
 var miniboss_nom="";
+var n_dealdevil = -1;
 //factions
 var chaos=[]; //agent du chars
 var heros=[]; //heros
@@ -529,6 +533,14 @@ function join_heros(msg){
 	}
 }
 
+//TODO
+function get_faction(msg){
+	return "heros";
+	return "dieux";
+	return "chaos";
+	return "fanatique";
+}
+
 //fonction principale : return true/false
 function dm(msg){
 	if(msg.channel.type=="dm"){
@@ -555,12 +567,24 @@ function check_dm(msg){
 					msg.channel.send("Bienvenue chez les lunatiques ! Votre objectif est de refaire descendre le groupe le plus vite possible à l'entrée du donjon ! Clairement c'est la meilleure solution. Mélanger les éléments sera votre meilleure solution : Eau avec Feu et Air avec Terre. Conservez cette information pour vous et restez cachés !");
 					MP=MP.splice(index,1);
 				break;
+				case 'deal_devil':
+					bank_levels-=5;
+					bank_folie+=5;
+					msg.channel.send("Qu'il en soit ainsi !");
+					MP=MP.splice(index,1);
+				break;
 			}
 		} else if(msg.cleanContent.toLowerCase()=="non"){
 			switch offer.Type{
 				case 'Fou':
 					join_heros(msg);
 					msg.channel.send("Bienvenue chez les heros ! Votre mission reste la même : guider le groupe d'aventuriers jusqu'au sommet de la tour. Attention, les lunatiques qui se cachent parmis vous vont tout faire pour saboter la mission.");
+					MP=MP.splice(index,1);
+				break;
+				case 'deal_devil':
+					bank_levels+=5;
+					bank_folie-=5;
+					msg.channel.send("Qu'il en soit ainsi !");
 					MP=MP.splice(index,1);
 				break;
 			}
@@ -782,29 +806,56 @@ function minijeu(msg){
 			}
 		}
 	} else if(minijeu_type=="Dieu"){
-		if(msg.cleanContent.toLowerCase=="prier"){
-			//3 solutions :
-			if (god[msg.author.id]!=undefined){
+		if(msg.channel.id==channel_id){
+			if(msg.cleanContent.toLowerCase=="prier"){
+				if (god[msg.author.id]!=undefined){
+					if (god[msg.author.id]==miniboss_nom){
+						msg.channel.send(msg.author.username+", fidèlement, s'agenouille devant l'avatar de "+nom+".");
+						if(get_faction(msg)=="lunatiques"){
+							folieup(msg);
+						} else {
+							levelup(msg); 
+						}
+						//5% drop divin
+					}
+					else {
+						msg.channel.send("Les cieux se déchirèrent et la voix de "+god[msg.author.id]+"retenti : \"Tu oses t'agenouiller devant "+nom" ? Puisque c'est ainsi, souffre mon couroux !");
+						if(get_faction(msg)=="lunatiques"){
+							leveldown();
+						} else {
+							folieup(msg);
+							leveldown(msg);
+						}	
+					}
+				}
+				else{
+					god.push({
+						msg.author.id:miniboss_nom
+					});
+					msg.channel.send("Bienvenue parmi mes fidèles "+god[msg.author.id]+"dit "+nom+" d'une voix bienveillante");
+					levelup(msg);
+					folieup(msg);
+				}
+			} else {
 				if (god[msg.author.id]==miniboss_nom){
-					//levelup
-					//5% drop divin
-				}
-				else {
-					// colere du dieu !
-					//folie up ET level up
+					msg.channel.send("Et bien, "msg.author.username+" tu ne te prosternes pas devant ton dieu ?");
+					leveldown(msg);
 				}
 			}
-			else{
-				god.push({
-					msg.author.id:miniboss_nom
-				});
-				//levelup
-			}
-		} else {
-			if (god[msg.author.id]==miniboss_nom){
-				//le fidele ne s'agenouille pas ? CHATIMENT
-				//level down
-			}
+		} 
+	}else if(minijeu_type=="deal_devil"){
+		n_dealdevil-=1;
+		if(n_dealdevil==0){
+			var offer={};
+			msg.author.createDM().then(function(channel){
+				offer={
+					channelid=id,
+					Type="deal_devil",
+					authorid=msg.author.id
+				};
+				MP.push(offer);
+				channel.send("Le chaos vous propose deux choix : voulez vous faire perdre au groupe des niveaux et plonger tout le monde dans la folie ? [oui/non]");
+			}).catch(error);
 		}
 	}
 }
@@ -818,8 +869,11 @@ function initminijeu(msg){
 			var nom = dieu[Math.floor(Math.random()*dieu.length)];
 			miniboss_nom = nom;
 			msg.channel.send("Une apparition divine de "+nom+" vous frappe tous. Vous agenouillez-vous ?");
-		}else if(r<0.06){
-			
+		}else if(r<0.02){
+			later_minijeu_type="deal_devil";
+			n_dealdevil=3+r*3700;
+			nom = "Pacte avec le chaos";
+			msg.channel.send("Je suis l'agent du chaos qui reigne dans cette tour. Le "+n_dealdevil+"ème à s'exprimer recevra une faveur unique.");
 		}else if(r<0.41){
 			later_minijeu_type="Mini-boss";
 			var nom = miniboss[Math.floor(Math.random()*miniboss.length)];

@@ -1,5 +1,8 @@
 {
+	"com":{
 	"Gourdin":"Augmente légèrement l'attaque",
 	"Bouclier":"Augmente légèrement la défense",
 	"Caillou":"Aiguise les armes pour la prochaine attaque"
+	},
+	
 }
