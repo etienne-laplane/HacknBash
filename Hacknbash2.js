@@ -3,15 +3,12 @@ var auth = require('./auth.json');
 var conf = require('./conf.json');
 const bot = new Discord.Client();
 var fs = require('fs');
-
-
-
 var install = false;
 var init = false;
 var event_classe = false;
 var id_classe = 0;
 var event_race = false;
-var id_race = 0;
+var id_race = [];
 var spes = require('./spes.json');
 var races = require('./races.json');
 var teams = require('./teams.json');
@@ -23,10 +20,12 @@ var dieu = names["dieux"];
 var god=[];
 var pieges = names["pieges"];
 var adj_pieg = names["adj-fem"];
+var items = require('./items.json');
 var piege_safe;
 var msg_precedent;
 var minijeu_status=false;
 var prison=false;
+var day_light=true;
 //reserve levels
 var bank_levels=0;
 var bank_folie=0;
@@ -41,15 +40,24 @@ var minijeu_type="";
 var minijeu_status=false;
 var miniboss_nom="";
 var n_dealdevil = -1;
+var boss_id=0;
+var boss_name="";
 //factions
-var chaos=[]; //agent du chars
+var chaos=[]; //agents du chaos
 var heros=[]; //heros
 var fous=[]; //lunatiques
-var dieu=[]; //envoyé divin
+var dieu_id; //envoyé divin
+var dieu_username; //envoyé divin
 var MP=[]; //channelID/authorID
 var chaos_decided=false; //devient vrai quand l'event chaos/divin est arrivé. Permet de ne pas double drop.
+var combo_id=0;
+var combo_count=0;
+var highest_floor=0;
+var event_floor_up=false;
+var event_floor_down=false;
+var event_team=false;
 
-//miniboss
+//trahison
 //event monter/descendre
 //commandes
 //drop items
@@ -58,12 +66,19 @@ var chaos_decided=false; //devient vrai quand l'event chaos/divin est arrivé. P
 //event_spécialisation
 
 bot.on('message', msg => {
-	if(msg.author.id=="618500337707515904") return;//le bot ne joue pas.
-	if(msg.member==null) return;//les gens offline ne jouent pas.
+	if(!install){
+		if(msg.content=="install"){
+			install(msg);
+			install=true;
+		}
+	}
+	if(day_light){
+		day_night(msg);
+		day_light=false;
+	}
+	if(msg.author.id=="625988662454386698") return;//le bot ne joue pas.
 	if(msg_precedent==null) msg_precedent=msg;//just in case.
-	
 	add_player(msg);
-	
 	if(msg.author.id==prison_id){
 		var r=Math.random();
 		if(r<proba_sortie_prison(msg)){
@@ -78,17 +93,305 @@ bot.on('message', msg => {
 		}
 		return;
 	}
-	
 	if(dm(msg)){
 		return;
 	}
-	
-	if(minijeu_status){
-		minijeu(msg);
+	if(msg.member==null) return;//les gens offline ne jouent pas.
+	if(event_floor_up){
+		event_floor_up_res(msg);
 		return;
 	}
+	if(event_floor_down){
+		event_floor_down_res(msg);
+		return;
+	}
+	if(event_team(msg){
+	}
+	if (event_specialization(msg){
+	}
+	if(boss_id==msg.author.id){
+		fight_boss(msg);
+	}
+	if(minijeu_status){
+		minijeu(msg);
+	}
+	msg_precedent=msg;
 	
 });
+
+function load(){
+}
+
+function save(){
+}
+
+//fonction principale
+function floor(msg){
+	r=Math.random();
+	if(r<0.01){
+		if(day<0){// c'est la nuit, on propose de redescendre.
+			if(bank_folie>5&&highest_floor>20){
+				msg.channel.send("Avec le manque de lumière en cette sombre nuit, le groupe appeuré considère la possibilité de redescendre d'un étage... Pensez-vous que c'est la solution ? [oui/non]");
+				event_floor_down=true;
+				return true;
+			}
+		} else{
+			if(bank_levels>5){
+				msg.channel.send("A force d'exploration dans cette immense tour, et à la faveur de la lumière du jour, le groupe trouve enfin de progresser. Vous engagez vous dans les escaliers sinueux qui semblent vous emmener vers le sommet ? [oui/non]");
+				event_floor_up=true;
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+function event_floor_up_res(msg){
+	if(msg.member.roles.some(r=>["Camisole"].includes(r.name))){
+		return;
+	}
+	if(msg.content.toLowerCase()=="oui"){
+		floorup(msg);
+		bank_levels-=5;
+		event_floor_up=false;
+	}
+	if(msg.content.toLowerCase()=="non"){
+		event_floor_up=false;
+	}
+	return;
+}
+
+function event_floor_down_res(msg){
+	if(msg.member.roles.some(r=>["Camisole"].includes(r.name))){
+		return;
+	}
+	if(msg.content.toLowerCase()=="oui"){
+		floordown(msg);
+		bank_levels-=5;
+		event_floor_down=false;
+	}
+	if(msg.content.toLowerCase()=="non"){
+		event_floor_down=false;
+	}
+	return;
+}
+
+//fonction principale : return true si qqch se passe, false sinon.
+function trahison(msg){
+	r=Math.random();
+	if (r<proba_event_team(msg)){
+		for(var exKey in teams){
+			if(teams[exKey][0]==msg.author.id&&teams[exKey][1]==msg_precedent.author.id||teams[exKey][1]==msg.author.id&&teams[exKey][0]==msg_precedent.author.id){
+				offer_trahison(msg,msg_precedent.author.username,exKey);
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+function offer_trahison(msg,autre,nom){
+	var offer={};
+	msg.author.createDM().then(function(channel){
+		offer={
+			"channelid":channel.id,
+			"Type":"trahison",
+			"authorid":msg.author.id
+		};
+		MP.push(offer);
+		channel.send("Votre voix intérieure vous murmure une proposition dérangeante... Voulez vous trahir votre alliance des \""+nom+"\" avec "+autre+" pour votre gain personnel ? [oui/non]");
+	}).catch(function(error) {
+		console.error(error);
+	});
+}
+
+//fonction principale : return true si qqch se passe, false sinon.
+function drop(msg){
+	var index=0;
+	var size = 0;
+	r=Math.random();
+	if(r<proba_drop(mes,"leg")){
+		leg=items["leg"];
+		for(var exKey in leg) {
+			size+=1;
+		}
+		size+=1;
+		for(var exKey in leg) {
+			droprate=Math.random();
+			if(droprate<1/size){
+				if(att_role(exKey,"8E44AD",msg)){
+					msg.channel.send("[OBJET LEGENDAIRE] "+msg.author.username+" trouve : "+ exKey+" ("+leg[exKey][desc]+")");
+					drop_count+=1;
+				}
+				return;
+			}
+			size=size-1;
+		}
+	} 
+	r=Math.random();
+	if (r<proba_drop(mes,"rar")){
+		rar=items["rar"];
+		for(var exKey in rar) {
+			size+=1;
+		}
+		size+=1;
+		for(var exKey in rar) {
+			droprate=Math.random();
+			if(droprate<1/size){
+				if(att_role(exKey,"F1C40F",msg)){
+					msg.channel.send("[OBJET RARE] "+msg.author.username+" trouve : "+ exKey+" ("+rar[exKey][desc]+")");
+					drop_count+=1;
+				}
+				return;
+			}
+			size=size-1;
+		}
+	} 
+	r=Math.random();
+	if (r<proba_drop(mes,"mag")){
+		mag=items["mag"];
+		for(var exKey in mag) {
+			size+=1;
+		}
+		size+=1;
+		for(var exKey in mag) {
+			droprate=Math.random();
+			if(droprate<1/size){
+				if(att_role(exKey,"3498DB",msg)){
+					msg.channel.send("[OBJET MAGIQUE] "+msg.author.username+" trouve : "+ exKey+" ("+mag[exKey][desc]+")");
+					drop_count+=1;
+				}
+				return;
+			}
+			size=size-1;
+		}
+	} 
+	r=Math.random();
+	if (r<proba_drop(mes,"com")){
+		com=items["com"];
+		for(var exKey in com) {
+			size+=1;
+		}
+		size+=1;
+		for(var exKey in com) {
+			droprate=Math.random();
+			if(droprate<1/size){
+				if(att_role(exKey,"BDC3C7",msg)){
+					msg.channel.send("[OBJET COMMUN] "+msg.author.username+" trouve : "+ exKey+" ("+com[exKey][desc]+")");
+					drop_count+=1;
+				}
+				return;
+			}
+			size=size-1;
+		}
+	}
+	return false;
+}
+
+function drop_unique(msg,nom){//nom de l'item unique à attribuer
+	unique=items["unique"];
+	if (unique[nom]!=undefined){
+		att_role(nom,"F39C12",msg);
+		msg.channel.send("[OBJET UNIQUE] "+msg.author.username+" trouve : "+ nom+" ("+unique[nom][desc]+")");
+	}
+	return;
+}
+
+function att_role(nom,couleur,msg){
+	if(msg.member.roles.some(r=>[nom].includes(r.name))){
+		return false;
+	}
+	myRole = msg.guild.roles.find(role => role.name === nom);
+	if(myRole==null){
+		botRole = msg.guild.roles.find(role => role.name === "Hack'n'Bash");
+		msg.guild.createRole({
+			name: nom,
+			color: couleur,
+			position: 0,
+			})
+			.then(role => msg.member.addRole(role))
+			.catch(console.error);	
+	}else{
+		msg.member.addRole(myRole);
+	}
+	return true;
+}
+
+//fonction principale : return true si qqch se passe, false sinon.
+function boss(msg){
+	size=0;
+	for(var exKey in boss) {
+		size+=1;
+	}
+	size+=1;
+	for(var exKey in boss) {
+		droprate=Math.random();
+		if(droprate<1/size){
+			boss_name=exKey;
+			break;
+		}
+		size=size-1;
+	}
+	boss_name=boss
+	boss_id=msg.author.id;
+	msg.channel.send(boss[boss_name]["Apparition"].replace("%username%",msg.author.username));
+	return true;
+}
+
+function fight_boss(msg){
+	r=Math.random();
+	proba_victoire = proba_attaque(msg)/(proba_attaque(msg)+proba_def(msg));
+	proba_défaite = proba_def(msg)/(proba_attaque(msg)+proba_def(msg));
+	race=raceplayer(msg);
+	if (r<(proba_attaque/10){
+		msg.channel.send(boss[boss_name][race]["Victoire"]["critique"].replace("%username%",msg.author.username));
+		levelup(msg);
+		drop_boss(boss[boss_name][race]["loot"],msg);
+	} else if (r<proba_attaque){
+		msg.channel.send(boss[boss_name][race]["Victoire"]["normal"].replace("%username%",msg.author.username));
+		levelup(msg);
+	} else if (r<(proba_défaite/10)){
+		msg.channel.send(boss[boss_name][race]["Défaite"]["critique"].replace("%username%",msg.author.username));
+		folieup(msg);
+		drop_boss(boss[boss_name][race]["loot"],msg);
+	} else {
+		msg.channel.send(boss[boss_name][race]["Défaite"]["normal"].replace("%username%",msg.author.username));
+		folieup(msg);
+	}
+	boss_name="";
+	boss_id=0;
+}
+
+function drop_boss(name,msg){//name of the reward, in string
+	switch (name){
+		case "lose_all_items":
+			lose_all_items(msg);
+			break;
+		default:
+			drop_unique(msg,name);
+			break;
+	}
+	return;
+}
+
+function lose_all_items(msg){
+	for (var exKey in items){
+		for (var it in items[exKey]){
+			if(msg.member.roles.some(r=>[it].includes(r.name))){
+				myRole = msg.guild.roles.find(role => role.name === it);
+				msg.member.removeRole(myRole);
+			}
+		}
+	}
+}
+
+function reset_level(msg){
+	levels[msg.author.id]=0;
+}
+
+function reset_folie(msg){
+	levels[msg.author.id]=0;
+}
 
 function day_night(msg){
 	r=math.random();
@@ -111,14 +414,25 @@ function day_night(msg){
 	}
 	
 }
+
 //fonction principale : return true si qqch se passe, false sinon.
 function attaque(msg){
 	var r=Math.random();
 	if(r<proba_attaque(msg)){
-		//alliés ?
 		for(var exKey in teams){
 			if(teams[exKey][0]==msg.author.id&&teams[exKey][1]==msg_precedent.author.id||teams[exKey][1]==msg.author.id&&teams[exKey][0]==msg_precedent.author.id){
-				msg.channel.send("L'équipe des "+exKey+" entre "+msg.author.username+" et "+msg_precedent.author.username+" se renforce sur ces sages paroles.");
+				txt="";
+				if(get_faction(msg)==get_faction(msg_precedent)){
+					if(get_faction(msg)=="lunatiques"){
+						txt="Le groupe entier plonge un peu plus dans la folie.";
+						bank_folie++;
+					}		
+					if(get_faction(msg)=="lunatiques"){
+						txt="Le groupe entier gagne en confiance et progresse plus vite !";
+						bank_levels++;
+					}						
+				}
+				msg.channel.send("L'équipe des "+exKey+" entre "+msg.author.username+" et "+msg_precedent.author.username+" se renforce sur ces sages paroles." + txt);
 				team_level_up(exKey);
 				if(msg.author.id==msg_precedent.author.id){
 					folieup(msg);
@@ -245,7 +559,7 @@ function team(msg){
 
 //fonction principale : return true si qqch se passe, false sinon.
 function event_team(msg){
-	if(msg.author.id==msg_team_a.author.id||msg.author.id==msg_team_b.author.id){
+	if(event_team&&(msg.author.id==msg_team_a.author.id||msg.author.id==msg_team_b.author.id)){
 		nom_team=msg.cleanContent.substring(0,98).replace(/[^a-zA-Z ]/g, "");
 		//test nom équipe déjà pris
 		for(var exKey in teams){
@@ -266,7 +580,7 @@ function event_team(msg){
 
 //fonction principale : return true si qqch se passe, false sinon.
 function event_prison(msg){
-	if(msg.content=="Oui"||msg.content=="oui"){
+	if(msg.content.toLowerCase()=="oui"){
 		if(prison_id!=0){
 			msg.channel.send("La sentence est tombée : " +msg_precedent.author.username+" prend la place de "+prison_name+" en prison !");
 		}else {
@@ -275,7 +589,7 @@ function event_prison(msg){
 		}
 		to_prison(msg_precedent);
 		prison=false;
-	} else if(msg.content=="Non"||msg.content=="non"){
+	} else if(msg.content.toLowerCase()=="non"){
 		msg.channel.send("Après moult délibérations, le groupe décide de ne pas mettre "+msg_precedent.author.username+" en prison.");
 		prison=false;
 	} else {
@@ -312,47 +626,48 @@ function team_level_up(nom){
 }
 
 function event_race(msg){
-	if(msg.author.id==id_race){
+	index = id_race.findIndex(msg.author.id);
+	if(index>=0){
 		switch (msg.cleanContent.toLowerCase()){
 			case humain:
 				give_race("Humain",msg);
 				event_race=false;
-				id_race=0;
+				id_race.splice(index,1);
 				break;
 			case elfe:
 				give_race("Elfe",msg);
 				event_race=false;
-				id_race=0;
+				id_race.splice(index,1);
 				break;
 			case gnome:
 				give_race("Gnome",msg);
 				event_race=false;
-				id_race=0;
+				id_race.splice(index,1);
 				break;
 			case ours:
 				give_race("Ours",msg);
 				event_race=false;
-				id_race=0;
+				id_race.splice(index,1);
 				break;
 			case cultiste:
 				give_race("Cultiste",msg);
 				event_race=false;
-				id_race=0;
+				id_race.splice(index,1);
 				break;
 			case nain:
 				give_race("Nain",msg);
 				event_race=false;
-				id_race=0;
+				id_race.splice(index,1);
 				break;
 			case rat:
 				give_race("Rat",msg);
 				event_race=false;
-				id_race=0;
+				id_race.splice(index,1);
 				break;
 			default :
 				return false;
 		}
-	return true;
+		return true;
 	} else {
 		return false;
 	}
@@ -479,7 +794,7 @@ function get_spe(msg){
 
 function join_chaos(msg){
 	msg.author.createDM().then(function(channel){
-		chaos.push(msg.author.id);
+		join_chaos(msg);
 		channel.send("Le chaos t'a désigné comme agent du désordre au sein du groupe. Ta mission est désormais de faire monter la malédiction jusqu'au niveau maximal. Sache que tu es devenu immunisé à la potion, et qu'en consommer fera perdurer la malédiction, l'empêchant de redescendre pendant un moment. Attention à l'envoyé divin qui fera tout pour te tuer.");
 	}).catch(error);
 }
@@ -492,30 +807,52 @@ function chaostotal(){
 	return total;
 }
 
+//si raté = devenir agent du chaos
 function join_dieu(msg){
 	msg.author.createDM().then(function(channel){
-		dieu.push(msg.author.id);
+		dieu_id=msg.author.id;
+		dieu_id=msg.author.username;
 		channel.send("Les dieux t'ont désigné comme agent divin. Un traitre s'est glissé dans le groupe, et ta mission est de l'empecher de nuire, et de le tuer le plus vite possible. Pour cela, tu peux utiliser ton coup divin en écrivant [utiliser coup divin] et cela frappera l'auteur du message précédent. Attention de ne pas frapper la mauvaise personne, le couroux des dieux ne sera pas tendre devant l'échec. Une dernière information : ne prête pas attention à la guilde des fous, ceux-ci ont perdu la raison et ne sont pas important dans ta quête.");
-	}).catch(error);
+	}).catch(function(error) {
+		console.error(error);
+	});
 }
 
 function offer_join_lunatics(msg){
 	var offer={};
 	msg.author.createDM().then(function(channel){
 		offer={
-			"channelid":id,
+			"channelid":channel.id,
 			"Type":"fou",
 			"authorid":msg.author.id
 		};
 		MP.push(offer);
 		channel.send("Une étrange voix intérieure commence à suggérer des idées étranges. La folie vous a atteint bien plus que vous ne le croyiez. Voulez vous y succomber et rejoindre le culte des fanatiques ? [oui/non]");
-	}).catch(error);
+	}).catch(function(error) {
+		console.error(error);
+	});
 }
 
 function join_lunatics(msg){
-	if(fous[msg.author.id]==undefined){
-		fous.push(msg.author.id);
+	for (var exKey in fous){
+		if exKey["id"]==msg.author.id{
+			return;
+		}
 	}
+	fous.push({"id":msg.author.id,
+			   "username":msg.author.username);
+	
+}
+
+function join_chaos(msg){
+	for (var exKey in chaos){
+		if exKey["id"]==msg.author.id{
+			return;
+		}
+	}
+	chaos.push({"id":msg.author.id,
+			   "username":msg.author.username);
+	
 }
 
 function lunaticstotal(){
@@ -527,17 +864,36 @@ function lunaticstotal(){
 }
 
 function join_heros(msg){
-	if(heros[msg.author.id]==undefined){
-		heros.push(msg.author.id);
+	for (var exKey in heros){
+		if exKey["id"]==msg.author.id{
+			return;
+		}
 	}
+	heros.push({"id":msg.author.id,
+			   "username":msg.author.username);
 }
 
-//TODO
 function get_faction(msg){
-	return "heros";
-	return "dieux";
-	return "chaos";
-	return "fanatique";
+	for (var exKey in heros){
+		if exKey["id"]==msg.author.id{
+			return "heros";
+		}
+	}
+	for (var exKey in fous){
+		if exKey["id"]==msg.author.id{
+			return "fanatique";
+		}
+	}
+	for (var exKey in chaos){
+		if exKey["id"]==msg.author.id{
+			return "chaos";
+		}
+	}
+	if(dieu_id==msg.author.id){
+		return "dieux";
+	}
+	return "neutre";
+
 }
 
 //fonction principale : return true/false
@@ -561,7 +917,7 @@ function check_dm(msg){
 		});
 		if(msg.cleanContent.toLowerCase()=="oui"){
 			switch (offer.Type){
-				case 'Fou':
+				case 'fou':
 					join_lunatics(msg);
 					msg.channel.send("Bienvenue chez les lunatiques ! Votre objectif est de refaire descendre le groupe le plus vite possible à l'entrée du donjon ! Clairement c'est la meilleure solution. Mélanger les éléments sera votre meilleure solution : Eau avec Feu et Air avec Terre. Conservez cette information pour vous et restez cachés !");
 					MP=MP.splice(index,1);
@@ -572,10 +928,15 @@ function check_dm(msg){
 					msg.channel.send("Qu'il en soit ainsi !");
 					MP=MP.splice(index,1);
 				break;
+				case 'trahison':
+					levels[offer.authorid]++;
+					folies[offer.authorid]++;
+					msg.channel.send("Très bien, le chaos t'offre un niveau dans le plus grand secret... Mais attention peut-être que ton partenaire prendra la même décision.");
+				break;
 			}
 		} else if(msg.cleanContent.toLowerCase()=="non"){
 			switch (offer.Type){
-				case 'Fou':
+				case 'fou':
 					join_heros(msg);
 					msg.channel.send("Bienvenue chez les heros ! Votre mission reste la même : guider le groupe d'aventuriers jusqu'au sommet de la tour. Attention, les lunatiques qui se cachent parmis vous vont tout faire pour saboter la mission.");
 					MP=MP.splice(index,1);
@@ -586,6 +947,11 @@ function check_dm(msg){
 					msg.channel.send("Qu'il en soit ainsi !");
 					MP=MP.splice(index,1);
 				break;
+				case 'trahison':
+					bank_levels++;
+					bank_folie--;
+					msg.channel.send("Sage décision ! Le groupe tout entier en est récompensé !");
+				break;
 			}
 		}
 	}
@@ -594,37 +960,130 @@ function check_dm(msg){
 	}
 }
 
+function dé(msg){
+	r=Math.random();
+	if (msg.author.id==msg_precedent.author.id){
+		if(folieplayer(msg)<30){
+			return false;
+		}
+	}
+	if(r<proba_dé(msg)){
+		typ="com";
+		r=Math.random();
+		if(r<0.2){
+			typ="unique";
+		} else if(r<0.4){
+			typ="leg";
+		} else if(r<0.6){
+			typ="rar";
+		} else if(r<0.8){
+			typ="mag";
+		}
+		for(var exKey in items[typ]) {
+			if(msg.member.roles.some(r=>[exKey].includes(r.name))){
+				r=Math.random();
+				if(r<0.5){
+					msg.channel.send(msg.author.username +" décide avec "+ msg_precedent.author.username+" de jouer un équipement : "+exKey+ ", aux dés");
+					r=Math.random();
+					r=Math.floor(r*6)+1;
+					t=Math.random();
+					t=Math.floor(t*6)+1;
+					msg.channel.send(msg.author.username +" lance un "+ r + " ...");
+					msg.channel.send(msg_precedent.author.username +" lance un "+ t + " !");
+					if(r>t){
+						msg.channel.send("Victoire ! " +msg.author.username +" gagne un niveau !");
+						levelup(msg);
+					} else if (r<t){
+						msg.channel.send("Défaite, "+msg.author.username +" perd son "+exKey+" !");
+						myRole = msg.guild.roles.find(role => role.name === exKey);
+						msg.member.removeRole(myRole);
+						msg_precedent.member.addRole(myRole);
+					} else {
+						msg.channel.send("Egalité, le jeu s'arrête sur ce résultat décevant...");
+						
+					}
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
 function add_player(msg){
 	if(!find_player(msg)){
-		players.push(msg.author.id);
-		//offrir race.
+		players.push([msg.author.id,msg.author.username]);
+		id_race.push(msg.author.id);
 	}
 }
 
 function find_player(msg){
 	var found = players.find(function(player){
-		return element==msg.author.id;
+		return player[0]==msg.author.id;
 	});
 	return found!=undefined;
 }
 
 function levelup(msg){
+	bank_folie++;
 	if(levels[msg.author.id]==undefined){
 		levels[msg.author.id]=1;
 	}else{
 		levels[msg.author.id]+=1;
 	}
 	log_levelup(msg);
-	msg.reply("level up!");
+	msg.reply("gagne un niveau !");
+	if(combo_id==msg.author.id){
+		combo_count++;
+		switch (combo_count){
+			3:
+				msg.reply("TRIPLE LEVELUP !");
+				break;
+			4:
+				msg.reply("QUAD LEVELUP !");
+				break;
+			5:
+				msg.reply("ULTRA LEVELUP !");
+				break;
+			6:
+				msg.reply("DOMINATION !");
+				folieup(msg);
+				break;
+			7:
+				msg.reply("DIVIN !");
+				folieup(msg);
+				break;
+			8:
+				msg.reply("BENI PAR LE DIEU DU CHAOS!");
+				folieup(msg);
+				bank_folie+=5;
+				break;
+			9:
+				msg.reply("SE RAPPROCHE DE LA CORRUPTION !");
+				folieup(msg);
+				bank_folie+=5;
+				break;
+			10:
+				msg.reply("DEPASSE LES LIMITES DU DIVIN ET DU CHAOS!");
+				folieup(msg);
+				bank_folie+=10;
+				bank_levels-=5;
+				leveldown(msg);
+				break;
+		}
+	}
+	combo_id=msg.author.id;
 }
 
 function leveldown(msg){
+	bank_levels--;
 	if(levels[msg.author.id]==undefined){
 		levels[msg.author.id]=0;
 	}else{
 		levels[msg.author.id]-=1;
 	}
 	log_leveldown(msg);
+	msg.reply("perd un niveau !");
 }
 
 function levelplayer(msg){
@@ -644,6 +1103,7 @@ function leveltotal(){
 }
 
 function folieup(msg){
+	bank_folie++;
 	if(folies[msg.author.id]==undefined){
 		folies[msg.author.id]=1;
 	}else{
@@ -654,12 +1114,14 @@ function folieup(msg){
 }
 
 function foliedown(msg){
+	bank_folie--;
 	if(folies[msg.author.id]==undefined){
 		folies[msg.author.id]=0;
 	}else{
 		folies[msg.author.id]-=1;
 	}
 	log_foliedown(msg);
+	msg.reply("reprend un peu ses esprits !");
 }
 
 function folieplayer(msg){
@@ -681,6 +1143,9 @@ function folietotal(){
 function floorup(msg){
 	floor++;
 	log_floorup(msg);
+	if(floor>highest_floor){
+		highest_floor=floor;
+	}
 }
 
 function floordown(msg){
@@ -746,6 +1211,7 @@ function install(msg){
 			.then(channel=>channel.send(str+"\n"+msg.cleanContent,{code:true}))
 		.catch(error);
 	}
+	//initialisation du cycle jour nuit.
 	day_night(msg);
 }
 
@@ -823,7 +1289,7 @@ function minijeu(msg){
 						} else {
 							levelup(msg); 
 						}
-						//5% drop divin
+						//5% de chances de drop item benediction divine
 					}
 					else {
 						msg.channel.send("Les cieux se déchirèrent et la voix de "+go_msg+"retenti : \"Tu oses t'agenouiller devant "+nom+" ? Puisque c'est ainsi, souffre mon couroux !");
@@ -857,7 +1323,7 @@ function minijeu(msg){
 			var offer={};
 			msg.author.createDM().then(function(channel){
 				offer={
-					"channelid":"id",
+					"channelid":channel.id,
 					"Type":"deal_devil",
 					"authorid":msg.author.id
 				};
@@ -872,12 +1338,12 @@ function initminijeu(msg){
 	piege_safe=Array();
 		//type de mini jeu
 		var r=Math.random();
-		if(r<0.01){
+		if(r<0.05){
 			later_minijeu_type="Dieu";
 			var nom = dieu[Math.floor(Math.random()*dieu.length)];
 			miniboss_nom = nom;
 			msg.channel.send("Une apparition divine de "+nom+" vous frappe tous. Vous agenouillez-vous ?");
-		}else if(r<0.02){
+		}else if(r<0.06){
 			later_minijeu_type="deal_devil";
 			n_dealdevil=3+r*3700;
 			nom = "Pacte avec le chaos";
@@ -915,7 +1381,7 @@ function initminijeu(msg){
 
 function startminijeu(msg){
 	var r = Math.random();
-	if(r<proba_minijeu(msg)){//505
+	if(r<proba_minijeu(msg)){
 		initminijeu(msg);
 		return true;
 	}
@@ -945,3 +1411,20 @@ function proba_killminiboss(msg){
 function proba_eviter_piege(msg){
 	return 0;
 }
+
+function proba_drop(msg, rarete){ //rareté = "leg", "rar", "mag", "com"
+	return 0;
+}
+
+function proba_event_team(msg){
+	return (0.005+folieplayer(msg)/1000)+folieplayer(msg_precedent)/1000)+;
+}
+
+function proba_dé(msg){
+	return folieplayer(msg)/2000)+folieplayer(msg_precedent)/2000;
+}
+bot.on("error", (e) => console.error(e));
+bot.on("warn", (e) => console.warn(e));
+bot.on("debug", (e) => console.info(e));
+  
+bot.login(auth.token);

@@ -1,7 +1,7 @@
 {
 	"com":{
-	"Gourdin":{
-		"desc":"Augmente légèrement l'attaque",
+		"Gourdin":{
+			"desc":"Augmente légèrement l'attaque",
 			"atk":1,
 			"def":3,
 			"mad":0,
@@ -12,8 +12,8 @@
 		}
 	},
 	"mag":{
-	"Gourdin":{
-		"desc":"Augmente légèrement l'attaque",
+		"Gourdin":{
+			"desc":"Augmente légèrement l'attaque",
 			"atk":1,
 			"def":3,
 			"mad":0,
@@ -24,8 +24,8 @@
 		}
 	},
 	"rar":{
-	"Gourdin":{
-		"desc":"Augmente légèrement l'attaque",
+		"Gourdin":{
+			"desc":"Augmente légèrement l'attaque",
 			"atk":1,
 			"def":3,
 			"mad":0,
@@ -36,8 +36,8 @@
 		}
 	},
 	"leg":{
-	"Gourdin":{
-		"desc":"Augmente légèrement l'attaque",
+		"Gourdin":{
+			"desc":"Augmente légèrement l'attaque",
 			"atk":1,
 			"def":3,
 			"mad":0,
@@ -48,5 +48,25 @@
 		}
 	}
 	"unique":{
+		"Bénédiction Divine":{
+		"desc":"La fortune divine les héros et les plus fous !",
+			"atk":0,
+			"def":0,
+			"mad":2,
+			"drop":0,
+			"levelup":2,
+			"leveldown":0,
+			"prison":0
+		}
+		"Tentacule de Yurgen":{
+		"desc":"Renforce la férocité du porteur, au prix de sa sanité",
+			"atk":2,
+			"def":0,
+			"mad":1,
+			"drop":0,
+			"levelup":0,
+			"leveldown":0,
+			"prison":0
+		}
 	}
 }
