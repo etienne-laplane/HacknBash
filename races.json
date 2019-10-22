@@ -7,11 +7,11 @@
 		"drop":1,
 		"levelup":0,
 		"leveldown":-3,
-		"prison":0
+		"prison":1
 		},
 	"Elfe":
 		{
-		"atk":0,
+		"atk":1,
 		"def":1,
 		"mad":-3, 
 		"drop":3,
@@ -45,7 +45,7 @@
 		"def":-1,
 		"mad":3,
 		"drop":3,
-		"levelup":0,
+		"levelup":3,
 		"leveldown":-3,
 		"prison":1
 		},

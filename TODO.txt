@@ -30,7 +30,6 @@ level ?
 team ?
 boire potion
 Camisole
-Coup divin
 
 >Commandes admin
 !ignorechan
@@ -59,6 +58,7 @@ trahison
 dés
 rejoindre faction - OK
 floor - OK
+drop camisole;
 
 >Wait réponse
 prison

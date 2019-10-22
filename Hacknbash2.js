@@ -4,7 +4,7 @@ var conf = require('./conf.json');
 const bot = new Discord.Client();
 var fs = require('fs');
 var install = false;
-var init = false;
+var start = false;
 var event_classe = false;
 var id_classe = 0;
 var event_race = false;
@@ -64,6 +64,8 @@ var event_leader=false//pour etre sur que le leader change
 var diff=5;
 var msg_count=1;
 var curse=0;
+var camisole_id=0; //le user qui peut utiliser une camisole
+var muets=[];
 
 //trahison
 //event monter/descendre
@@ -74,12 +76,26 @@ var curse=0;
 //event_spécialisation
 
 bot.on('message', msg => {
-	if(!install){
-		if(msg.content=="install"){
-			install(msg);
-			install=true;
-		}
+	if(!install&&msg.content=="install"){
+		install();
+		install=true;
+		msg.channel.send("Hack'n'Bash est un jeu d'aventure discord, basé sur la chance et les décisions. Chaque événement est basé sur de l'aléatoire et il n'y a aucun moyen de manipuler ceci par le contenu des messages. Certains événements demandent aux joueurs (membres du discord) de répondre à des questions. Ces moments sont les seuls pendant lesquels le contenu du message est analysé. Il n'existe pas de commande cachée et il n'y a aucun moyen d'arrêter l'aventure avant la victoire ou la défaite du groupe. Il existe 3 fins différentes, et il est possible de bien jouer, ou de faire n'importe quoi. Les décisions importantes personnelles (choix de classe ou de race par exemple) ne pourront être répondues que par le joueur concerné. Si vous acceptez ces règles, et que vous concevez que l'anarchie règnera, que tout le monde peut prendre les décisions pour tout le monde, tapez 'start'.");
 	}
+	if(!install) return;
+	if(!start&&msg.content=="start"){
+		start=true;
+		msg.channel.send("Votre groupe d'aventuriers se retrouve au bas d'une tour. Il est dit que toutes les réponses se trouvent en haut de la tour. Mais pour trouver les réponses que vous êtes venus chercher, il faudra traverser 100 étages. Les pieges sont peu nombreux, et les monstres quasiment inexistants... Qu'est ce qui rendait alors le périple si difficile ? Est-ce... vous même ? En tous cas, il est temps de se mettre en route !");
+		msg.guild.channels.find("name","niveau-ni-cochon").send("CHOIX DES RACES : \n"+
+																"[Humain] : Habile et robuste, il ne perd pas ce qu'il a acquis, l'humain est l'opposé de l'ours, ses nombreux talents le tireront de nombreuses situations. \n"+
+																"[Elfe] : Combatif, il ne succombe que rarement aux tentations, et saura être chanceux lors qu'il le faudra. \n"+
+																"[Gnome] : Intelligent, le gnome est la créature qui progresse le plus vite, quelque soit la situation. Il sera aussi difficile de le réduire au silence. \n"+
+																"[Ours] : C'est LE combattant par excellence. Attention, cela dit, car sa soif de sang le fait vite tomber dans une rage inarretable. \n"+
+																"[Cultiste] : Dévoué, c'est les cultistes qui ont monté cette expedition pour trouver des réponses. Il est très sensible aux appels divins, mais aussi chaotiques... \n"+
+																"[Nain] : Orfèvre délicat, le nain forge les meilleurs équipement, sait rester intègre, et ne garde pas sa langue dans sa poche. \n"+
+																"[Rat] : Furtif et rusés, les rats sont les créatures les plus solides, les plus sournoises, et la meilleure chance de succès dans la mission."
+																,{code:true});
+	}
+	if(!start) return;
 	if(day_light){
 		day_night(msg);
 		day_light=false;
@@ -193,6 +209,14 @@ function load(){
 function save(){
 }
 
+function drop_camisole(msg){
+	msg.author.createDM().then(function(channel){
+		join_chaos(msg);
+		channel.send("Dans le plus grand secret, tu réussis à fabriquer un sortilège qui empechera les plus fous de s'exprimer. Avec l'invocation [Par les esprits, ta folie nous mène à la perte !] tu maudiras le joueur qui s'est exprimé avant toi. Il ne pourra plus faire de choix pour monter ou descendre d'étage dans le donjon.");
+	}).catch(error);
+	camisole_id=msg.author.id;
+}
+
 //fonction principale
 function commande(msg){
 	//boire potion
@@ -201,6 +225,18 @@ function commande(msg){
 	//niveau ?
 	//équipe ?
 	//camisole
+	if(msg.content=="Par les esprits, ta folie nous mène à la perte !"){
+		if(camisole_id==msg.author.id){
+			muets.push(msg_precedent.author.id);
+			if(muets.length>(players.length/10+1)){
+				folieup_noreply(muets.shift());
+				msg.channel.send("Les langues ne sont pas gelées indéfiniement, l'un devient muet, mais un autre récupère la parole...");
+			}
+			folieup(msg_precedent);
+			levelup(msg);
+			return true;
+		}
+	}
 	//couroux divin
 	if(msg.content=="Couroux divin!"){
 		if(dieu_id==msg.author.id){
@@ -220,13 +256,15 @@ function commande(msg){
 				dieu_id=0;
 			}
 		}
+		return true;
 	}
+	return false;
 }
 
 function setleader(msg){
 	leader_id=msg.author.id;
 	leader_name=msg.author.username;
-	msg.channel.send("Sur ces mots, "+msg.author.username+" gagne l'admiration de tous, et devient le nouveau LEADER... Jusqu'a ce que la couronne lui soit reprise...");
+	msg.channel.send("Sur ces mots, "+msg.author.username+" gagne l'admiration de tous, et devient le nouveau LEADER... Jusqu'à ce que la couronne lui soit reprise...");
 	msg.guild.channels.find("name","niveau-ni-cochon").send("LEADER : "+msg.author.username,{code:true});
 }
 
@@ -252,7 +290,7 @@ function floor(msg){
 }
 
 function event_floor_up_res(msg){
-	if(msg.member.roles.some(r=>["Camisole"].includes(r.name))){
+	if(muets.includes(msg.author.id))){
 		return;
 	}
 	if(msg.content.toLowerCase()=="oui"){
@@ -267,7 +305,7 @@ function event_floor_up_res(msg){
 }
 
 function event_floor_down_res(msg){
-	if(msg.member.roles.some(r=>["Camisole"].includes(r.name))){
+	if(muets.includes(msg.author.id))){
 		return;
 	}
 	if(msg.content.toLowerCase()=="oui"){
@@ -1395,6 +1433,7 @@ function install(msg){
 	}
 	//initialisation du cycle jour nuit.
 	day_night(msg);
+	day_light=false;
 }
 
 function minijeu(msg){
