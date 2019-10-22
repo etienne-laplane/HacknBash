@@ -1,0 +1,69 @@
+
+
+affixe spéciale (légendaire/dieu/chaos) pour les mini boss ?
+message à la disparition du mini boss ?
+
+>drop de camisole : uniquement pour les héros.
+si camisole utilisée, plus de choix floor up/down
+proba de s'en défaire.
+
+- calculs de probas
+	- folie up bonus si nuit
+	- levelup bonus si jour
+	
+	Calcul proba drop folie
+	% LEVELUP = 3%+BONUS (moyenne 4%)
+	% FOLIEUP = 0% + X(1+Y)
+	X = folie (spé)
+	folie (spé) X=#1*#2*#3*#4+#1*#2+#3*#4
+	1/2(X+folie (X-Y)) > max 8%
+
+
+
+
+
+
+
+>Commandes
+leader ?
+level ?
+team ?
+boire potion
+Camisole
+Coup divin
+
+>Commandes admin
+!ignorechan
+
+
+
+
+>effet immédiat au drop d'item ?
+
+
+
+Stats
+
+
+CHECKLIST
+>Events 
+levelup
+folieup
+attaque
+team
+boss
+miniboss
+spé
+race (automatique)
+trahison
+dés
+rejoindre faction - OK
+floor - OK
+
+>Wait réponse
+prison
+spé (non bloquant)
+race (non bloquant)(auto)
+fight boss (non bloquant)
+nom team (non bloquant)
+floor

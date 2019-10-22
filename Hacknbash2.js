@@ -46,7 +46,8 @@ var boss_name="";
 var chaos=[]; //agents du chaos
 var heros=[]; //heros
 var fous=[]; //lunatiques
-var dieu_id; //envoyé divin
+var dieu_id=0; //envoyé divin
+var dechu=[];//pour les id des envoyés déchus
 var dieu_username; //envoyé divin
 var MP=[]; //channelID/authorID
 var chaos_decided=false; //devient vrai quand l'event chaos/divin est arrivé. Permet de ne pas double drop.
@@ -56,6 +57,13 @@ var highest_floor=0;
 var event_floor_up=false;
 var event_floor_down=false;
 var event_team=false;
+var coef=1;
+var leader_id=0;
+var leader_name="tous";
+var event_leader=false//pour etre sur que le leader change
+var diff=5;
+var msg_count=1;
+var curse=0;
 
 //trahison
 //event monter/descendre
@@ -78,8 +86,29 @@ bot.on('message', msg => {
 	}
 	if(msg.author.id=="625988662454386698") return;//le bot ne joue pas.
 	if(msg_precedent==null) msg_precedent=msg;//just in case.
+	msg_count++;
 	add_player(msg);
-	if(msg.author.id==prison_id){
+	//quand un meme joueur spam, le coef diminue jusqu'a atteindre 0.
+	//toutes les probas sont x coef.
+	if(msg.author.id==msg_precedent.author.id||msg.author.bot||msg_precedent.author.bot){
+		coef-=0.01;
+	} else {
+		coef=1;
+	}
+	if(dm(msg)){
+		return;
+	}
+	if(msg_count%500==0){
+		curse++;
+		if (curse == 10){
+			msg.channel.send("GAME OVER : Le groupe tourne en rond depuis des jours et des jours, le chaos reignant dans la tour a enfin eu raison de tous. Seul l'envoyé du chaos s'en sort, corrompu jusqu'au bout de son âme !");
+			msg.guild.channels.find("name","niveau-ni-cochon").send("GAME OVER : WINNER : "+winnerchaos(),{code:true});
+			gameover();
+			return;
+		}
+		msg.channel.send("La malédiction se renforce... Il est peut-être temps d'utiliser une potion ? ["+chiffre_rom(curse)+"]");
+	}
+	if(msg.author.id==prison_id&&!msg_precedent.author.bot){
 		var r=Math.random();
 		if(r<proba_sortie_prison(msg)){
 			if(prison_msg!=null&&prison_msg!=0){
@@ -93,10 +122,15 @@ bot.on('message', msg => {
 		}
 		return;
 	}
-	if(dm(msg)){
+	if(msg.member==null) return;//les gens offline ne jouent pas.
+	if(commande(msg)){
 		return;
 	}
-	if(msg.member==null) return;//les gens offline ne jouent pas.
+	if(event_leader){
+		if(msg.author.id!=leader_id){
+			setleader(msg);
+		}
+	}
 	if(event_floor_up){
 		event_floor_up_res(msg);
 		return;
@@ -105,16 +139,50 @@ bot.on('message', msg => {
 		event_floor_down_res(msg);
 		return;
 	}
-	if(event_team(msg){
+	if(event_team(msg)){
+		return;
 	}
-	if (event_specialization(msg){
+	if (event_specialization(msg)){
+		return;
 	}
+	r=Math.random();
+	if(r<proba_spe(msg)){
+		id_classe=msg.author.id;
+		msg.reply("Dans un éclair de lucidité, "+msg.author.username+" voit un bref instant la nature véritable du donjon. De cet enseignement il monte en compétence et choisi une affinité élémentaire ! [eau/feu/air/terre]");
+		msg_precedent=msg;
+		return;
+	}	
 	if(boss_id==msg.author.id){
 		fight_boss(msg);
+		msg_precedent=msg;
+		return;
 	}
 	if(minijeu_status){
 		minijeu(msg);
+		msg_precedent=msg;
+		return;
 	}
+	
+	//EN DERNIER : REJOINDRE UNE FACTION
+	//LUNATICS-HEROS
+	if(highest_floor>19){
+		if(players.length>fous.length/(2.4)){
+			if(get_faction(msg)=="neutre"){
+				offer_join_lunatics(msg);
+			}
+		}
+	}
+	//DIEU-CHAOS
+
+	if(msg_precedent.author.id!=msg.author.id&&highest_floor>49){
+		if(dieu_id==0){
+			if((get_faction(msg)=="neutre")&&(get_faction(msg_precedent)=="neutre")&&!dechu.includes(msg_precedent.author.id)){
+				offer_join_chaos(msg);
+				join_dieu(msg_precedent);
+			}
+		}
+	}
+	
 	msg_precedent=msg;
 	
 });
@@ -126,17 +194,54 @@ function save(){
 }
 
 //fonction principale
+function commande(msg){
+	//boire potion
+	//leader ?
+	//prison ?
+	//niveau ?
+	//équipe ?
+	//camisole
+	//couroux divin
+	if(msg.content=="Couroux divin!"){
+		if(dieu_id==msg.author.id){
+			//SUCCES
+			if(get_faction(msg_precedent)=="chaos"){
+				msg.channel.send("Un éclair jailli du sol, et frappe "+msg_precedent.author.username+" ! Une voix qui n'est pas la sienne jailli de sa bouche, et des convulsions l'agitent dans tous les sens. Au bout d'un long moment son corps retombe. Le démon l'avait quitté. Le chaos s'était infiltré parmis vous, mais grâce à "+msg.author.username+" tout le monde est sauf. La route doit reprendre jusqu'au sommet de la tour !");
+				reset_level(msg_precedent);
+				reset_folie(msg_precedent);
+				levelup(msg);
+				reset_folie(msg);
+				bank_folie-=3*diff;
+				bank_levels+=3*diff;
+			} else {
+				msg.channel.send(msg.author.username+" lève le bras et implore que le couroux divin tombe sur "+msg_precedent.author.username+" mais rien ne se passe... L'erreur est fatale : au rang d'envoyé divin, "+msg.author.username +" est maintenant dans la triste caste des déchus. Tous ses levels perdus, et l'errance spirituelle éternelle. Mais l'envie de grimper jusqu'en haut de la tour pour en finir est quelque part présente...");
+				dechu.push(msg.author.id);
+				reset_level(msg);
+				dieu_id=0;
+			}
+		}
+	}
+}
+
+function setleader(msg){
+	leader_id=msg.author.id;
+	leader_name=msg.author.username;
+	msg.channel.send("Sur ces mots, "+msg.author.username+" gagne l'admiration de tous, et devient le nouveau LEADER... Jusqu'a ce que la couronne lui soit reprise...");
+	msg.guild.channels.find("name","niveau-ni-cochon").send("LEADER : "+msg.author.username,{code:true});
+}
+
+//fonction principale
 function floor(msg){
 	r=Math.random();
 	if(r<0.01){
 		if(day<0){// c'est la nuit, on propose de redescendre.
-			if(bank_folie>5&&highest_floor>20){
+			if(bank_folie>diff&&highest_floor>20){
 				msg.channel.send("Avec le manque de lumière en cette sombre nuit, le groupe appeuré considère la possibilité de redescendre d'un étage... Pensez-vous que c'est la solution ? [oui/non]");
 				event_floor_down=true;
 				return true;
 			}
 		} else{
-			if(bank_levels>5){
+			if(bank_levels>diff){
 				msg.channel.send("A force d'exploration dans cette immense tour, et à la faveur de la lumière du jour, le groupe trouve enfin de progresser. Vous engagez vous dans les escaliers sinueux qui semblent vous emmener vers le sommet ? [oui/non]");
 				event_floor_up=true;
 				return true;
@@ -152,7 +257,7 @@ function event_floor_up_res(msg){
 	}
 	if(msg.content.toLowerCase()=="oui"){
 		floorup(msg);
-		bank_levels-=5;
+		bank_levels-=diff;
 		event_floor_up=false;
 	}
 	if(msg.content.toLowerCase()=="non"){
@@ -167,7 +272,7 @@ function event_floor_down_res(msg){
 	}
 	if(msg.content.toLowerCase()=="oui"){
 		floordown(msg);
-		bank_levels-=5;
+		bank_levels-=diff;
 		event_floor_down=false;
 	}
 	if(msg.content.toLowerCase()=="non"){
@@ -343,7 +448,7 @@ function fight_boss(msg){
 	proba_victoire = proba_attaque(msg)/(proba_attaque(msg)+proba_def(msg));
 	proba_défaite = proba_def(msg)/(proba_attaque(msg)+proba_def(msg));
 	race=raceplayer(msg);
-	if (r<(proba_attaque/10){
+	if (r<(proba_attaque/10)){
 		msg.channel.send(boss[boss_name][race]["Victoire"]["critique"].replace("%username%",msg.author.username));
 		levelup(msg);
 		drop_boss(boss[boss_name][race]["loot"],msg);
@@ -360,6 +465,7 @@ function fight_boss(msg){
 	}
 	boss_name="";
 	boss_id=0;
+	
 }
 
 function drop_boss(name,msg){//name of the reward, in string
@@ -426,9 +532,13 @@ function attaque(msg){
 					if(get_faction(msg)=="lunatiques"){
 						txt="Le groupe entier plonge un peu plus dans la folie.";
 						bank_folie++;
+						folieup_noreply(msg.author.id);
+						folieup_noreply(msg_precedent.author.id);
 					}		
-					if(get_faction(msg)=="lunatiques"){
+					if(get_faction(msg)=="heros"){
 						txt="Le groupe entier gagne en confiance et progresse plus vite !";
+						levelup_noreply(msg.author.id);
+						levelup_noreply(msg_precedent.author.id);
 						bank_levels++;
 					}						
 				}
@@ -792,7 +902,7 @@ function get_spe(msg){
 	return "";
 }
 
-function join_chaos(msg){
+function offer_join_chaos(msg){
 	msg.author.createDM().then(function(channel){
 		join_chaos(msg);
 		channel.send("Le chaos t'a désigné comme agent du désordre au sein du groupe. Ta mission est désormais de faire monter la malédiction jusqu'au niveau maximal. Sache que tu es devenu immunisé à la potion, et qu'en consommer fera perdurer la malédiction, l'empêchant de redescendre pendant un moment. Attention à l'envoyé divin qui fera tout pour te tuer.");
@@ -812,7 +922,7 @@ function join_dieu(msg){
 	msg.author.createDM().then(function(channel){
 		dieu_id=msg.author.id;
 		dieu_id=msg.author.username;
-		channel.send("Les dieux t'ont désigné comme agent divin. Un traitre s'est glissé dans le groupe, et ta mission est de l'empecher de nuire, et de le tuer le plus vite possible. Pour cela, tu peux utiliser ton coup divin en écrivant [utiliser coup divin] et cela frappera l'auteur du message précédent. Attention de ne pas frapper la mauvaise personne, le couroux des dieux ne sera pas tendre devant l'échec. Une dernière information : ne prête pas attention à la guilde des fous, ceux-ci ont perdu la raison et ne sont pas important dans ta quête.");
+		channel.send("Les dieux t'ont désigné comme agent divin. Un traitre s'est glissé dans le groupe, et ta mission est de l'empecher de nuire, et de le tuer le plus vite possible. Pour cela, tu peux utiliser ton pouvoir divin en écrivant [Couroux divin!] et cela frappera l'auteur du message précédent. Attention de ne pas frapper la mauvaise personne, le couroux des dieux ne sera pas tendre devant l'échec. Une dernière information : ne prête pas attention à la guilde des fous, ceux-ci ont perdu la raison et ne sont pas important dans ta quête.");
 	}).catch(function(error) {
 		console.error(error);
 	});
@@ -835,24 +945,52 @@ function offer_join_lunatics(msg){
 
 function join_lunatics(msg){
 	for (var exKey in fous){
-		if exKey["id"]==msg.author.id{
+		if fous[exKey]["id"]==msg.author.id{
 			return;
 		}
 	}
 	fous.push({"id":msg.author.id,
-			   "username":msg.author.username);
+			"username":msg.author.username});
 	
 }
 
 function join_chaos(msg){
 	for (var exKey in chaos){
-		if exKey["id"]==msg.author.id{
+		if chaos[exKey]["id"]==msg.author.id{
 			return;
 		}
 	}
 	chaos.push({"id":msg.author.id,
-			   "username":msg.author.username);
+		"username":msg.author.username});
 	
+}
+
+function winnerchaos(){
+	toReturn="";
+	chaos.forEach(function(element){
+		toReturn=toReturn+element.username+" ";
+	});
+	return toReturn;
+}
+
+function winlunatics(){
+	result="";
+	fous.forEach(function(element){
+		result=result+element.username+"\n";
+	});
+	msg.channel.send("GAME OVER : Le groupe a sombré dans la folie et a totalement oublié quelle était sa quête... Pendant que les héros essayaient vaillamment de monter d'autres fondaient un culte, et ils réussirent finalement à prendre le pouvoir !");
+	msg.guild.channels.find("name","niveau-ni-cochon").send("GAME OVER : SECTE DES LUNATIQUES :\n"+result,{code:true});
+	gameover();
+}
+
+function winheros(){
+	result="";
+	heros.forEach(function(element){
+		result=result+element.username+"\n";
+	});
+	msg.channel.send("GAME OVER : Le groupe a sombré dans la folie et a totalement oublié quelle était sa quête... Pendant que les héros essayaient vaillamment de monter d'autres fondaient un culte, et ils réussirent finalement à prendre le pouvoir !");
+	msg.guild.channels.find("name","niveau-ni-cochon").send("GAME OVER : Tous ceux qui n'étaient pas dans la secte des fous ou des envoyés du chaos gagnent ! Mention honorable :\n",{code:true});
+	gameover();
 }
 
 function lunaticstotal(){
@@ -865,32 +1003,38 @@ function lunaticstotal(){
 
 function join_heros(msg){
 	for (var exKey in heros){
-		if exKey["id"]==msg.author.id{
+		if heros[exKey]["id"]==msg.author.id{
 			return;
 		}
 	}
 	heros.push({"id":msg.author.id,
-			   "username":msg.author.username);
+		"username":msg.author.username});
 }
 
+//heros, fanatique, chaos, dieu, neutre
 function get_faction(msg){
 	for (var exKey in heros){
-		if exKey["id"]==msg.author.id{
+		if heros[exKey]["id"]==msg.author.id{
 			return "heros";
 		}
 	}
 	for (var exKey in fous){
-		if exKey["id"]==msg.author.id{
+		if fous[exKey]["id"]==msg.author.id{
 			return "fanatique";
 		}
 	}
 	for (var exKey in chaos){
-		if exKey["id"]==msg.author.id{
+	if chaos[exKey]["id"]==msg.author.id{
 			return "chaos";
 		}
 	}
 	if(dieu_id==msg.author.id){
-		return "dieux";
+		return "dieu";
+	}
+	for (var exKey in dechu){
+	if dechu[exKey]==msg.author.id{
+			return "déchu";
+		}
 	}
 	return "neutre";
 
@@ -919,7 +1063,7 @@ function check_dm(msg){
 			switch (offer.Type){
 				case 'fou':
 					join_lunatics(msg);
-					msg.channel.send("Bienvenue chez les lunatiques ! Votre objectif est de refaire descendre le groupe le plus vite possible à l'entrée du donjon ! Clairement c'est la meilleure solution. Mélanger les éléments sera votre meilleure solution : Eau avec Feu et Air avec Terre. Conservez cette information pour vous et restez cachés !");
+					msg.channel.send("Bienvenue chez les lunatiques ! Votre objectif est de refaire descendre le groupe le plus vite possible à l'entrée du donjon ! Clairement c'est la meilleure solution. Mélanger les éléments sera votre meilleure solution : Eau avec Feu et Air avec Terre. Conservez cette information pour vous et restez cachés ! Seuls les lunatiques comme toi ont accès à ce discord : https://discord.gg/86MfDSF");
 					MP=MP.splice(index,1);
 				break;
 				case 'deal_devil':
@@ -938,7 +1082,7 @@ function check_dm(msg){
 			switch (offer.Type){
 				case 'fou':
 					join_heros(msg);
-					msg.channel.send("Bienvenue chez les heros ! Votre mission reste la même : guider le groupe d'aventuriers jusqu'au sommet de la tour. Attention, les lunatiques qui se cachent parmis vous vont tout faire pour saboter la mission.");
+					msg.channel.send("Bienvenue chez les heros ! Votre mission reste la même : guider le groupe d'aventuriers jusqu'au sommet de la tour. Attention, les lunatiques qui se cachent parmis vous vont tout faire pour saboter la mission. Vous gagnez un important bonus de levelup, drop ainsi que la possibilité de récupérer des camisoles de force pour empêcher les fous de prendre des décisions !");
 					MP=MP.splice(index,1);
 				break;
 				case 'deal_devil':
@@ -1025,7 +1169,7 @@ function find_player(msg){
 }
 
 function levelup(msg){
-	bank_folie++;
+	bank_levels++;
 	if(levels[msg.author.id]==undefined){
 		levels[msg.author.id]=1;
 	}else{
@@ -1071,8 +1215,25 @@ function levelup(msg){
 				leveldown(msg);
 				break;
 		}
+	} else {
+		combo_count=0;
 	}
 	combo_id=msg.author.id;
+}
+
+function levelup_noreply(id){
+	bank_levels++;
+	if(levels[id]==undefined){
+		levels[id]=1;
+	}else{
+		levels[id]+=1;
+	}
+	if(combo_id==id){
+		combo_count++;
+	} else {
+		combo_count=0;
+	}
+	combo_id=id;
 }
 
 function leveldown(msg){
@@ -1113,6 +1274,15 @@ function folieup(msg){
 	msg.reply("sombre un peu plus dans la folie");
 }
 
+function folieup_noreply(id){
+	bank_folie++;
+	if(folies[id]==undefined){
+		folies[id]=1;
+	}else{
+		folies[id]+=1;
+	}
+}
+
 function foliedown(msg){
 	bank_folie--;
 	if(folies[msg.author.id]==undefined){
@@ -1146,11 +1316,23 @@ function floorup(msg){
 	if(floor>highest_floor){
 		highest_floor=floor;
 	}
+	if(leader_id!=0){
+		levelup_noreply(leader_id);
+	}
+	event_leader=true;
 }
 
 function floordown(msg){
 	floor--;
+	if(floor==0){
+		winlunatics();
+	}else{
 	log_floordown(msg);
+	if(leader_id!=0){
+		folieup_noreply(leader_id);
+	}
+	event_leader=true;
+	}
 }
 
 function log_levelup(msg){
@@ -1192,13 +1374,13 @@ function log_foliedown(msg){
 function log_floorup(msg){
 	msg.guild.channels.find(function(channel){
 		return channel.name=="niveau-ni-cochon";
-	}).send("Le groupe parvient enfin à grimper un étage : "+floor,{code:true});
+	}).send("Le groupe parvient enfin à grimper un étage : "+floor+"\nGrace à l'incroyable leadership de "+leader_name + "! Sa sagesse est récompensée par un niveau durement acquis !",{code:true});
 }
 
 function log_floordown(msg){
 	msg.guild.channels.find(function(channel){
 		return channel.name=="niveau-ni-cochon";
-	}).send("Perdu, le groupe décide qu'il est plus sage de revenir en arrière : "+floor,{code:true});
+	}).send("Perdu, le groupe décide qu'il est plus sage de revenir en arrière : "+floor+"\nLe leadership douteux de "+leader_name+" est remis en question par le reste du groupe, leurs reproches le font tomber un peu plus dans la folie...",{code:true});
 }
 
 function install(msg){
@@ -1321,6 +1503,7 @@ function minijeu(msg){
 		n_dealdevil-=1;
 		if(n_dealdevil==0){
 			var offer={};
+			msg.reply("sans un son, l'envoyé du chaos disparait...");
 			msg.author.createDM().then(function(channel){
 				offer={
 					"channelid":channel.id,
@@ -1417,12 +1600,66 @@ function proba_drop(msg, rarete){ //rareté = "leg", "rar", "mag", "com"
 }
 
 function proba_event_team(msg){
-	return (0.005+folieplayer(msg)/1000)+folieplayer(msg_precedent)/1000)+;
+	return (0.005+folieplayer(msg)/1000)+(folieplayer(msg_precedent)/1000)+;
 }
 
 function proba_dé(msg){
-	return folieplayer(msg)/2000)+folieplayer(msg_precedent)/2000;
+	return (folieplayer(msg)/2000)+(folieplayer(msg_precedent)/2000);
 }
+
+function proba_spe(msg){
+	return 0;
+}
+
+function chiffre_rom(curs){
+	switch(curs){
+		case 1 : 
+			return "I";
+		case 2 : 
+			return "II";
+		case 3 : 
+			return "III";
+		case 4 : 
+			return "IV";
+		case 5 : 
+			return "V";
+		case 6 : 
+			return "VI";
+		case 7 : 
+			return "VII";
+		case 8 : 
+			return "VIII";
+		case 9 : 
+			return "IX";
+		case 10 :
+			return "X";
+		case 11 : 
+			return "XI";
+		case 12 : 
+			return "XII";
+		case 13 : 
+			return "XIII";
+		case 14 : 
+			return "XIV";
+		case 15 : 
+			return "XV";
+		case 16 : 
+			return "XVI";
+		case 17 : 
+			return "XVII";
+		case 18 : 
+			return "XVIII";
+		case 19 : 
+			return "XIX";
+		case 20 :
+			return "XX";
+	}
+}
+
+//TODO
+function gameover(){
+}
+
 bot.on("error", (e) => console.error(e));
 bot.on("warn", (e) => console.warn(e));
 bot.on("debug", (e) => console.info(e));
