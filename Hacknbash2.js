@@ -147,6 +147,10 @@ bot.on('message', msg => {
 			setleader(msg);
 		}
 	}
+	if(prison){
+		event_prison(msg);
+		return;
+	}
 	if(event_floor_up){
 		event_floor_up_res(msg);
 		return;
@@ -159,6 +163,7 @@ bot.on('message', msg => {
 		return;
 	}
 	if (event_specialization(msg)){
+		msg_precedent=msg;
 		return;
 	}
 	r=Math.random();
@@ -178,7 +183,22 @@ bot.on('message', msg => {
 		msg_precedent=msg;
 		return;
 	}
-	
+	if(floor(msg)){
+		msg_precedent=msg;
+		return;
+	}
+	if(dé(msg)){
+		msg_precedent=msg;
+		return;
+	}
+	if(trahison(msg)){
+		msg_precedent=msg;
+		return;
+	}
+	if(startminijeu(msg)){
+		msg_precedent=msg;
+		return;
+	}
 	//EN DERNIER : REJOINDRE UNE FACTION
 	//LUNATICS-HEROS
 	if(highest_floor>19){
