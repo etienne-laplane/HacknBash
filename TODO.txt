@@ -1,11 +1,13 @@
+les bots sont humain, spé random. OK
+les bots ne peuvent pas rejoindre de faction. OK
 
 
 affixe spéciale (légendaire/dieu/chaos) pour les mini boss ?
 message à la disparition du mini boss ?
 
->drop de camisole : uniquement pour les héros.
+>drop de camisole : uniquement pour les héros. OK
 
-- calculs de probas
+- calculs de probas ----------------------------------------------------------------------------
 	- folie up bonus si nuit
 	- levelup bonus si jour
 	
@@ -23,11 +25,12 @@ message à la disparition du mini boss ?
 
 
 >Commandes
-leader ?
-level ?
-team ?
-boire potion
-
+leader OK
+level OK
+team OK
+boire potion OK
+ECRIRE DES ITEMS --------------------------------------------------------------------------------
+ECRIRE DES BOSS ---------------------------------------------------------------------------------
 >Commandes admin
 !ignorechan
 
@@ -35,16 +38,17 @@ boire potion
 
 
 
-Stats
+Stats -------------------------------------------------------------------------------------------
+gameover ----------------------------------------------------------------------------------------
 
 
 CHECKLIST
 >Events 
-levelup
-folieup
-attaque
-team
-boss
+levelup OK
+folieup OK
+attaque OK
+team OK
+boss - OK
 miniboss - OK
 spé - OK
 race (automatique)
@@ -52,12 +56,4 @@ trahison - OK
 dés - OK
 rejoindre faction - OK
 floor - OK
-drop camisole;
-
->Wait réponse
-prison - OK
-spé (non bloquant)
-race (non bloquant)(auto)
-fight boss (non bloquant)
-nom team (non bloquant)
-floor - OK
+drop camisole OK;

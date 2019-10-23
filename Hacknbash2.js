@@ -66,6 +66,7 @@ var msg_count=1;
 var curse=0;
 var camisole_id=0; //le user qui peut utiliser une camisole
 var muets=[];
+var nopotion=500;
 
 //trahison
 //event monter/descendre
@@ -103,6 +104,7 @@ bot.on('message', msg => {
 	if(msg.author.id=="625988662454386698") return;//le bot ne joue pas.
 	if(msg_precedent==null) msg_precedent=msg;//just in case.
 	msg_count++;
+	nopotion--;
 	add_player(msg);
 	//quand un meme joueur spam, le coef diminue jusqu'a atteindre 0.
 	//toutes les probas sont x coef.
@@ -195,13 +197,50 @@ bot.on('message', msg => {
 		msg_precedent=msg;
 		return;
 	}
+	r=Math.random();
+	if(r<proba_boss(msg)){
+		boss(msg);
+		msg_precedent=msg;
+		return;
+	}
 	if(startminijeu(msg)){
 		msg_precedent=msg;
 		return;
 	}
+	if(team(msg)){
+		msg_precedent=msg;
+		return;
+	}
+	r=Math.random();
+	if(r<proba_levelup(msg)){
+		levelup(msg);
+		msg_precedent=msg;
+		return;
+	}
+	r=Math.random();
+	if(r<proba_folieup(msg)){
+		folieup(msg);
+		msg_precedent=msg;
+		return;
+	}
+	if(attaque(msg)){
+		msg_precedent=msg;
+		return;
+	}
+	//EN AVANT DERNIER, LE DROP D'UNE CAMISOLE
+	if((highest_floor-floor)>10){
+		if(get_faction(msg)=="heros"){
+			if(camisole_id==0){
+				r=Math.random();
+				if(r<(5*proba_drop(msg))){
+					drop_camisole(msg);
+				}
+			}
+		}
+	}	
 	//EN DERNIER : REJOINDRE UNE FACTION
 	//LUNATICS-HEROS
-	if(highest_floor>19){
+	if(highest_floor>19&&!msg.author.bot){
 		if(players.length>fous.length/(2.4)){
 			if(get_faction(msg)=="neutre"){
 				offer_join_lunatics(msg);
@@ -210,7 +249,7 @@ bot.on('message', msg => {
 	}
 	//DIEU-CHAOS
 
-	if(msg_precedent.author.id!=msg.author.id&&highest_floor>49){
+	if(msg_precedent.author.id!=msg.author.id&&highest_floor>49&&!msg.author.bot&&!msg_precedent.author.bot){
 		if(dieu_id==0){
 			if((get_faction(msg)=="neutre")&&(get_faction(msg_precedent)=="neutre")&&!dechu.includes(msg_precedent.author.id)){
 				offer_join_chaos(msg);
@@ -240,10 +279,65 @@ function drop_camisole(msg){
 //fonction principale
 function commande(msg){
 	//boire potion
-	//leader ?
-	//prison ?
-	//niveau ?
-	//équipe ?
+	if(msg.content.includes("boire")&&msg.content.includes("potion")){
+		if(nopotion<0){
+			if(get_faction(msg)=="chaos"){
+				msg.channel.send(msg.author.username + " boit une gorgée de potion, mais celle ci n'a aucun effet.");
+				nopotion=333;
+				return true;
+			}else {
+				r=Math.random();
+				if(r<0.25){
+					msg.channel.send(msg.author.username + " boit une gorgée de potion, mais celle ci n'a aucun effet.");
+					return true;
+				} else if(r<0.75){
+					msg.channel.send(msg.author.username + " boit une gorgée de potion, et au prix de sa santé mentale et d'un peu d'experience, la malédiction se dissipe un peu.");
+					curse--;
+					folieup(msg);
+					leveldown(msg);
+					return true;
+				} else if(r<0.99){
+					msg.channel.send(msg.author.username + " boit une gorgée de potion, concentre une importante energie autour de lui, et dissipe la malédiction.");
+					curse--;
+					levelup(msg);
+					return true;
+				} else{
+					msg.channel.send(msg.author.username + " conjure la puissance cachée du clan des "+raceplayer(msg)+" et lève toute la malédiction qui freinait le groupe dans sa progression.");
+					levelup(msg);
+					folieup(msg);
+					bank_levels++;
+					return true;
+				}
+			}
+		}
+		msg.channel.send("La source de la malédiction est pour l'instant intraçable. Même en augmentant leurs capacités magiques, le groupe ne parvient pas à la contenir.");
+	}
+	//leader
+	if(msg.cleanContent.toLowerCase().includes("leader") && msg.content.includes("?")){
+		msg.channel.send("N'oubliez pas que "+leader_name+" est votre guide pour cet étage ("+floor+"). Sa mission est de vous mener jusqu'à l'étage suivant. En échange, vous lui devez admiration et respect.");
+		return true;
+	}
+	//prison
+	if(msg.cleanContent.toLowerCase().includes("prison") && msg.content.includes("?")){
+		if(prison_id!="0"){
+			msg.channel.send(prison_msg.author.username +" tourne en rond dans la petite cellule. Il maugrée en boucle ces paroles qui lui méritèrent le cachot : "+prison_msg.cleanContent);
+		}
+		return true;
+	}
+	//niveau
+	if(msg.cleanContent.toLowerCase().includes("niveau") && msg.content.includes("?")){
+		msg.channel.send(msg.author.username "- Niveau : " +levelplayer(msg)+" - Folie : " +folieplayer(msg));
+		return true;
+	}
+	//équipe
+	if(msg.content.includes("équipe ?")){
+		for(var exKey in teams){
+			if(msg.member.roles.some(r=>[exKey].includes(r.name))){
+				msg.channel.send(teams[exKey][0]+" et "+teams[exKey][1]+" forment l'équipe "+exKey+"(niveau :"+teams[exKey][2]+") et ne peuvent pas s'attaquer l'un l'autre.");
+			}
+		}
+		return true;
+	}
 	//camisole
 	if(msg.content=="Par les esprits, ta folie nous mène à la perte !"){
 		if(camisole_id==msg.author.id){
@@ -254,6 +348,7 @@ function commande(msg){
 			}
 			folieup(msg_precedent);
 			levelup(msg);
+			camisole_id=0;
 			return true;
 		}
 	}
@@ -696,7 +791,7 @@ function team(msg){
 		//if tres fou, team tout seul.
 		if ((folieplayer(msg)>30)&&(r<proba_team(msg))){
 			for(var exKey in teams){
-				if(msg.member.roles.some(r=>[exKey].includes(r.name))||msg_precedent.member.roles.somes(r=>[exKey].includes(r.name))){
+				if(msg.member.roles.some(r=>[exKey].includes(r.name))){
 					return false;
 				}
 			}
@@ -795,39 +890,43 @@ function team_level_up(nom){
 
 function event_race(msg){
 	index = id_race.findIndex(msg.author.id);
+	var msg_clean=msg.cleanContent.toLowerCase();
+	if(msg.author.bot){
+		msg_clean="humain";
+	}
 	if(index>=0){
-		switch (msg.cleanContent.toLowerCase()){
-			case humain:
+		switch (msg_clean){
+			case "humain":
 				give_race("Humain",msg);
 				event_race=false;
 				id_race.splice(index,1);
 				break;
-			case elfe:
+			case "elfe":
 				give_race("Elfe",msg);
 				event_race=false;
 				id_race.splice(index,1);
 				break;
-			case gnome:
+			case "gnome":
 				give_race("Gnome",msg);
 				event_race=false;
 				id_race.splice(index,1);
 				break;
-			case ours:
+			case "ours":
 				give_race("Ours",msg);
 				event_race=false;
 				id_race.splice(index,1);
 				break;
-			case cultiste:
+			case "cultiste":
 				give_race("Cultiste",msg);
 				event_race=false;
 				id_race.splice(index,1);
 				break;
-			case nain:
+			case "nain":
 				give_race("Nain",msg);
 				event_race=false;
 				id_race.splice(index,1);
 				break;
-			case rat:
+			case "rat":
 				give_race("Rat",msg);
 				event_race=false;
 				id_race.splice(index,1);
@@ -851,9 +950,22 @@ function raceplayer(msg){
 
 //fonction principale : return true si qqch se passe, false sinon.
 function event_specialization(msg){
+	var msg_clean=msg.cleanContent.toLowerCase();
 	if(msg.author.id==id_classe){
-		switch (msg.cleanContent.toLowerCase()){
-			case feu:
+		if(msg.author.bot){
+			r=Math.random;
+			if(r<0.25){
+				msg_clean="feu";
+			}else if(r<0.50){
+				msg_clean="eau";
+			}else if(r<0.75){
+				msg_clean="air";
+			}else {
+				msg_clean="terre";
+			}
+		}
+		switch (msg_clean)){
+			case "feu":
 				spe=get_spe(msg);
 				spe=add_spe(1,spe);
 				give_spe(spe,msg);
@@ -861,7 +973,7 @@ function event_specialization(msg){
 				if_classe=0;
 				return true;
 				break;
-			case eau:
+			case "eau":
 				spe=get_spe(msg);
 				spe=add_spe(2,spe);
 				give_spe(spe,msg);
@@ -869,7 +981,7 @@ function event_specialization(msg){
 				if_classe=0;
 				return true;
 				break;
-			case air:
+			case "air":
 				spe=get_spe(msg);
 				spe=add_spe(3,spe);
 				give_spe(spe,msg);
@@ -877,7 +989,7 @@ function event_specialization(msg){
 				if_classe=0;
 				return true;
 				break;
-			case terre:
+			case "terre":
 				spe=get_spe(msg);
 				spe=add_spe(4,spe);
 				give_spe(spe,msg);
@@ -1670,6 +1782,18 @@ function proba_spe(msg){
 	return 0;
 }
 
+function proba_boss(msg){
+	return 0;
+}
+
+function proba_levelup(msg){
+	return 0;
+}
+
+function proba_folieup(msg){
+	return 0;
+}
+
 function chiffre_rom(curs){
 	switch(curs){
 		case 1 : 
@@ -1713,6 +1837,11 @@ function chiffre_rom(curs){
 		case 20 :
 			return "XX";
 	}
+}
+
+function to_prison(msg){
+	prison_msg=msg;
+	prison_id=msg.author.id;
 }
 
 //TODO
