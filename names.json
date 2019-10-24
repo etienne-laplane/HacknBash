@@ -23,7 +23,18 @@
       "paire de lunettes",
       "ceinture",
       "lampe",
-      "tartiflette"
+      "tartiflette",
+	  "guillotine",
+	  "saucisse fumée",
+	  "poussette",
+	  "caisse",
+	  "chauve-souris",
+	  "momie",
+	  "tête de méduse",
+	  "torche",
+	  "grille",
+	  "horde de zombies",
+	  "croix"
    ],
    "miniboss":[  
       "Lion",
@@ -60,7 +71,8 @@
       "Va-nu-pieds",
       "Vandale",
       "Hun",
-      "Wisigoth"
+      "Wisigoth",
+	  "Vampire"
    ],
    "dieux":[  
       "Nehma, déesse de l'amour",

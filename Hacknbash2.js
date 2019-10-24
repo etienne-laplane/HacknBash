@@ -1407,6 +1407,10 @@ function levelup_noreply(id){
 }
 
 function leveldown(msg){
+	r=Math.random();
+	if(r<proba_leveldown(msg)){
+		return;
+	}
 	bank_levels--;
 	if(levels[msg.author.id]==undefined){
 		levels[msg.author.id]=0;
@@ -1791,6 +1795,10 @@ function proba_levelup(msg){
 }
 
 function proba_folieup(msg){
+	return 0;
+}
+
+function proba_leveldown(msg){
 	return 0;
 }
 

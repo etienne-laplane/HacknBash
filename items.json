@@ -3,69 +3,289 @@
 		"Gourdin":{
 			"desc":"Augmente légèrement l'attaque",
 			"atk":1,
-			"def":3,
+			"def":0,
+			"mad":0,
+			"drop":0,
+			"levelup":0,
+			"leveldown":0,
+			"prison":0
+		},
+		"Plastron léger":{
+			"desc":"Augmente légèrement la défense",
+			"atk":0,
+			"def":1,
+			"mad":0,
+			"drop":0,
+			"levelup":0,
+			"leveldown":0,
+			"prison":0
+		},
+		"Ceinturon":{
+			"desc":"Augmente légèrement la chance de levelup",
+			"atk":0,
+			"def":0,
+			"mad":0,
+			"drop":0,
+			"levelup":1,
+			"leveldown":0,
+			"prison":0
+		},
+		"Ecu":{
+			"desc":"Augmente légèrement la défense",
+			"atk":0,
+			"def":1,
+			"mad":0,
+			"drop":0,
+			"levelup":0,
+			"leveldown":0,
+			"prison":0
+		},
+		"Poignard":{
+			"desc":"Augmente légèrement l'attaque",
+			"atk":1,
+			"def":0,
+			"mad":0,
+			"drop":0,
+			"levelup":0,
+			"leveldown":0,
+			"prison":0
+		},
+		"Falchion":{
+			"desc":"Augmente la résistance à la perte de niveaux",
+			"atk":0,
+			"def":0,
+			"mad":0,
+			"drop":0,
+			"levelup":0,
+			"leveldown":1,
+			"prison":0
+		},
+		"Passe-Partout":{
+			"desc":"Augmente les chances de sortir de prison",
+			"atk":0,
+			"def":0,
+			"mad":0,
+			"drop":0,
+			"levelup":0,
+			"leveldown":0,
+			"prison":1
+		},
+		"Anneau simple":{
+			"desc":"Augmente la résistance à la magie",
+			"atk":0,
+			"def":0,
+			"mad":0,
+			"drop":0,
+			"levelup":0,
+			"leveldown":1,
+			"prison":0
+		},
+		"Médaille bénite":{
+			"desc":"Augmente la chance du porteur",
+			"atk":0,
+			"def":0,
 			"mad":0,
 			"drop":1,
 			"levelup":0,
-			"leveldown":-3,
+			"leveldown":0,
 			"prison":0
 		}
 	},
 	"mag":{
-		"Gourdin":{
-			"desc":"Augmente légèrement l'attaque",
-			"atk":1,
-			"def":3,
-			"mad":0,
-			"drop":1,
+		"Capuchon de guerre":{
+			"desc":"Augmente la défense et la resistance à la magie",
+			"atk":-1,
+			"def":2,
+			"mad":1,
+			"drop":0,
 			"levelup":0,
-			"leveldown":-3,
+			"leveldown":1,
 			"prison":0
+		},
+		"Haume macabre":{
+			"desc":"Terrifie les adversaires",
+			"atk":1,
+			"def":1,
+			"mad":1,
+			"drop":0,
+			"levelup":0,
+			"leveldown":1,
+			"prison":0
+		},
+		"Katar":{
+			"desc":"Augmente l'attaque, au prix de la défense",
+			"atk":2,
+			"def":-1,
+			"mad":0,
+			"drop":0,
+			"levelup":0,
+			"leveldown":0,
+			"prison":0
+		},
+		"Bouclier à pointes":{
+			"desc":"Augmente l'attaque et la défense, mais le porteur developpe une attirance pour les forces occultes",
+			"atk":1,
+			"def":1,
+			"mad":1,
+			"drop":0,
+			"levelup":0,
+			"leveldown":0,
+			"prison":0
+		},
+		"Anneau des dieux":{
+			"desc":"Forgé par les Cultistes, il est dit que le porteur est béni par les dieux. Son efficacité n'est pas prouvée...",
+			"atk":0,
+			"def":0,
+			"mad":0,
+			"drop":0,
+			"levelup":1,
+			"leveldown":1,
+			"prison":0
+		},
+		"Médaillon du Chaos":{
+			"desc":"Seuls les Ours osent arborer ce médaillon fièrement. Son effet relève pourtant plus de la superstition que de la magie.",
+			"atk":0,
+			"def":0,
+			"mad":1,
+			"drop":0,
+			"levelup":0,
+			"leveldown":0,
+			"prison":0
+		},
+		"Trident":{
+			"desc":"Pratique pour empaler ses ennemis... Ou faire cuire des saucisses de loin.",
+			"atk":1,
+			"def":0,
+			"mad":0,
+			"drop":0,
+			"levelup":0,
+			"leveldown":0,
+			"prison":1
 		}
 	},
 	"rar":{
-		"Gourdin":{
-			"desc":"Augmente légèrement l'attaque",
+		"Coeur de Démon":{
+			"desc":"Le porteur devient fou, mais sa puissance augmente considérablement",
+			"atk":2,
+			"def":0,
+			"mad":3,
+			"drop":0,
+			"levelup":2,
+			"leveldown":0,
+			"prison":0
+		},
+		"Arc Elfique":{
+			"desc":"Augmente l'attaque et la chance du porteur. S'utilise avec des carreaux elfiques.",
 			"atk":1,
-			"def":3,
+			"def":0,
 			"mad":0,
-			"drop":1,
+			"drop":0,
+			"levelup":1,
+			"leveldown":0,
+			"prison":0
+		},
+		"Carreau Elfiques":{
+			"desc":"Riposte automatique à la prochaine attaque. Nécessite un arc",
+			"atk":0,
+			"def":0,
+			"mad":0,
+			"drop":0,
 			"levelup":0,
-			"leveldown":-3,
+			"leveldown":0,
 			"prison":0
 		}
 	},
 	"leg":{
-		"Gourdin":{
-			"desc":"Augmente légèrement l'attaque",
-			"atk":1,
-			"def":3,
+		"Royaume de la paix":{
+			"desc":"Anneau forgé par les nains, augmente grandement la résistance à la perte de niveau.",
+			"atk":0,
+			"def":0,
 			"mad":0,
-			"drop":1,
+			"drop":0,
 			"levelup":0,
-			"leveldown":-3,
+			"leveldown":5,
+			"prison":0
+		},
+		"Anneau divin véritable":{
+			"desc":"Forgé par les dieux, le porteur est empli d'une profonde bénédiction divine",
+			"atk":2,
+			"def":2,
+			"mad":-1,
+			"drop":2,
+			"levelup":2,
+			"leveldown":2,
+			"prison":2
+		},
+		"Jugement des fous":{
+			"desc":"Armure épaisse, qui protège le porteur des attaques des fous, et le rend insensible aux proposition des servants du chaos",
+			"atk":0,
+			"def":7,
+			"mad":-1,
+			"drop":0,
+			"levelup":0,
+			"leveldown":0,
+			"prison":0
+		},
+		"Pari des Rats":{
+			"desc":"Epée courte sertie de toutes les pierres magiques du clan des Rats.",
+			"atk":3,
+			"def":0,
+			"mad":1,
+			"drop":0,
+			"levelup":1,
+			"leveldown":0,
 			"prison":0
 		}
 	}
 	"unique":{
 		"Bénédiction Divine":{
-		"desc":"La fortune divine les héros et les plus fous !",
+			"desc":"La fortune divine les héros et les plus fous !",
 			"atk":0,
 			"def":0,
-			"mad":2,
+			"mad":-2,
 			"drop":0,
 			"levelup":2,
 			"leveldown":0,
 			"prison":0
 		}
 		"Tentacule de Yurgen":{
-		"desc":"Renforce la férocité du porteur, au prix de sa sanité",
+			"desc":"Renforce la férocité du porteur, au prix de sa sanité",
+			"atk":2,
+			"def":0,
+			"mad":-1,
+			"drop":0,
+			"levelup":0,
+			"leveldown":0,
+			"prison":0
+		},
+		"Miroir magique":{
+			"desc":"La prochaine personne qui vous attaque s'attaquera elle même à la place.",
+			"atk":0,
+			"def":0,
+			"mad":1,
+			"drop":0,
+			"levelup":2,
+			"leveldown":0,
+			"prison":0
+		},
+		"Casque Hydre":{
+			"desc":"Heaume de l'Hydre. Augmente considérablement la défense, le porteur devient terrifiant, ne peut plus être contenu dans une prison très longtemps...",
+			"atk":0,
+			"def":4,
+			"mad":0,
+			"drop":0,
+			"levelup":0,
+			"leveldown":-1,
+			"prison":10
+		},
+		"Katana pestilenciel":{
+			"desc":"Lame baignée dans le sang des chevaliers de l'apocalypse, le porteur est empli d'un terrible fardeau.",
 			"atk":2,
 			"def":0,
 			"mad":1,
 			"drop":0,
 			"levelup":0,
-			"leveldown":0,
+			"leveldown":-3,
 			"prison":0
 		}
 	}
