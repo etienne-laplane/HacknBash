@@ -322,6 +322,9 @@ function commande(msg){
 		if(prison_id!="0"){
 			msg.channel.send(prison_msg.author.username +" tourne en rond dans la petite cellule. Il maugrée en boucle ces paroles qui lui méritèrent le cachot : "+prison_msg.cleanContent);
 		}
+		else{
+			msg.channel.send("L'étroite cellule est vide. Pour l'instant.");
+		}
 		return true;
 	}
 	//niveau
@@ -335,6 +338,9 @@ function commande(msg){
 			if(msg.member.roles.some(r=>[exKey].includes(r.name))){
 				msg.channel.send(teams[exKey][0]+" et "+teams[exKey][1]+" forment l'équipe "+exKey+"(niveau :"+teams[exKey][2]+") et ne peuvent pas s'attaquer l'un l'autre.");
 			}
+		}
+		else{
+			msg.channel.send(msg.author.username+" n'est dans aucune équipe. Peut-être que quelqu'un s'alliera avant que la solitude ne le plonge dans la folie.");
 		}
 		return true;
 	}
@@ -365,7 +371,7 @@ function commande(msg){
 				bank_folie-=3*diff;
 				bank_levels+=3*diff;
 			} else {
-				msg.channel.send(msg.author.username+" lève le bras et implore que le couroux divin tombe sur "+msg_precedent.author.username+" mais rien ne se passe... L'erreur est fatale : au rang d'envoyé divin, "+msg.author.username +" est maintenant dans la triste caste des déchus. Tous ses levels perdus, et l'errance spirituelle éternelle. Mais l'envie de grimper jusqu'en haut de la tour pour en finir est quelque part présente...");
+				msg.channel.send(msg.author.username+" lève le bras et implore que le couroux divin tombe sur "+msg_precedent.author.username+" mais rien ne se passe... L'erreur est fatale : au rang d'envoyé divin, "+msg.author.username +" est maintenant dans la triste caste des déchus. Tous ses levels sont perdus, et son destin c'est l'errance spirituelle éternelle. Mais l'envie de grimper jusqu'en haut de la tour pour en finir reste quelque part présente...");
 				dechu.push(msg.author.id);
 				reset_level(msg);
 				dieu_id=0;
@@ -1747,30 +1753,74 @@ function startminijeu(msg){
 }
 
 function proba_team(msg){
-	return 0;
+	return ((1+levelplayer(msg))/100);
 }
 
 function proba_attaque(msg){
-	return 0;
+	var att=0;
+	for (var exKey in items){
+		for (var it in items[exKey]){
+			if(msg.member.roles.some(r=>[it].includes(r.name))){
+				att=it.atk+att;
+			}
+		}
+	}
+	if(races[raceplayer(msg)]!=undefined)
+		att=att+races[raceplayer(msg)].atk;
+	return (att/100);
 }
 
 function proba_def(msg){
-	return 0;
+	var def=0;
+	for (var exKey in items){
+		for (var it in items[exKey]){
+			if(msg.member.roles.some(r=>[it].includes(r.name))){
+				def=it.def+def;
+			}
+		}
+	}
+	if(races[raceplayer(msg)]!=undefined)
+		def=def+races[raceplayer(msg)].def;
+	return (def/100);
 }
 
 function proba_minijeu(msg){
-	return 0;
+	return (1/100+folieplayer(msg)/1000);
 }
 
 function proba_killminiboss(msg){
-	return 0;
+	return proba_attaque(msg)+proba_def(msg);
 }
 
 function proba_eviter_piege(msg){
-	return 0;
+	return proba_def(msg)+(levelplayer(msg)/100);
 }
 
 function proba_drop(msg, rarete){ //rareté = "leg", "rar", "mag", "com"
+	var dr=0;
+	for (var exKey in items){
+		for (var it in items[exKey]){
+			if(msg.member.roles.some(r=>[it].includes(r.name))){
+				dr=it.drop+dr;
+			}
+		}
+	}
+	if(races[raceplayer(msg)]!=undefined)
+		dr=dr+races[raceplayer(msg)].drop;
+	switch (rarete){
+		case "leg":
+			return dr/10000; 
+			break;
+		case "rar":
+			return dr/2000
+			break;
+		case "mag":
+			return dr/333;
+			break;
+		case "com":
+			return 1/100;
+			break;
+	}
 	return 0;
 }
 
