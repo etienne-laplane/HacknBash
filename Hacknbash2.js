@@ -390,7 +390,7 @@ function commande(msg){
 	}
 	//niveau
 	if(msg.cleanContent.toLowerCase().includes("niveau") && msg.content.includes("?")){
-		msg.channel.send(msg.author.username +"- Niveau : " +levelplayer(msg)+" - Folie : " +folieplayer(msg));
+		msg.channel.send(msg.author.username +" - Niveau : " +levelplayer(msg)+" - Folie : " +folieplayer(msg));
 		return true;
 	}
 	//équipe
@@ -797,7 +797,7 @@ function attaque(msg){
 			prison=true;
 		} else{
 			r=Math.random();
-			if(r<proba_folie(msg)){
+			if(r<proba_folieup(msg)){
 				msg.channel.send("Confus et désorienté, "+msg.author.username+" se met à s'attaquer lui même en criant.");
 				folieup(msg);
 				if(r<0.25){
@@ -894,6 +894,9 @@ function event_team_(msg){
 				msg.channel.send("l'équipe des "+nom_team+" voit d'un très mauvais oeil cette tentative d'usurpation de nom...");
 				return false;
 			}
+		}
+		if(nom_team==""){
+			return;
 		}
 		team_role(nom_team,msg_team_a,msg_team_b);
 		msg.channel.send(msg_team_a.author.username+" et "+msg_team_b.author.username+" créent une entente amicale, et nomment leur équipe : "+nom_team);
@@ -1072,11 +1075,11 @@ function add_spe(x,spe){
 	if (spe==""){
 		return x;
 	} else{
-		if(parseInt(x)<=parseInt(spe.subString(0,1))){
+		if(parseInt(x)<=parseInt(spe.substring(0,1))){
 			return x+spe;
 		}
 		else {
-			return spe.subString(0,1)+add_spe(x,spe.subString(1));
+			return spe.substring(0,1)+add_spe(x,spe.substring(1));
 		}
 	}	
 }
@@ -1549,6 +1552,7 @@ function folietotal(){
 
 function floorup(msg){
 	floor++;
+	msg.channel.send("Le groupe décide de monter d'un étage, et de progresser vers le sommet de la tour.");
 	log_floorup(msg);
 	if(floor>highest_floor){
 		highest_floor=floor;
@@ -1561,6 +1565,7 @@ function floorup(msg){
 
 function floordown(msg){
 	floor--;
+	msg.channel.send("Le groupe, prudent, décide de redescendre d'un étage.");
 	if(floor==0){
 		winlunatics();
 	}else{
@@ -1609,9 +1614,15 @@ function log_foliedown(msg){
 }
 
 function log_floorup(msg){
+	if (leader_name=="tous"){
+		msg.guild.channels.find(function(channel){
+		return channel.name=="niveau-ni-cochon";
+	}).send("Le groupe parvient enfin à grimper un étage : "+floor+"\n",{code:true});
+	} else {
 	msg.guild.channels.find(function(channel){
 		return channel.name=="niveau-ni-cochon";
 	}).send("Le groupe parvient enfin à grimper un étage : "+floor+"\nGrace à l'incroyable leadership de "+leader_name + "! Sa sagesse est récompensée par un niveau durement acquis !",{code:true});
+	}
 }
 
 function log_floordown(msg){
@@ -1943,7 +1954,6 @@ function proba_spe(msg){
 }
 
 function proba_boss(msg){
-	return 1;
 	if(folieplayer(msg)>100){
 		return 0;
 	}
@@ -1988,16 +1998,16 @@ function proba_folieup(msg){
 	n3=0;
 	n4=0;
 	for (exKey in get_spe(msg)){
-		if(spe[exKey]=="1"){
+		if(spes[exKey]=="1"){
 			n1++;
 		}
-		if(spe[exKey]=="2"){
+		if(spes[exKey]=="2"){
 			n2++;
 		}
-		if(spe[exKey]=="3"){
+		if(spes[exKey]=="3"){
 			n3++;
 		}
-		if(spe[exKey]=="4"){
+		if(spes[exKey]=="4"){
 			n4++;
 		}
 	}
