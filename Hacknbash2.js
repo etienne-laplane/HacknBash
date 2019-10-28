@@ -248,7 +248,6 @@ bot.on('message', msg => {
 		}
 	}
 	//DIEU-CHAOS
-
 	if(msg_precedent.author.id!=msg.author.id&&highest_floor>49&&!msg.author.bot&&!msg_precedent.author.bot){
 		if(dieu_id==0){
 			if((get_faction(msg)=="neutre")&&(get_faction(msg_precedent)=="neutre")&&!dechu.includes(msg_precedent.author.id)){

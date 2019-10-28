@@ -348,7 +348,7 @@
 			"leveldown":-1,
 			"prison":10
 		},
-		"Katana pestilenciel":{
+		"Katana pestilentiel":{
 			"desc":"Lame baignée dans le sang des chevaliers de l'apocalypse, le porteur est empli d'un terrible fardeau.",
 			"atk":2,
 			"def":0,
@@ -356,6 +356,16 @@
 			"drop":0,
 			"levelup":0,
 			"leveldown":-3,
+			"prison":0
+		},
+		"Oeil du Griffon":{
+			"desc":"",
+			"atk":0,
+			"def":0,
+			"mad":0,
+			"drop":0,
+			"levelup":0,
+			"leveldown":0,
 			"prison":0
 		}
 	}
