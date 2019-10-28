@@ -4,7 +4,7 @@
         "Ours":{
             "Victoire":{
                 "normal":"D'un coup de crocs, %username% sectionne le tentacule avant de se faire attraper et entrainer dans les profondeurs du bassin.",
-                "critique":"Un combat de titan commence, %username% l'Ours déploie sa forcé fénoménale pour combattre Yurgen le Kraken malheureusement ce dernier bien plus à l'aise dans l'eau fini par l'emporter laissant %username% à l'article de la mort. En le soignant ses compagnons retrouvent un bout de tentacule côlté à sa fourrure, probablement arraché par un coup de griffe. Ils décident de donner le tentacule à %username% à son réveil.",
+                "critique":"Un combat de titan commence, %username% l'Ours déploie sa force phénoménale pour combattre Yurgen le Kraken malheureusement ce dernier bien plus à l'aise dans l'eau fini par l'emporter laissant %username% à l'article de la mort. En le soignant ses compagnons retrouvent un bout de tentacule côlté à sa fourrure, probablement arraché par un coup de griffe. Ils décident de donner le tentacule à %username% à son réveil.",
                 "loot":"Tentacule de Yurgen"
                 }
             "Défaite":{
