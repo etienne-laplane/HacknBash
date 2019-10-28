@@ -1866,7 +1866,7 @@ function proba_minijeu(msg){
 }
 
 function proba_killminiboss(msg){
-	return proba_attaque(msg)+proba_def(msg);
+	return 5/100+proba_attaque(msg)+1-proba_def(msg);
 }
 
 function proba_eviter_piege(msg){
