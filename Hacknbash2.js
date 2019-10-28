@@ -836,14 +836,14 @@ function arc_fleche(x,y){
 }
 
 function defense_div(x,y){
-	if(what_level(x)<40){
+	if(levelplayer(x)<40){
 		return false;
 	}
 	if(y.member.roles.some(r=>["Bouclier Divin"].includes(r.name))){
 		myRole = y.guild.roles.find(role => role.name === "Bouclier Divin");
 		y.member.removeRole(myRole);
 		x.channel.send("La bénédiction qui enveloppe "+y.author.username+" se change en malédiction qui frappe "+x.author.username+" !"); 
-		levelreset(x,x);
+		reset_level(x,x);
 		return true;
 	}
 	return false;
