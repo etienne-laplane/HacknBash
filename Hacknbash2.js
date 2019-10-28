@@ -68,6 +68,7 @@ var curse=0;
 var camisole_id=0; //le user qui peut utiliser une camisole
 var muets=[];
 var nopotion=500;
+var channel_id=0;
 
 //trahison
 //event monter/descendre
