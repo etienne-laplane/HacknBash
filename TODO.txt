@@ -7,7 +7,7 @@ message à la disparition du mini boss ?
 
 >drop de camisole : uniquement pour les héros. OK
 
-- calculs de probas ----------------------------------------------------------------------------
+- calculs de probas OK ?
 	- folie up bonus si nuit
 	- levelup bonus si jour
 	
@@ -31,6 +31,8 @@ team OK
 boire potion OK
 ECRIRE DES ITEMS --------------------------------------------------------------------------------
 ECRIRE DES BOSS ---------------------------------------------------------------------------------
+reset level
+reset folie
 >Commandes admin
 !ignorechan
 
@@ -40,7 +42,8 @@ ECRIRE DES BOSS ----------------------------------------------------------------
 
 Stats -------------------------------------------------------------------------------------------
 gameover ----------------------------------------------------------------------------------------
-
+Leaderboard -------------------------------------------------------------------------------------
+réponse en réaction ?
 
 CHECKLIST
 >Events 

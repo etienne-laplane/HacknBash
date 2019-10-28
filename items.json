@@ -161,22 +161,42 @@
 			"levelup":0,
 			"leveldown":0,
 			"prison":1
+		},
+		"Cor de guerre":{
+			"desc":"Le porteur galvanise le groupe, rendant tout le monde plus résistant à la folie et plus combatif.",
+			"atk":1,
+			"def":0,
+			"mad":1,
+			"drop":0,
+			"levelup":0,
+			"leveldown":1,
+			"prison":0
+		},
+		"Falchion enchanté":{
+			"desc":"Epée courte, imbue de magie élémentaire par son porteur. Augmente la défense, l'attaque, et l'expérience.",
+			"atk":1,
+			"def":1,
+			"mad":0,
+			"drop":0,
+			"levelup":1,
+			"leveldown":1,
+			"prison":0
 		}
 	},
 	"rar":{
 		"Coeur de Démon":{
 			"desc":"Le porteur devient fou, mais sa puissance augmente considérablement",
-			"atk":2,
+			"atk":1,
 			"def":0,
-			"mad":3,
+			"mad":2,
 			"drop":0,
-			"levelup":2,
+			"levelup":1,
 			"leveldown":0,
 			"prison":0
 		},
 		"Arc Elfique":{
 			"desc":"Augmente l'attaque et la chance du porteur. S'utilise avec des carreaux elfiques.",
-			"atk":1,
+			"atk":2,
 			"def":0,
 			"mad":0,
 			"drop":0,
@@ -193,6 +213,46 @@
 			"levelup":0,
 			"leveldown":0,
 			"prison":0
+		},
+		"Masque Vengeur":{
+			"desc":"Crâne d'un géant porté comme heaume, il inspire la terreur aux adversaires.",
+			"atk":0,
+			"def":0,
+			"mad":-1,
+			"drop":0,
+			"levelup":1,
+			"leveldown":1,
+			"prison":1
+		},
+		"Tourbillon de Cristal":{
+			"desc":"Pierre enchassée au bout d'un baton de druide, contient l'essence primale du froid. Augmente énormément la résistance à la perte de niveaux.",
+			"atk":0,
+			"def":1,
+			"mad":0,
+			"drop":0,
+			"levelup":0,
+			"leveldown":5,
+			"prison":1
+		},
+		"Médaillon du chaos véritable":{
+			"desc":"Pierre du chef du clan des ours, son effet est négligeable sans le set complet des médaillons du chaos",
+			"atk":0,
+			"def":0,
+			"mad":2,
+			"drop":0,
+			"levelup":-1,
+			"leveldown":0,
+			"prison":0
+		},
+		"Marteau des gnomes":{
+			"desc":"Preuve du talent de forgeron des Gnomes, il augmente l'experience du porteur, sans aucune conséquence négative pour le porteur.",
+			"atk":0,
+			"def":0,
+			"mad":2,
+			"drop":0,
+			"levelup":2,
+			"leveldown":0,
+			"prison":1
 		}
 	},
 	"leg":{
@@ -235,8 +295,18 @@
 			"levelup":1,
 			"leveldown":0,
 			"prison":0
+		},
+		"Médaillon du chaos total":{
+			"desc":"Pierre du set du chaos, seuls les fous oseront porter les 3 médaillons en même temps.",
+			"atk":0,
+			"def":0,
+			"mad":3,
+			"drop":0,
+			"levelup":-2,
+			"leveldown":0,
+			"prison":0
 		}
-	}
+	},
 	"unique":{
 		"Bénédiction Divine":{
 			"desc":"La fortune divine les héros et les plus fous !",
@@ -247,7 +317,7 @@
 			"levelup":2,
 			"leveldown":0,
 			"prison":0
-		}
+		},
 		"Tentacule de Yurgen":{
 			"desc":"Renforce la férocité du porteur, au prix de sa sanité",
 			"atk":2,

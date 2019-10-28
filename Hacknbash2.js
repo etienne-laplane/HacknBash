@@ -624,7 +624,6 @@ function fight_boss(msg){
 	}
 	boss_name="";
 	boss_id=0;
-	
 }
 
 function drop_boss(name,msg){//name of the reward, in string
@@ -1833,23 +1832,133 @@ function proba_dé(msg){
 }
 
 function proba_spe(msg){
+	var spekey = get_spe(msg);
+	switch(spekey.length){
+		case 0:
+			if(levelplayer<5){
+				return 0;
+			} else if(levelplayer>15){
+				return 5/100;
+			} else {
+				return (levelplayer(msg)-5)/200;
+			}
+			break;
+		case 1:
+			if(levelplayer<20){
+				return 0;
+			} else if(levelplayer>35){
+				return 4/100;
+			} else {
+				return (levelplayer(msg)-20)/375;
+			}
+			break;
+		case 2:
+			if(levelplayer<30){
+				return 0;
+			} else if(levelplayer>60){
+				return 3/100;
+			} else {
+				return (levelplayer(msg)-30)/1000;
+			}
+			break;
+		case 3:
+			if(levelplayer<45){
+				return 0;
+			} else if(levelplayer>80){
+				return 2/100;
+			} else {
+				return (levelplayer(msg)-45)/1750;
+			}
+			break;
+	}
 	return 0;
 }
 
 function proba_boss(msg){
-	return 0;
+	if(folieplayer(msg)>100){
+		return 0;
+	}
+	if(folieplayer(msg)>50){
+		return 1/1000;
+	}
+	if(folieplayer(msg)>25){
+		return 1/250;
+	}
+	return (1/100);
 }
 
 function proba_levelup(msg){
-	return 0;
+	var up=0;
+	for (var exKey in items){
+		for (var it in items[exKey]){
+			if(msg.member.roles.some(r=>[it].includes(r.name))){
+				up=it.levelup+up;
+			}
+		}
+	}
+	if(races[raceplayer(msg)]!=undefined)
+		up=up+races[raceplayer(msg)].levelup;
+	return (1+up)/100+day/100;
 }
 
 function proba_folieup(msg){
-	return 0;
+	var mad=0;
+	for (var exKey in items){
+		for (var it in items[exKey]){
+			if(msg.member.roles.some(r=>[it].includes(r.name))){
+				mad=it.mad+mad;
+			}
+		}
+	}
+	if(races[raceplayer(msg)]!=undefined)
+		mad=mad+races[raceplayer(msg)].mad;
+	n1=0;
+	n2=0;
+	n3=0;
+	n4=0;
+	for (exKey in get_spe(msg)){
+		if(spe[exKey]=="1"){
+			n1++;
+		}
+		if(spe[exKey]=="2"){
+			n2++;
+		}
+		if(spe[exKey]=="3"){
+			n3++;
+		}
+		if(spe[exKey]=="4"){
+			n4++;
+		}
+	}
+	return (mad/100)-day/100+(n1*n2*n3*n4+n1*n2+n3*n4)/100;
 }
 
 function proba_leveldown(msg){
-	return 0;
+	var dw=0;
+	for (var exKey in items){
+		for (var it in items[exKey]){
+			if(msg.member.roles.some(r=>[it].includes(r.name))){
+				dw=it.leveldown+dw;
+			}
+		}
+	}
+	if(races[raceplayer(msg)]!=undefined)
+		dw=dw+races[raceplayer(msg)].leveldown;
+	return dw/100;
+}
+
+function proba_sortie_prison(msg){
+	var pr=0;
+	for (var exKey in items){
+		for (var it in items[exKey]){
+			if(msg.member.roles.some(r=>[it].includes(r.name))){
+				pr=it.prison+pr;
+			}
+		}
+	}
+	if(races[raceplayer(msg)]!=undefined)
+		pr=pr+races[raceplayer(msg)].prison;
+	return (1+pr)/100;
 }
 
 function chiffre_rom(curs){
