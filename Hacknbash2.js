@@ -21,6 +21,7 @@ var god=[];
 var pieges = names["pieges"];
 var adj_pieg = names["adj-fem"];
 var items = require('./items.json');
+var boss = require('./boss.json');
 var piege_safe;
 var msg_precedent;
 var minijeu_status=false;
@@ -34,7 +35,7 @@ var prison_msg;
 var day=0;
 var players=[];
 var levels=[];
-var folies=[]
+var folies=[];
 var floor=0;
 var minijeu_type="";
 var minijeu_status=false;
@@ -75,10 +76,64 @@ var nopotion=500;
 //choix race
 //calculproba
 //event_spécialisation
+function debug(msg){
+	msg.guild.channels.find("name","niveau-ni-cochon").send("install "+install+"\n"+
+"start "+start+"\n"+
+"event_classe "+event_classe+"\n"+
+"id_classe "+id_classe+"\n"+
+"event_race "+event_race+"\n"+
+"id_race "+id_race+"\n"+
+"god "+god+"\n"+
+"piege_safe "+piege_safe+"\n"+
+"msg_precedent "+msg_precedent+"\n"+
+"minijeu_status "+minijeu_status+"\n"+
+"prison "+prison+"\n"+
+"day_light "+day_light+"\n"+
+"bank_levels "+bank_levels+"\n"+
+"bank_folie "+bank_folie+"\n"+
+"prison_id "+prison_id+"\n"+
+"prison_msg "+prison_msg+"\n"+
+"day "+day+"\n"+
+"players "+players+"\n"+
+"levels "+levels+"\n"+
+"folies "+folies+"\n"+
+"floor "+floor+"\n"+
+"minijeu_type "+minijeu_type+"\n"+
+"minijeu_status "+minijeu_status+"\n"+
+"miniboss_nom "+miniboss_nom+"\n"+
+"n_dealdevil "+n_dealdevil+"\n"+
+"boss_id "+boss_id+"\n"+
+"boss_name "+boss_name+"\n"+
+"chaos "+chaos+"\n"+
+"heros "+heros+"\n"+
+"fous "+fous+"\n"+
+"dieu_id "+dieu_id+"\n"+
+"dechu "+dechu+"\n"+
+"dieu_username "+dieu_username+"\n"+
+"MP "+MP+"\n"+
+"chaos_decided "+chaos_decided+"\n"+
+"combo_id "+combo_id+"\n"+
+"combo_count "+combo_count+"\n"+
+"highest_floor "+highest_floor+"\n"+
+"event_floor_up "+event_floor_up+"\n"+
+"event_floor_down "+event_floor_down+"\n"+
+"event_team "+event_team+"\n"+
+"coef "+coef+"\n"+
+"leader_id "+leader_id+"\n"+
+"leader_name "+leader_name+"\n"+
+"event_leader "+event_leader+"\n"+
+"diff "+diff+"\n"+
+"msg_count "+msg_count+"\n"+
+"curse "+curse+"\n"+
+"camisole_id "+camisole_id+"\n"+
+"muets "+muets+"\n"+
+"nopotion "+nopotion+"\n"
+															,{code:true});
+}
 
 bot.on('message', msg => {
 	if(!install&&msg.content=="install"){
-		install();
+		install_(msg);
 		install=true;
 		msg.channel.send("Hack'n'Bash est un jeu d'aventure discord, basé sur la chance et les décisions. Chaque événement est basé sur de l'aléatoire et il n'y a aucun moyen de manipuler ceci par le contenu des messages. Certains événements demandent aux joueurs (membres du discord) de répondre à des questions. Ces moments sont les seuls pendant lesquels le contenu du message est analysé. Il n'existe pas de commande cachée et il n'y a aucun moyen d'arrêter l'aventure avant la victoire ou la défaite du groupe. Il existe 3 fins différentes, et il est possible de bien jouer, ou de faire n'importe quoi. Les décisions importantes personnelles (choix de classe ou de race par exemple) ne pourront être répondues que par le joueur concerné. Si vous acceptez ces règles, et que vous concevez que l'anarchie règnera, que tout le monde peut prendre les décisions pour tout le monde, tapez 'start'.");
 	}
@@ -86,25 +141,32 @@ bot.on('message', msg => {
 	if(!start&&msg.content=="start"){
 		start=true;
 		msg.channel.send("Votre groupe d'aventuriers se retrouve au bas d'une tour. Il est dit que toutes les réponses se trouvent en haut de la tour. Mais pour trouver les réponses que vous êtes venus chercher, il faudra traverser 100 étages. Les pieges sont peu nombreux, et les monstres quasiment inexistants... Qu'est ce qui rendait alors le périple si difficile ? Est-ce... vous même ? En tous cas, il est temps de se mettre en route !");
-		msg.guild.channels.find("name","niveau-ni-cochon").send("CHOIX DES RACES : \n"+
-																"[Humain] : Habile et robuste, il ne perd pas ce qu'il a acquis, l'humain est l'opposé de l'ours, ses nombreux talents le tireront de nombreuses situations. \n"+
-																"[Elfe] : Combatif, il ne succombe que rarement aux tentations, et saura être chanceux lors qu'il le faudra. \n"+
-																"[Gnome] : Intelligent, le gnome est la créature qui progresse le plus vite, quelque soit la situation. Il sera aussi difficile de le réduire au silence. \n"+
-																"[Ours] : C'est LE combattant par excellence. Attention, cela dit, car sa soif de sang le fait vite tomber dans une rage inarretable. \n"+
-																"[Cultiste] : Dévoué, c'est les cultistes qui ont monté cette expedition pour trouver des réponses. Il est très sensible aux appels divins, mais aussi chaotiques... \n"+
-																"[Nain] : Orfèvre délicat, le nain forge les meilleurs équipement, sait rester intègre, et ne garde pas sa langue dans sa poche. \n"+
+		msg.guild.channels.find("name","niveau-ni-cochon").send("CHOIX DES CLANS : \n\n"+
+																"[Humain] : Habile et robuste, il ne perd pas ce qu'il a acquis, l'humain est l'opposé de l'ours, ses nombreux talents le tireront de nombreuses situations. \n\n"+
+																"[Elfe] : Combatif, il ne succombe que rarement aux tentations, et saura être chanceux lors qu'il le faudra. \n\n"+
+																"[Gnome] : Intelligent, le gnome est la créature qui progresse le plus vite, quelque soit la situation. Il sera aussi difficile de le réduire au silence. \n\n"+
+																"[Ours] : C'est LE combattant par excellence. Attention, cela dit, car sa soif de sang le fait vite tomber dans une rage inarretable. \n\n"+
+																"[Cultiste] : Dévoué, c'est les cultistes qui ont monté cette expedition pour trouver des réponses. Il est très sensible aux appels divins, mais aussi chaotiques... \n\n"+
+																"[Nain] : Orfèvre délicat, le nain forge les meilleurs équipement, sait rester intègre, et ne garde pas sa langue dans sa poche. \n\n"+
 																"[Rat] : Furtif et rusés, les rats sont les créatures les plus solides, les plus sournoises, et la meilleure chance de succès dans la mission."
 																,{code:true});
+	return;
 	}
 	if(!start) return;
 	if(day_light){
 		day_night(msg);
 		day_light=false;
 	}
-	if(msg.author.id=="625988662454386698") return;//le bot ne joue pas.
+	if(msg.author.id=="625993776397287424") return;//le bot ne joue pas.
 	if(msg_precedent==null) msg_precedent=msg;//just in case.
 	msg_count++;
+	if(msg_count%10==0){
+		debug(msg);
+	}
 	nopotion--;
+	if (event_race_(msg)){
+		return;
+	}
 	add_player(msg);
 	//quand un meme joueur spam, le coef diminue jusqu'a atteindre 0.
 	//toutes les probas sont x coef.
@@ -146,7 +208,7 @@ bot.on('message', msg => {
 	}
 	if(event_leader){
 		if(msg.author.id!=leader_id){
-			setleader(msg);
+			// setleader(msg);
 		}
 	}
 	if(prison){
@@ -161,7 +223,7 @@ bot.on('message', msg => {
 		event_floor_down_res(msg);
 		return;
 	}
-	if(event_team(msg)){
+	if(event_team_(msg)){
 		return;
 	}
 	if (event_specialization(msg)){
@@ -185,7 +247,7 @@ bot.on('message', msg => {
 		msg_precedent=msg;
 		return;
 	}
-	if(floor(msg)){
+	if(floor_(msg)){
 		msg_precedent=msg;
 		return;
 	}
@@ -199,7 +261,7 @@ bot.on('message', msg => {
 	}
 	r=Math.random();
 	if(r<proba_boss(msg)){
-		boss(msg);
+		boss_(msg);
 		msg_precedent=msg;
 		return;
 	}
@@ -384,10 +446,11 @@ function setleader(msg){
 	leader_name=msg.author.username;
 	msg.channel.send("Sur ces mots, "+msg.author.username+" gagne l'admiration de tous, et devient le nouveau LEADER... Jusqu'à ce que la couronne lui soit reprise...");
 	msg.guild.channels.find("name","niveau-ni-cochon").send("LEADER : "+msg.author.username,{code:true});
+	event_leader=false;
 }
 
 //fonction principale
-function floor(msg){
+function floor_(msg){
 	r=Math.random();
 	if(r<0.01){
 		if(day<0){// c'est la nuit, on propose de redescendre.
@@ -579,12 +642,12 @@ function att_role(nom,couleur,msg){
 }
 
 //fonction principale : return true si qqch se passe, false sinon.
-function boss(msg){
+function boss_(msg){
 	size=0;
 	for(var exKey in boss) {
 		size+=1;
 	}
-	size+=1;
+	console.log(size);
 	for(var exKey in boss) {
 		droprate=Math.random();
 		if(droprate<1/size){
@@ -593,7 +656,6 @@ function boss(msg){
 		}
 		size=size-1;
 	}
-	boss_name=boss
 	boss_id=msg.author.id;
 	msg.channel.send(boss[boss_name]["Apparition"].replace("%username%",msg.author.username));
 	return true;
@@ -655,7 +717,7 @@ function reset_folie(msg){
 }
 
 function day_night(msg){
-	r=math.random();
+	r=Math.random();
 	if (day<0){
 		setTimeout(function(){ 
 			day=Math.random(); 
@@ -809,7 +871,7 @@ function team(msg){
 	}
 	if (r<proba_team(msg)){
 		for(var exKey in teams){
-			if(msg.member.roles.some(r=>[exKey].includes(r.name))||msg_precedent.member.roles.somes(r=>[exKey].includes(r.name))){
+			if(msg.member.roles.some(r=>[exKey].includes(r.name))||msg_precedent.member.roles.some(r=>[exKey].includes(r.name))){
 				return false;
 			}
 		}
@@ -823,7 +885,7 @@ function team(msg){
 }
 
 //fonction principale : return true si qqch se passe, false sinon.
-function event_team(msg){
+function event_team_(msg){
 	if(event_team&&(msg.author.id==msg_team_a.author.id||msg.author.id==msg_team_b.author.id)){
 		nom_team=msg.cleanContent.substring(0,98).replace(/[^a-zA-Z ]/g, "");
 		//test nom équipe déjà pris
@@ -890,13 +952,13 @@ function team_level_up(nom){
 	});
 }
 
-function event_race(msg){
-	index = id_race.findIndex(msg.author.id);
+function event_race_(msg){
+	index = id_race.findIndex(element=>element==msg.author.id);
 	var msg_clean=msg.cleanContent.toLowerCase();
-	if(msg.author.bot){
-		msg_clean="humain";
-	}
 	if(index>=0){
+		if(msg.author.bot){
+			msg_clean="humain";
+		}
 		switch (msg_clean){
 			case "humain":
 				give_race("Humain",msg);
@@ -944,7 +1006,7 @@ function event_race(msg){
 
 function raceplayer(msg){
 	for (var exKey in races){
-		if(msg.member.roles.some(r=>[spes[exKey].nom].includes(r.name))){
+		if(msg.member.roles.some(r=>[exKey].includes(r.name))){
 			return exKey;
 		}
 	}
@@ -1328,6 +1390,7 @@ function add_player(msg){
 	if(!find_player(msg)){
 		players.push([msg.author.id,msg.author.username]);
 		id_race.push(msg.author.id);
+		msg.reply("Bienvenue dans l'aventure! A quel clan souhaitez vous appartenir ?");
 	}
 }
 
@@ -1557,7 +1620,7 @@ function log_floordown(msg){
 	}).send("Perdu, le groupe décide qu'il est plus sage de revenir en arrière : "+floor+"\nLe leadership douteux de "+leader_name+" est remis en question par le reste du groupe, leurs reproches le font tomber un peu plus dans la folie...",{code:true});
 }
 
-function install(msg){
+function install_(msg){
 	//création du channel niveau-ni-cochon
 	chan = msg.guild.channels.find(function(channel){
 		return channel.name=="niveau-ni-cochon";
@@ -1747,6 +1810,8 @@ function startminijeu(msg){
 }
 
 function proba_team(msg){
+	console.log("team");
+	console.log((1+levelplayer(msg))/100);
 	return ((1+levelplayer(msg))/100);
 }
 
@@ -1761,6 +1826,8 @@ function proba_attaque(msg){
 	}
 	if(races[raceplayer(msg)]!=undefined)
 		att=att+races[raceplayer(msg)].atk;
+	console.log("att");
+	console.log((att/100));
 	return (att/100);
 }
 
@@ -1775,10 +1842,14 @@ function proba_def(msg){
 	}
 	if(races[raceplayer(msg)]!=undefined)
 		def=def+races[raceplayer(msg)].def;
-	return (def/100);
+	console.log("def");
+	console.log((def/100));
+	return (1-def/100);
 }
 
 function proba_minijeu(msg){
+	console.log("minijeu");
+	console.log((1/100+folieplayer(msg)/1000));
 	return (1/100+folieplayer(msg)/1000);
 }
 
@@ -1819,6 +1890,8 @@ function proba_drop(msg, rarete){ //rareté = "leg", "rar", "mag", "com"
 }
 
 function proba_event_team(msg){
+	console.log("eventteam");
+    console.log(0.005+folieplayer(msg)/1000)+(folieplayer(msg_precedent)/1000);
 	return (0.005+folieplayer(msg)/1000)+(folieplayer(msg_precedent)/1000);
 }
 
@@ -1870,6 +1943,7 @@ function proba_spe(msg){
 }
 
 function proba_boss(msg){
+	return 1;
 	if(folieplayer(msg)>100){
 		return 0;
 	}
@@ -1893,7 +1967,9 @@ function proba_levelup(msg){
 	}
 	if(races[raceplayer(msg)]!=undefined)
 		up=up+races[raceplayer(msg)].levelup;
-	return (1+up)/100+day/100;
+	console.log("levelup");
+	console.log((3+up)/100+day/100);
+	return (3+up)/100+day/100;
 }
 
 function proba_folieup(msg){

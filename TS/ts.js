@@ -10,7 +10,9 @@ var t2 = require('./t-nom.json');
 var sf = require('./s-adj.json');
 var s="";
 var t="";
-//https://discordapp.com/oauth2/authorize?client_id=634047192574984223&scope=bot&permissions=8
+//https://discordapp.com/oauth2/authorize?client_id=634047192574984223&scope=bot&permissions=8 - TS
+//https://discordapp.com/oauth2/authorize?client_id=625993776397287424&scope=bot&permissions=8 - ROBIN
+
 bot.on('message', msg => {
 	if (msg.content=="!ts"){
 		r=Math.random();
