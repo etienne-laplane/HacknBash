@@ -329,7 +329,7 @@ function commande(msg){
 	}
 	//niveau
 	if(msg.cleanContent.toLowerCase().includes("niveau") && msg.content.includes("?")){
-		msg.channel.send(msg.author.username "- Niveau : " +levelplayer(msg)+" - Folie : " +folieplayer(msg));
+		msg.channel.send(msg.author.username +"- Niveau : " +levelplayer(msg)+" - Folie : " +folieplayer(msg));
 		return true;
 	}
 	//équipe
@@ -339,9 +339,7 @@ function commande(msg){
 				msg.channel.send(teams[exKey][0]+" et "+teams[exKey][1]+" forment l'équipe "+exKey+"(niveau :"+teams[exKey][2]+") et ne peuvent pas s'attaquer l'un l'autre.");
 			}
 		}
-		else{
-			msg.channel.send(msg.author.username+" n'est dans aucune équipe. Peut-être que quelqu'un s'alliera avant que la solitude ne le plonge dans la folie.");
-		}
+		msg.channel.send(msg.author.username+" n'est dans aucune équipe. Peut-être que quelqu'un s'alliera avant que la solitude ne le plonge dans la folie.");
 		return true;
 	}
 	//camisole
@@ -411,7 +409,7 @@ function floor(msg){
 }
 
 function event_floor_up_res(msg){
-	if(muets.includes(msg.author.id))){
+	if(muets.includes(msg.author.id)){
 		return;
 	}
 	if(msg.content.toLowerCase()=="oui"){
@@ -426,7 +424,7 @@ function event_floor_up_res(msg){
 }
 
 function event_floor_down_res(msg){
-	if(muets.includes(msg.author.id))){
+	if(muets.includes(msg.author.id)){
 		return;
 	}
 	if(msg.content.toLowerCase()=="oui"){
@@ -969,7 +967,7 @@ function event_specialization(msg){
 				msg_clean="terre";
 			}
 		}
-		switch (msg_clean)){
+		switch (msg_clean){
 			case "feu":
 				spe=get_spe(msg);
 				spe=add_spe(1,spe);
@@ -1120,18 +1118,17 @@ function offer_join_lunatics(msg){
 
 function join_lunatics(msg){
 	for (var exKey in fous){
-		if fous[exKey]["id"]==msg.author.id{
+		if (fous[exKey]["id"]==msg.author.id){
 			return;
 		}
 	}
 	fous.push({"id":msg.author.id,
 			"username":msg.author.username});
-	
 }
 
 function join_chaos(msg){
 	for (var exKey in chaos){
-		if chaos[exKey]["id"]==msg.author.id{
+		if (chaos[exKey]["id"]==msg.author.id){
 			return;
 		}
 	}
@@ -1178,7 +1175,7 @@ function lunaticstotal(){
 
 function join_heros(msg){
 	for (var exKey in heros){
-		if heros[exKey]["id"]==msg.author.id{
+		if (heros[exKey]["id"]==msg.author.id){
 			return;
 		}
 	}
@@ -1189,17 +1186,17 @@ function join_heros(msg){
 //heros, fanatique, chaos, dieu, neutre
 function get_faction(msg){
 	for (var exKey in heros){
-		if heros[exKey]["id"]==msg.author.id{
+		if (heros[exKey]["id"]==msg.author.id){
 			return "heros";
 		}
 	}
 	for (var exKey in fous){
-		if fous[exKey]["id"]==msg.author.id{
+		if (fous[exKey]["id"]==msg.author.id){
 			return "fanatique";
 		}
 	}
 	for (var exKey in chaos){
-	if chaos[exKey]["id"]==msg.author.id{
+	if (chaos[exKey]["id"]==msg.author.id){
 			return "chaos";
 		}
 	}
@@ -1207,12 +1204,11 @@ function get_faction(msg){
 		return "dieu";
 	}
 	for (var exKey in dechu){
-	if dechu[exKey]==msg.author.id{
+	if (dechu[exKey]==msg.author.id){
 			return "déchu";
 		}
 	}
 	return "neutre";
-
 }
 
 //fonction principale : return true/false
@@ -1355,34 +1351,34 @@ function levelup(msg){
 	if(combo_id==msg.author.id){
 		combo_count++;
 		switch (combo_count){
-			3:
+			case 3:
 				msg.reply("TRIPLE LEVELUP !");
 				break;
-			4:
+			case 4:
 				msg.reply("QUAD LEVELUP !");
 				break;
-			5:
+			case 5:
 				msg.reply("ULTRA LEVELUP !");
 				break;
-			6:
+			case 6:
 				msg.reply("DOMINATION !");
 				folieup(msg);
 				break;
-			7:
+			case 7:
 				msg.reply("DIVIN !");
 				folieup(msg);
 				break;
-			8:
+			case 8:
 				msg.reply("BENI PAR LE DIEU DU CHAOS!");
 				folieup(msg);
 				bank_folie+=5;
 				break;
-			9:
+			case 9:
 				msg.reply("SE RAPPROCHE DE LA CORRUPTION !");
 				folieup(msg);
 				bank_folie+=5;
 				break;
-			10:
+			case 10:
 				msg.reply("DEPASSE LES LIMITES DU DIVIN ET DU CHAOS!");
 				folieup(msg);
 				bank_folie+=10;
@@ -1824,7 +1820,7 @@ function proba_drop(msg, rarete){ //rareté = "leg", "rar", "mag", "com"
 }
 
 function proba_event_team(msg){
-	return (0.005+folieplayer(msg)/1000)+(folieplayer(msg_precedent)/1000)+;
+	return (0.005+folieplayer(msg)/1000)+(folieplayer(msg_precedent)/1000);
 }
 
 function proba_dé(msg){
