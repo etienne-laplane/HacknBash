@@ -6,7 +6,7 @@ var fs = require('fs');
 var install = false;
 var start = false;
 var event_classe = false;
-var id_classe = 0;
+var id_classe = [];
 var event_race = false;
 var id_race = [];
 var spes = require('./spes.json');
@@ -287,6 +287,10 @@ bot.on('message', msg => {
 		return;
 	}
 	if(attaque(msg)){
+		msg_precedent=msg;
+		return;
+	}
+	if(drop(msg)){
 		msg_precedent=msg;
 		return;
 	}
@@ -1018,8 +1022,9 @@ function raceplayer(msg){
 
 //fonction principale : return true si qqch se passe, false sinon.
 function event_specialization(msg){
+	index = id_classe.findIndex(element=>element==msg.author.id);
 	var msg_clean=msg.cleanContent.toLowerCase();
-	if(msg.author.id==id_classe){
+	if(index>=0){
 		if(msg.author.bot){
 			r=Math.random;
 			if(r<0.25){
@@ -1599,7 +1604,7 @@ function log_spe(msg,spe){
 function log_race(msg,race){
 	msg.guild.channels.find(function(channel){
 		return channel.name=="niveau-ni-cochon";
-	}).send(msg.author.username+" fait partie du clan : "+race+"\n\""+msg.cleanContent+"\"",{code:true});
+	}).send(msg.author.username+" fait partie du clan : "+race,{code:true});
 }
 
 function log_folieup(msg){
@@ -1780,7 +1785,7 @@ function initminijeu(msg){
 			later_minijeu_type="deal_devil";
 			n_dealdevil=3+r*3700;
 			nom = "Pacte avec le chaos";
-			msg.channel.send("Je suis l'agent du chaos qui reigne dans cette tour. Le "+n_dealdevil+"ème à s'exprimer recevra une faveur unique.");
+			msg.channel.send("Le chaos se manifeste devant les yeux ébahis du groupe !");
 		}else if(r<0.41){
 			later_minijeu_type="Mini-boss";
 			var nom = miniboss[Math.floor(Math.random()*miniboss.length)];
@@ -1796,8 +1801,23 @@ function initminijeu(msg){
 		}
 		msg.guild.createChannel(miniboss_nom,'text').then(function(result){
 			channel_id = result.id;
-			msg.guild.channels.get(result.id).send("Qui osera défier le péril ?");
 			minijeu_type=later_minijeu_type;
+			switch (minijeu_type){
+				case "Dieu":
+					msg.guild.channels.get(result.id).send("Devant l'avatar de "+miniboss_nom+" comment réagissez-vous ? [prier]");
+					break;
+				case "deal_devil":
+					msg.guild.channels.get(result.id).send("Je suis l'agent du chaos qui reigne dans cette tour. Le "+n_dealdevil+"ème à s'exprimer recevra une faveur unique.");
+					break;
+				case "Mini-boss":
+					msg.guild.channels.get(result.id).send("Le combat contre le "+miniboss_nom+" fait rage !");
+					break;
+				case "Piege":
+					msg.guild.channels.get(result.id).send("Qui osera défier le péril ?");
+					break;
+			}
+			
+
 		});
 		minijeu_status=true;
 		r=Math.random();
@@ -1824,7 +1844,7 @@ function startminijeu(msg){
 function proba_team(msg){
 	console.log("team");
 	console.log((1+levelplayer(msg))/100);
-	return ((1+levelplayer(msg))/100);
+	return ((1+levelplayer(msg))/100)*coef;
 }
 
 function proba_attaque(msg){
@@ -1840,7 +1860,7 @@ function proba_attaque(msg){
 		att=att+races[raceplayer(msg)].atk;
 	console.log("att");
 	console.log((att/100));
-	return (att/100);
+	return (att/100)*coef;
 }
 
 function proba_def(msg){
@@ -1856,21 +1876,21 @@ function proba_def(msg){
 		def=def+races[raceplayer(msg)].def;
 	console.log("def");
 	console.log((def/100));
-	return (1-def/100);
+	return ((1-def/100))*coef;
 }
 
 function proba_minijeu(msg){
 	console.log("minijeu");
 	console.log((1/100+folieplayer(msg)/1000));
-	return (1/100+folieplayer(msg)/1000);
+	return (1/100+folieplayer(msg)/1000)*coef;
 }
 
 function proba_killminiboss(msg){
-	return 5/100+proba_attaque(msg)+1-proba_def(msg);
+	return (5/100+proba_attaque(msg)+1-proba_def(msg))*coef;
 }
 
 function proba_eviter_piege(msg){
-	return proba_def(msg)+(levelplayer(msg)/100);
+	return (proba_def(msg)+(levelplayer(msg)/100))*coef;
 }
 
 function proba_drop(msg, rarete){ //rareté = "leg", "rar", "mag", "com"
@@ -1886,16 +1906,16 @@ function proba_drop(msg, rarete){ //rareté = "leg", "rar", "mag", "com"
 		dr=dr+races[raceplayer(msg)].drop;
 	switch (rarete){
 		case "leg":
-			return dr/10000; 
+			return (dr/10000)*coef; 
 			break;
 		case "rar":
-			return dr/2000
+			return (dr/2000)*coef;
 			break;
 		case "mag":
-			return dr/333;
+			return (dr/333)*coef;
 			break;
 		case "com":
-			return 1/100;
+			return (1/100)*coef;
 			break;
 	}
 	return 0;
@@ -1904,11 +1924,11 @@ function proba_drop(msg, rarete){ //rareté = "leg", "rar", "mag", "com"
 function proba_event_team(msg){
 	console.log("eventteam");
     console.log(0.005+folieplayer(msg)/1000)+(folieplayer(msg_precedent)/1000);
-	return (0.005+folieplayer(msg)/1000)+(folieplayer(msg_precedent)/1000);
+	return ((0.005+folieplayer(msg)/1000)+(folieplayer(msg_precedent)/1000))*coef;
 }
 
 function proba_dé(msg){
-	return (folieplayer(msg)/2000)+(folieplayer(msg_precedent)/2000);
+	return ((folieplayer(msg)/2000)+(folieplayer(msg_precedent)/2000))*coef;
 }
 
 function proba_spe(msg){
@@ -1918,36 +1938,36 @@ function proba_spe(msg){
 			if(levelplayer<5){
 				return 0;
 			} else if(levelplayer>15){
-				return 5/100;
+				return (5/100))*coef;
 			} else {
-				return (levelplayer(msg)-5)/200;
+				return ((levelplayer(msg)-5)/200)*coef;
 			}
 			break;
 		case 1:
 			if(levelplayer<20){
 				return 0;
 			} else if(levelplayer>35){
-				return 4/100;
+				return (4/100)*coef;
 			} else {
-				return (levelplayer(msg)-20)/375;
+				return ((levelplayer(msg)-20)/375)*coef;
 			}
 			break;
 		case 2:
 			if(levelplayer<30){
 				return 0;
 			} else if(levelplayer>60){
-				return 3/100;
+				return (3/100)*coef;
 			} else {
-				return (levelplayer(msg)-30)/1000;
+				return ((levelplayer(msg)-30)/1000)*coef;
 			}
 			break;
 		case 3:
 			if(levelplayer<45){
 				return 0;
 			} else if(levelplayer>80){
-				return 2/100;
+				return (2/100)*coef;
 			} else {
-				return (levelplayer(msg)-45)/1750;
+				return ((levelplayer(msg)-45)/1750)*coef;
 			}
 			break;
 	}
@@ -1959,12 +1979,12 @@ function proba_boss(msg){
 		return 0;
 	}
 	if(folieplayer(msg)>50){
-		return 1/1000;
+		return (1/1000)*coef;
 	}
 	if(folieplayer(msg)>25){
-		return 1/250;
+		return (1/250)*coef;
 	}
-	return (1/100);
+	return (1/100)*coef;
 }
 
 function proba_levelup(msg){
@@ -1980,7 +2000,7 @@ function proba_levelup(msg){
 		up=up+races[raceplayer(msg)].levelup;
 	console.log("levelup");
 	console.log((3+up)/100+day/100);
-	return (3+up)/100+day/100;
+	return ((3+up)/100+day/100))*coef;
 }
 
 function proba_folieup(msg){
@@ -2012,7 +2032,7 @@ function proba_folieup(msg){
 			n4++;
 		}
 	}
-	return (mad/100)-day/100+(n1*n2*n3*n4+n1*n2+n3*n4)/100;
+	return ((mad/100)-day/100+(n1*n2*n3*n4+n1*n2+n3*n4)/100)*coef;
 }
 
 function proba_leveldown(msg){
@@ -2026,7 +2046,7 @@ function proba_leveldown(msg){
 	}
 	if(races[raceplayer(msg)]!=undefined)
 		dw=dw+races[raceplayer(msg)].leveldown;
-	return dw/100;
+	return (dw/100)*coef;
 }
 
 function proba_sortie_prison(msg){
@@ -2040,7 +2060,7 @@ function proba_sortie_prison(msg){
 	}
 	if(races[raceplayer(msg)]!=undefined)
 		pr=pr+races[raceplayer(msg)].prison;
-	return (1+pr)/100;
+	return ((1+pr)/100)*coef;
 }
 
 function chiffre_rom(curs){
