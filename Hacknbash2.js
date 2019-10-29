@@ -1021,7 +1021,7 @@ function event_specialization(msg){
 	var msg_clean=msg.cleanContent.toLowerCase();
 	if(msg.author.id==id_classe){
 		if(msg.author.bot){
-			r=Math.random;
+			r=Math.random();
 			if(r<0.25){
 				msg_clean="feu";
 			}else if(r<0.50){
@@ -1038,7 +1038,7 @@ function event_specialization(msg){
 				spe=add_spe(1,spe);
 				give_spe(spe,msg);
 				event_classe=false;
-				if_classe=0;
+				id_classe=0;
 				return true;
 				break;
 			case "eau":
@@ -1046,7 +1046,7 @@ function event_specialization(msg){
 				spe=add_spe(2,spe);
 				give_spe(spe,msg);
 				event_classe=false;
-				if_classe=0;
+				id_classe=0;
 				return true;
 				break;
 			case "air":
@@ -1054,7 +1054,7 @@ function event_specialization(msg){
 				spe=add_spe(3,spe);
 				give_spe(spe,msg);
 				event_classe=false;
-				if_classe=0;
+				id_classe=0;
 				return true;
 				break;
 			case "terre":
@@ -1062,7 +1062,7 @@ function event_specialization(msg){
 				spe=add_spe(4,spe);
 				give_spe(spe,msg);
 				event_classe=false;
-				if_classe=0;
+				id_classe=0;
 				return true;
 				break;
 			default :
@@ -1106,9 +1106,11 @@ function give_race(race,msg){
 
 function give_spe(spe,msg){
 	var old_spe = get_spe(msg);
+	console.log("give spe"+spe);
+	console.log("old spe"+old_spe);
 	if (old_spe!=""){
 		oldRole = msg.guild.roles.find(function(role){
-			return role.name == spes[spe]
+			return role.name == spes[spe].nom;
 		});
 		msg.member.removeRole(oldRole);
 	}
@@ -1133,7 +1135,9 @@ function give_spe(spe,msg){
 
 function get_spe(msg){
 	for(var exKey in spes){
+		console.log(spes[exKey].nom);
 		if(msg.member.roles.some(r=>[spes[exKey].nom].includes(r.name))){
+			console.log(exKey);
 			return exKey;
 		}
 	}
