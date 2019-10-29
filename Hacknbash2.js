@@ -1720,6 +1720,7 @@ function minijeu(msg){
 		}
 	} else if(minijeu_type=="Dieu"){
 		if(msg.channel.id==channel_id){
+			console.log("DEBUT");
 			if(priere.find(function(element) {
 				return element==msg.author.id;
 			})){
@@ -1774,6 +1775,7 @@ function minijeu(msg){
 			}
 			priere.push(msg.author.id);
 			console.log(priere);
+			console.log("FIN");
 		} 
 	}else if(minijeu_type=="deal_devil"){
 		n_dealdevil-=1;
