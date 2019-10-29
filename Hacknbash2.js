@@ -70,8 +70,9 @@ var muets=[];
 var nopotion=500;
 var channel_id=0;
 var end=false;
+var save = require('./save.json');
 
-loadgame();
+savegame();
 //trahison
 //event monter/descendre
 //commandes
@@ -1940,7 +1941,7 @@ function proba_spe(msg){
 			if(levelplayer<5){
 				return 0;
 			} else if(levelplayer>15){
-				return (5/100))*coef;
+				return (5/100)*coef;
 			} else {
 				return ((levelplayer(msg)-5)/200)*coef;
 			}
@@ -2002,7 +2003,7 @@ function proba_levelup(msg){
 		up=up+races[raceplayer(msg)].levelup;
 	console.log("levelup");
 	console.log((3+up)/100+day/100);
-	return ((3+up)/100+day/100))*coef;
+	return ((3+up)/100+day/100)*coef;
 }
 
 function proba_folieup(msg){
@@ -2219,6 +2220,8 @@ function savegame(){
 	save["nopotion"]=nopotion;
 	save["channel_id"]=channel_id;
 	save["end"]=end;
+	console.log('prout');
+	console.log(JSON.stringify(save));
 	fs.writeFile('./save.json', JSON.stringify(save), function (err) {
 	if (err) return console.log(err);
 	});
