@@ -1804,6 +1804,8 @@ function minijeu(msg){
 			itemname=cnt.substring(7);
 			if(msg.member.roles.some(r=>[itemname].includes(r.name))){
 				msg.reply("Le marchand te déleste de ton "+itemname+" avec grand plaisir.");
+				myRole = msg.guild.roles.find(role => role.name === itemname);
+				msg.member.removeRole(myRole);
 			}
 		}
 	}
@@ -1854,7 +1856,7 @@ function initminijeu(msg){
 	piege_safe=Array();
 		//type de mini jeu
 		var r=Math.random();
-		if(r<10.05){
+		if(r<0.05){
 			later_minijeu_type="Dieu";
 			var nom = dieu[Math.floor(Math.random()*dieu.length)];
 			miniboss_nom = nom;
@@ -1967,7 +1969,6 @@ function proba_def(msg){
 }
 
 function proba_minijeu(msg){
-	return 1;
 	console.log("minijeu");
 	console.log((1/100+folieplayer(msg)/1000));
 	return (1/100+folieplayer(msg)/1000)*coef;
