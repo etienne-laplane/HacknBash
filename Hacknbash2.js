@@ -6,7 +6,7 @@ var fs = require('fs');
 var install = false;
 var start = false;
 var event_classe = false;
-var id_classe = 0;
+var id_classe = [];
 var event_race = false;
 var id_race = [];
 var spes = require('./spes.json');
@@ -69,7 +69,10 @@ var camisole_id=0; //le user qui peut utiliser une camisole
 var muets=[];
 var nopotion=500;
 var channel_id=0;
+var end=false;
+var save = require('./save.json');
 
+savegame();
 //trahison
 //event monter/descendre
 //commandes
@@ -133,6 +136,7 @@ function debug(msg){
 }
 
 bot.on('message', msg => {
+	if(end)return;
 	if(!install&&msg.content=="install"){
 		install_(msg);
 		install=true;
@@ -162,6 +166,7 @@ bot.on('message', msg => {
 	if(msg_precedent==null) msg_precedent=msg;//just in case.
 	msg_count++;
 	if(msg_count%10==0){
+		savegame();
 		debug(msg);
 	}
 	nopotion--;
@@ -233,7 +238,7 @@ bot.on('message', msg => {
 	}
 	r=Math.random();
 	if(r<proba_spe(msg)){
-		id_classe=msg.author.id;
+		id_classe.push(msg.author.id);
 		msg.reply("Dans un éclair de lucidité, "+msg.author.username+" voit un bref instant la nature véritable du donjon. De cet enseignement il monte en compétence et choisi une affinité élémentaire ! [eau/feu/air/terre]");
 		msg_precedent=msg;
 		return;
@@ -287,6 +292,10 @@ bot.on('message', msg => {
 		return;
 	}
 	if(attaque(msg)){
+		msg_precedent=msg;
+		return;
+	}
+	if(drop(msg)){
 		msg_precedent=msg;
 		return;
 	}
@@ -1018,8 +1027,9 @@ function raceplayer(msg){
 
 //fonction principale : return true si qqch se passe, false sinon.
 function event_specialization(msg){
+	index = id_classe.findIndex(element=>element==msg.author.id);
 	var msg_clean=msg.cleanContent.toLowerCase();
-	if(msg.author.id==id_classe){
+	if(index>=0){
 		if(msg.author.bot){
 			r=Math.random();
 			if(r<0.25){
@@ -1038,7 +1048,7 @@ function event_specialization(msg){
 				spe=add_spe(1,spe);
 				give_spe(spe,msg);
 				event_classe=false;
-				id_classe=0;
+				id_classe.splice(index,1);
 				return true;
 				break;
 			case "eau":
@@ -1046,7 +1056,7 @@ function event_specialization(msg){
 				spe=add_spe(2,spe);
 				give_spe(spe,msg);
 				event_classe=false;
-				id_classe=0;
+				id_classe.splice(index,1);
 				return true;
 				break;
 			case "air":
@@ -1054,7 +1064,7 @@ function event_specialization(msg){
 				spe=add_spe(3,spe);
 				give_spe(spe,msg);
 				event_classe=false;
-				id_classe=0;
+				id_classe.splice(index,1);
 				return true;
 				break;
 			case "terre":
@@ -1062,7 +1072,7 @@ function event_specialization(msg){
 				spe=add_spe(4,spe);
 				give_spe(spe,msg);
 				event_classe=false;
-				id_classe=0;
+				id_classe.splice(index,1);
 				return true;
 				break;
 			default :
@@ -1603,7 +1613,7 @@ function log_spe(msg,spe){
 function log_race(msg,race){
 	msg.guild.channels.find(function(channel){
 		return channel.name=="niveau-ni-cochon";
-	}).send(msg.author.username+" fait partie du clan : "+race+"\n\""+msg.cleanContent+"\"",{code:true});
+	}).send(msg.author.username+" fait partie du clan : "+race,{code:true});
 }
 
 function log_folieup(msg){
@@ -1784,7 +1794,7 @@ function initminijeu(msg){
 			later_minijeu_type="deal_devil";
 			n_dealdevil=3+r*3700;
 			nom = "Pacte avec le chaos";
-			msg.channel.send("Je suis l'agent du chaos qui reigne dans cette tour. Le "+n_dealdevil+"ème à s'exprimer recevra une faveur unique.");
+			msg.channel.send("Le chaos se manifeste devant les yeux ébahis du groupe !");
 		}else if(r<0.41){
 			later_minijeu_type="Mini-boss";
 			var nom = miniboss[Math.floor(Math.random()*miniboss.length)];
@@ -1800,8 +1810,21 @@ function initminijeu(msg){
 		}
 		msg.guild.createChannel(miniboss_nom,'text').then(function(result){
 			channel_id = result.id;
-			msg.guild.channels.get(result.id).send("Qui osera défier le péril ?");
 			minijeu_type=later_minijeu_type;
+			switch (minijeu_type){
+				case "Dieu":
+					msg.guild.channels.get(result.id).send("Devant l'avatar de "+miniboss_nom+" comment réagissez-vous ? [prier]");
+					break;
+				case "deal_devil":
+					msg.guild.channels.get(result.id).send("Je suis l'agent du chaos qui reigne dans cette tour. Le "+n_dealdevil+"ème à s'exprimer recevra une faveur unique.");
+					break;
+				case "Mini-boss":
+					msg.guild.channels.get(result.id).send("Le combat contre le "+miniboss_nom+" fait rage !");
+					break;
+				case "Piege":
+					msg.guild.channels.get(result.id).send("Qui osera défier le péril ?");
+					break;
+			}
 		});
 		minijeu_status=true;
 		r=Math.random();
@@ -1828,7 +1851,7 @@ function startminijeu(msg){
 function proba_team(msg){
 	console.log("team");
 	console.log((1+levelplayer(msg))/100);
-	return ((1+levelplayer(msg))/100);
+	return ((1+levelplayer(msg))/100)*coef;
 }
 
 function proba_attaque(msg){
@@ -1844,7 +1867,7 @@ function proba_attaque(msg){
 		att=att+races[raceplayer(msg)].atk;
 	console.log("att");
 	console.log((att/100));
-	return (att/100);
+	return (att/100)*coef;
 }
 
 function proba_def(msg){
@@ -1860,21 +1883,21 @@ function proba_def(msg){
 		def=def+races[raceplayer(msg)].def;
 	console.log("def");
 	console.log((def/100));
-	return (1-def/100);
+	return ((1-def/100))*coef;
 }
 
 function proba_minijeu(msg){
 	console.log("minijeu");
 	console.log((1/100+folieplayer(msg)/1000));
-	return (1/100+folieplayer(msg)/1000);
+	return (1/100+folieplayer(msg)/1000)*coef;
 }
 
 function proba_killminiboss(msg){
-	return 5/100+proba_attaque(msg)+1-proba_def(msg);
+	return (5/100+proba_attaque(msg)+1-proba_def(msg))*coef;
 }
 
 function proba_eviter_piege(msg){
-	return proba_def(msg)+(levelplayer(msg)/100);
+	return (proba_def(msg)+(levelplayer(msg)/100))*coef;
 }
 
 function proba_drop(msg, rarete){ //rareté = "leg", "rar", "mag", "com"
@@ -1890,16 +1913,16 @@ function proba_drop(msg, rarete){ //rareté = "leg", "rar", "mag", "com"
 		dr=dr+races[raceplayer(msg)].drop;
 	switch (rarete){
 		case "leg":
-			return dr/10000; 
+			return (dr/10000)*coef; 
 			break;
 		case "rar":
-			return dr/2000
+			return (dr/2000)*coef;
 			break;
 		case "mag":
-			return dr/333;
+			return (dr/333)*coef;
 			break;
 		case "com":
-			return 1/100;
+			return (1/100)*coef;
 			break;
 	}
 	return 0;
@@ -1908,11 +1931,11 @@ function proba_drop(msg, rarete){ //rareté = "leg", "rar", "mag", "com"
 function proba_event_team(msg){
 	console.log("eventteam");
     console.log(0.005+folieplayer(msg)/1000)+(folieplayer(msg_precedent)/1000);
-	return (0.005+folieplayer(msg)/1000)+(folieplayer(msg_precedent)/1000);
+	return ((0.005+folieplayer(msg)/1000)+(folieplayer(msg_precedent)/1000))*coef;
 }
 
 function proba_dé(msg){
-	return (folieplayer(msg)/2000)+(folieplayer(msg_precedent)/2000);
+	return ((folieplayer(msg)/2000)+(folieplayer(msg_precedent)/2000))*coef;
 }
 
 function proba_spe(msg){
@@ -1922,36 +1945,36 @@ function proba_spe(msg){
 			if(levelplayer<5){
 				return 0;
 			} else if(levelplayer>15){
-				return 5/100;
+				return (5/100)*coef;
 			} else {
-				return (levelplayer(msg)-5)/200;
+				return ((levelplayer(msg)-5)/200)*coef;
 			}
 			break;
 		case 1:
 			if(levelplayer<20){
 				return 0;
 			} else if(levelplayer>35){
-				return 4/100;
+				return (4/100)*coef;
 			} else {
-				return (levelplayer(msg)-20)/375;
+				return ((levelplayer(msg)-20)/375)*coef;
 			}
 			break;
 		case 2:
 			if(levelplayer<30){
 				return 0;
 			} else if(levelplayer>60){
-				return 3/100;
+				return (3/100)*coef;
 			} else {
-				return (levelplayer(msg)-30)/1000;
+				return ((levelplayer(msg)-30)/1000)*coef;
 			}
 			break;
 		case 3:
 			if(levelplayer<45){
 				return 0;
 			} else if(levelplayer>80){
-				return 2/100;
+				return (2/100)*coef;
 			} else {
-				return (levelplayer(msg)-45)/1750;
+				return ((levelplayer(msg)-45)/1750)*coef;
 			}
 			break;
 	}
@@ -1963,12 +1986,12 @@ function proba_boss(msg){
 		return 0;
 	}
 	if(folieplayer(msg)>50){
-		return 1/1000;
+		return (1/1000)*coef;
 	}
 	if(folieplayer(msg)>25){
-		return 1/250;
+		return (1/250)*coef;
 	}
-	return (1/100);
+	return (1/100)*coef;
 }
 
 function proba_levelup(msg){
@@ -1984,7 +2007,7 @@ function proba_levelup(msg){
 		up=up+races[raceplayer(msg)].levelup;
 	console.log("levelup");
 	console.log((3+up)/100+day/100);
-	return (3+up)/100+day/100;
+	return ((3+up)/100+day/100)*coef;
 }
 
 function proba_folieup(msg){
@@ -2016,7 +2039,7 @@ function proba_folieup(msg){
 			n4++;
 		}
 	}
-	return (mad/100)-day/100+(n1*n2*n3*n4+n1*n2+n3*n4)/100;
+	return ((mad/100)-day/100+(n1*n2*n3*n4+n1*n2+n3*n4)/100)*coef;
 }
 
 function proba_leveldown(msg){
@@ -2030,7 +2053,7 @@ function proba_leveldown(msg){
 	}
 	if(races[raceplayer(msg)]!=undefined)
 		dw=dw+races[raceplayer(msg)].leveldown;
-	return dw/100;
+	return (dw/100)*coef;
 }
 
 function proba_sortie_prison(msg){
@@ -2044,7 +2067,7 @@ function proba_sortie_prison(msg){
 	}
 	if(races[raceplayer(msg)]!=undefined)
 		pr=pr+races[raceplayer(msg)].prison;
-	return (1+pr)/100;
+	return ((1+pr)/100)*coef;
 }
 
 function chiffre_rom(curs){
@@ -2097,8 +2120,120 @@ function to_prison(msg){
 	prison_id=msg.author.id;
 }
 
+function loadgame(){
+	install = save["install"];
+	start = save["start"];
+	event_classe = save["event_classe"];
+	id_classe = save["id_classe"];
+	event_race = save["event_race"];
+	id_race = save["id_race"];
+	god = save["god"];
+	piege_safe = save["piege_safe"];
+	minijeu_status = save["minijeu_status"];
+	prison = save["prison"];
+	day_light = save["day_light"];
+	bank_levels = save["bank_levels"];
+	bank_folie = save["bank_folie"];
+	prison_id = save["prison_id"];
+	day = save["day"];
+	players = save["players"];
+	levels = save["levels"];
+	folies = save["folies"];
+	floor = save["floor"];
+	minijeu_type = save["minijeu_type"];
+	minijeu_status = save["minijeu_status"];
+	miniboss_nom = save["miniboss_nom"];
+	n_dealdevil = save["n_dealdevil"];
+	boss_id = save["boss_id"];
+	boss_name = save["boss_name"];
+	chaos = save["chaos"];
+	heros = save["heros"];
+	fous = save["fous"];
+	dieu_id = save["dieu_id"];
+	dechu = save["dechu"];
+	dieu_username = save["dieu_username"];
+	MP = save["MP"];
+	chaos_decided = save["chaos_decided"];
+	combo_id = save["combo_id"];
+	combo_count = save["combo_count"];
+	highest_floor = save["highest_floor"];
+	event_floor_up = save["event_floor_up"];
+	event_floor_down = save["event_floor_down"];
+	event_team = save["event_team"];
+	leader_id = save["leader_id"];
+	leader_name = save["leader_name"];
+	event_leader = save["event_leader"];
+	diff = save["diff"];
+	msg_count = save["msg_count"];
+	curse = save["curse"];
+	camisole_id = save["camisole_id"];
+	muets = save["muets"];
+	nopotion = save["nopotion"];
+	channel_id = save["channel_id"];
+	end = save["end"];
+}
+
+function savegame(){
+	save["install"]=install;
+	save["start"]=start;
+	save["event_classe"]=event_classe;
+	save["id_classe"]=id_classe;
+	save["event_race"]=event_race;
+	save["id_race"]=id_race;
+	save["god"]=god;
+	save["piege_safe"]=piege_safe;
+	save["minijeu_status"]=minijeu_status;
+	save["prison"]=prison;
+	save["day_light"]=day_light;
+	save["bank_levels"]=bank_levels;
+	save["bank_folie"]=bank_folie;
+	save["prison_id"]=prison_id;
+	save["day"]=day;
+	save["players"]=players;
+	save["levels"]=levels;
+	save["folies"]=folies;
+	save["floor"]=floor;
+	save["minijeu_type"]=minijeu_type;
+	save["minijeu_status"]=minijeu_status;
+	save["miniboss_nom"]=miniboss_nom;
+	save["n_dealdevil"]=n_dealdevil;
+	save["boss_id"]=boss_id;
+	save["boss_name"]=boss_name;
+	save["chaos"]=chaos;
+	save["heros"]=heros;
+	save["fous"]=fous;
+	save["dieu_id"]=dieu_id;
+	save["dechu"]=dechu;
+	save["dieu_username"]=dieu_username;
+	save["MP"]=MP;
+	save["chaos_decided"]=chaos_decided;
+	save["combo_id"]=combo_id;
+	save["combo_count"]=combo_count;
+	save["highest_floor"]=highest_floor;
+	save["event_floor_up"]=event_floor_up;
+	save["event_floor_down"]=event_floor_down;
+	save["event_team"]=event_team;
+	save["leader_id"]=leader_id;
+	save["leader_name"]=leader_name;
+	save["event_leader"]=event_leader;
+	save["diff"]=diff;
+	save["msg_count"]=msg_count;
+	save["curse"]=curse;
+	save["camisole_id"]=camisole_id;
+	save["muets"]=muets;
+	save["nopotion"]=nopotion;
+	save["channel_id"]=channel_id;
+	save["end"]=end;
+	console.log('prout');
+	console.log(JSON.stringify(save));
+	fs.writeFile('./save.json', JSON.stringify(save), function (err) {
+	if (err) return console.log(err);
+	});
+}
+
 //TODO
 function gameover(){
+	end=true;
 }
 
 bot.on("error", (e) => console.error(e));
