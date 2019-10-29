@@ -71,6 +71,7 @@ var nopotion=500;
 var channel_id=0;
 var end=false;
 var save = require('./save.json');
+var priere=[];
 
 savegame();
 //trahison
@@ -544,7 +545,7 @@ function drop(msg){
 	var index=0;
 	var size = 0;
 	r=Math.random();
-	if(r<proba_drop(mes,"leg")){
+	if(r<proba_drop(msg,"leg")){
 		leg=items["leg"];
 		for(var exKey in leg) {
 			size+=1;
@@ -554,8 +555,7 @@ function drop(msg){
 			droprate=Math.random();
 			if(droprate<1/size){
 				if(att_role(exKey,"8E44AD",msg)){
-					msg.channel.send("[OBJET LEGENDAIRE] "+msg.author.username+" trouve : "+ exKey+" ("+leg[exKey][desc]+")");
-					drop_count+=1;
+					msg.channel.send("[OBJET LEGENDAIRE] "+msg.author.username+" trouve : "+ exKey+" ("+leg[exKey]["desc"]+")");
 				}
 				return;
 			}
@@ -563,7 +563,7 @@ function drop(msg){
 		}
 	} 
 	r=Math.random();
-	if (r<proba_drop(mes,"rar")){
+	if (r<proba_drop(msg,"rar")){
 		rar=items["rar"];
 		for(var exKey in rar) {
 			size+=1;
@@ -573,8 +573,7 @@ function drop(msg){
 			droprate=Math.random();
 			if(droprate<1/size){
 				if(att_role(exKey,"F1C40F",msg)){
-					msg.channel.send("[OBJET RARE] "+msg.author.username+" trouve : "+ exKey+" ("+rar[exKey][desc]+")");
-					drop_count+=1;
+					msg.channel.send("[OBJET RARE] "+msg.author.username+" trouve : "+ exKey+" ("+rar[exKey]["desc"]+")");
 				}
 				return;
 			}
@@ -582,7 +581,7 @@ function drop(msg){
 		}
 	} 
 	r=Math.random();
-	if (r<proba_drop(mes,"mag")){
+	if (r<proba_drop(msg,"mag")){
 		mag=items["mag"];
 		for(var exKey in mag) {
 			size+=1;
@@ -592,8 +591,7 @@ function drop(msg){
 			droprate=Math.random();
 			if(droprate<1/size){
 				if(att_role(exKey,"3498DB",msg)){
-					msg.channel.send("[OBJET MAGIQUE] "+msg.author.username+" trouve : "+ exKey+" ("+mag[exKey][desc]+")");
-					drop_count+=1;
+					msg.channel.send("[OBJET MAGIQUE] "+msg.author.username+" trouve : "+ exKey+" ("+mag[exKey]["desc"]+")");
 				}
 				return;
 			}
@@ -601,7 +599,7 @@ function drop(msg){
 		}
 	} 
 	r=Math.random();
-	if (r<proba_drop(mes,"com")){
+	if (r<proba_drop(msg,"com")){
 		com=items["com"];
 		for(var exKey in com) {
 			size+=1;
@@ -611,8 +609,7 @@ function drop(msg){
 			droprate=Math.random();
 			if(droprate<1/size){
 				if(att_role(exKey,"BDC3C7",msg)){
-					msg.channel.send("[OBJET COMMUN] "+msg.author.username+" trouve : "+ exKey+" ("+com[exKey][desc]+")");
-					drop_count+=1;
+					msg.channel.send("[OBJET COMMUN] "+msg.author.username+" trouve : "+ exKey+" ("+com[exKey]["desc"]+")");
 				}
 				return;
 			}
@@ -626,7 +623,7 @@ function drop_unique(msg,nom){//nom de l'item unique à attribuer
 	unique=items["unique"];
 	if (unique[nom]!=undefined){
 		att_role(nom,"F39C12",msg);
-		msg.channel.send("[OBJET UNIQUE] "+msg.author.username+" trouve : "+ nom+" ("+unique[nom][desc]+")");
+		msg.channel.send("[OBJET UNIQUE] "+msg.author.username+" trouve : "+ nom+" ("+unique[nom]["desc"]+")");
 	}
 	return;
 }
@@ -1120,14 +1117,18 @@ function give_spe(spe,msg){
 	console.log("old spe"+old_spe);
 	if (old_spe!=""){
 		oldRole = msg.guild.roles.find(function(role){
-			return role.name == spes[spe].nom;
+			return role.name == spes[old_spe].nom;
 		});
 		msg.member.removeRole(oldRole);
 	}
 	myRole = msg.guild.roles.find(function(role){
-		return role.name == spes[spe]
+		console.log("CACA-------");
+		console.log(role.name);
+		console.log(spes[spe].nom);
+		return role.name == spes[spe].nom;
 	});
 	if(myRole==undefined){
+		console.log("UNDEFINED?");
 		botRole = msg.guild.roles.find(role => role.name === "Hack'n'Bash");
 		msg.guild.createRole({
 			name: spes[spe].nom,
@@ -1137,6 +1138,7 @@ function give_spe(spe,msg){
 			.then(role => msg.member.addRole(role))
 			.catch(console.error);	
 	}else{
+		console.log("addrole");
 		msg.member.addRole(myRole);
 	}
 	msg.reply("amélioration de classe : "+spes[spe].nom);
@@ -1718,7 +1720,13 @@ function minijeu(msg){
 		}
 	} else if(minijeu_type=="Dieu"){
 		if(msg.channel.id==channel_id){
-		var id_msg=undefined;
+			if(priere.find(function(element) {
+				return element==msg.author.id;
+			})){
+				console.log("ROUTVE");
+				return;
+			}
+			var id_msg=undefined;
 			var go_msg=undefined;
 			for(var exKey in god){
 				if(god[exKey]["id"]==msg.author.id){
@@ -1726,10 +1734,12 @@ function minijeu(msg){
 					go_msg=god[exKey]["d"];
 				}
 			}
-			if(msg.cleanContent.toLowerCase=="prier"){
+			console.log("PIERE " + id_msg+" " +go_msg);
+			if(msg.cleanContent.toLowerCase()=="prier"){
+				console.log("PIERE " + id_msg+" " +go_msg);
 				if (id_msg!=undefined){
 					if (go_msg==miniboss_nom){
-						msg.channel.send(msg.author.username+", fidèlement, s'agenouille devant l'avatar de "+nom+".");
+						msg.channel.send(msg.author.username+", fidèlement, s'agenouille devant l'avatar de "+miniboss_nom+".");
 						if(get_faction(msg)=="lunatiques"){
 							folieup(msg);
 						} else {
@@ -1738,7 +1748,7 @@ function minijeu(msg){
 						//5% de chances de drop item benediction divine
 					}
 					else {
-						msg.channel.send("Les cieux se déchirèrent et la voix de "+go_msg+"retenti : \"Tu oses t'agenouiller devant "+nom+" ? Puisque c'est ainsi, souffre mon couroux !");
+						msg.channel.send("Les cieux se déchirèrent et la voix de "+go_msg+"retenti : \"Tu oses t'agenouiller devant "+miniboss_nom+" ? Puisque c'est ainsi, souffre mon couroux !");
 						if(get_faction(msg)=="lunatiques"){
 							leveldown();
 						} else {
@@ -1752,7 +1762,7 @@ function minijeu(msg){
 						"id":msg.author.id,
 						"d":miniboss_nom
 					});
-					msg.channel.send("Bienvenue parmi mes fidèles "+msg.author.username+" dit "+nom+" d'une voix bienveillante");
+					msg.channel.send("Bienvenue parmi mes fidèles "+msg.author.username+" dit "+miniboss_nom+" d'une voix bienveillante");
 					levelup(msg);
 					folieup(msg);
 				}
@@ -1762,6 +1772,8 @@ function minijeu(msg){
 					leveldown(msg);
 				}
 			}
+			priere.push(msg.author.id);
+			console.log(priere);
 		} 
 	}else if(minijeu_type=="deal_devil"){
 		n_dealdevil-=1;
@@ -1778,6 +1790,61 @@ function minijeu(msg){
 				channel.send("Le chaos vous propose deux choix : voulez vous faire perdre au groupe des niveaux et plonger tout le monde dans la folie ? [oui/non]");
 			}).catch(error);
 		}
+	}else if(minijeu_type=="Marchand"){
+		cnt=msg.cleanContent;
+		if(cnt.split(' ')[0]=="identifier"){
+			itemname=cnt.substring(11);
+			if(msg.member.roles.some(r=>[itemname].includes(r.name))){
+				msg.reply(print_stats(itemname));
+			}
+		}
+		if(cnt.split(' ')[0]=="donner"){
+			itemname=cnt.substring(7);
+			if(msg.member.roles.some(r=>[itemname].includes(r.name))){
+				msg.reply("Le marchand te déleste de ton "+itemname+" avec grand plaisir.");
+			}
+		}
+	}
+}
+
+function print_stats(itemname){
+	toReturn="";
+	if (items["leg"][itemname]!=undefined){
+		for(var exKey in items["leg"][itemname]){
+			if (items["leg"][itemname][exKey]!=0){
+				toReturn=toReturn + exKeyitemtoString(exKey)+" : "+items["leg"][itemname][exKey]+"\n";
+			}
+		}
+	}
+	return toReturn;
+}
+
+function exKeyitemtoString(arg){
+	switch(arg){
+		case "desc":
+			return "Description";
+			break;
+		case "atk":
+			return "Capacité offensive";
+			break;
+		case "def":
+			return "Capacité défensive";
+			break;
+		case "mad":
+			return "Folie";
+			break;
+		case "drop":
+			return "Chance de loot";
+			break;
+		case "levelup":
+			return "Experience";
+			break;
+		case "leveldown":
+			return "Résistance à la perte de niveaux";
+			break;
+		case "prison":
+			return "Chance de s'échapper de prison";
+			break;
 	}
 }
 
@@ -1785,7 +1852,7 @@ function initminijeu(msg){
 	piege_safe=Array();
 		//type de mini jeu
 		var r=Math.random();
-		if(r<0.05){
+		if(r<10.05){
 			later_minijeu_type="Dieu";
 			var nom = dieu[Math.floor(Math.random()*dieu.length)];
 			miniboss_nom = nom;
@@ -1793,9 +1860,13 @@ function initminijeu(msg){
 		}else if(r<0.06){
 			later_minijeu_type="deal_devil";
 			n_dealdevil=3+r*3700;
-			nom = "Pacte avec le chaos";
+			miniboss_nom = "Pacte avec le chaos";
 			msg.channel.send("Le chaos se manifeste devant les yeux ébahis du groupe !");
-		}else if(r<0.41){
+		}else if(r<0.11){
+			later_minijeu_type="Marchand";
+			miniboss_nom = "Marchand ambulant";
+			msg.channel.send("Un marchand ambulant s'arrête devant le groupe. Il vous propose d'identifier vos objets et de vous en débarrasser !");
+		}else if(r<0.51){
 			later_minijeu_type="Mini-boss";
 			var nom = miniboss[Math.floor(Math.random()*miniboss.length)];
 			var adject = adj[Math.floor(Math.random()*adj.length)];
@@ -1812,6 +1883,9 @@ function initminijeu(msg){
 			channel_id = result.id;
 			minijeu_type=later_minijeu_type;
 			switch (minijeu_type){
+				case "Marchand":
+					msg.guild.channels.get(result.id).send("Le marchand vous propose d'identifier [identifier <nom de l'item>] et de vous débarrasser de vos objets [donner <nom de l'item]");
+					break;
 				case "Dieu":
 					msg.guild.channels.get(result.id).send("Devant l'avatar de "+miniboss_nom+" comment réagissez-vous ? [prier]");
 					break;
@@ -1828,6 +1902,9 @@ function initminijeu(msg){
 		});
 		minijeu_status=true;
 		r=Math.random();
+		if(minijeu_type=="Marchand"){
+			r=1;
+		}
 		setTimeout(function(){
 			try{	
 				msg.guild.channels.get(channel_id).delete();
@@ -1836,12 +1913,13 @@ function initminijeu(msg){
 				channel_id=0;
 				minijeu_status=false;
 				minijeu_type="";
+				priere=[];
 			},r*300000);
 }
 
 function startminijeu(msg){
 	var r = Math.random();
-	if(r<proba_minijeu(msg)){
+	if(r<proba_minijeu(msg)&&channel_id==0){
 		initminijeu(msg);
 		return true;
 	}
@@ -1887,6 +1965,7 @@ function proba_def(msg){
 }
 
 function proba_minijeu(msg){
+	return 1;
 	console.log("minijeu");
 	console.log((1/100+folieplayer(msg)/1000));
 	return (1/100+folieplayer(msg)/1000)*coef;
@@ -1900,7 +1979,7 @@ function proba_eviter_piege(msg){
 	return (proba_def(msg)+(levelplayer(msg)/100))*coef;
 }
 
-function proba_drop(msg, rarete){ //rareté = "leg", "rar", "mag", "com"
+function proba_drop(msg, rarete){ //rareté = "leg", "rar", "mag", "com"r*300000
 	var dr=0;
 	for (var exKey in items){
 		for (var it in items[exKey]){
@@ -1913,15 +1992,43 @@ function proba_drop(msg, rarete){ //rareté = "leg", "rar", "mag", "com"
 		dr=dr+races[raceplayer(msg)].drop;
 	switch (rarete){
 		case "leg":
+			count=0;
+			for (var exKey in items["leg"]){
+				if(msg.member.roles.some(r=>[exKey].includes(r.name))){
+					count++;
+				}
+			}
+			if(count>2)return 0;
 			return (dr/10000)*coef; 
 			break;
 		case "rar":
+			count=0;
+			for (var exKey in items["rar"]){
+				if(msg.member.roles.some(r=>[exKey].includes(r.name))){
+					count++;
+				}
+			}
+			if(count>2)return 0;
 			return (dr/2000)*coef;
 			break;
 		case "mag":
+			count=0;
+			for (var exKey in items["mag"]){
+				if(msg.member.roles.some(r=>[exKey].includes(r.name))){
+					count++;
+				}
+			}
+			if(count>2)return 0;
 			return (dr/333)*coef;
 			break;
 		case "com":
+			count=0;
+			for (var exKey in items["com"]){
+				if(msg.member.roles.some(r=>[exKey].includes(r.name))){
+					count++;
+				}
+			}
+			if(count>2)return 0;
 			return (1/100)*coef;
 			break;
 	}
