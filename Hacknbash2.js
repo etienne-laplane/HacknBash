@@ -69,7 +69,9 @@ var camisole_id=0; //le user qui peut utiliser une camisole
 var muets=[];
 var nopotion=500;
 var channel_id=0;
+var end=false;
 
+loadgame();
 //trahison
 //event monter/descendre
 //commandes
@@ -133,6 +135,7 @@ function debug(msg){
 }
 
 bot.on('message', msg => {
+	if(end)return;
 	if(!install&&msg.content=="install"){
 		install_(msg);
 		install=true;
@@ -162,6 +165,7 @@ bot.on('message', msg => {
 	if(msg_precedent==null) msg_precedent=msg;//just in case.
 	msg_count++;
 	if(msg_count%10==0){
+		savegame();
 		debug(msg);
 	}
 	nopotion--;
@@ -233,7 +237,7 @@ bot.on('message', msg => {
 	}
 	r=Math.random();
 	if(r<proba_spe(msg)){
-		id_classe=msg.author.id;
+		id_classe.push(msg.author.id);
 		msg.reply("Dans un éclair de lucidité, "+msg.author.username+" voit un bref instant la nature véritable du donjon. De cet enseignement il monte en compétence et choisi une affinité élémentaire ! [eau/feu/air/terre]");
 		msg_precedent=msg;
 		return;
@@ -1043,7 +1047,7 @@ function event_specialization(msg){
 				spe=add_spe(1,spe);
 				give_spe(spe,msg);
 				event_classe=false;
-				if_classe=0;
+				id_classe.splice(index,1);
 				return true;
 				break;
 			case "eau":
@@ -1051,7 +1055,7 @@ function event_specialization(msg){
 				spe=add_spe(2,spe);
 				give_spe(spe,msg);
 				event_classe=false;
-				if_classe=0;
+				id_classe.splice(index,1);
 				return true;
 				break;
 			case "air":
@@ -1059,7 +1063,7 @@ function event_specialization(msg){
 				spe=add_spe(3,spe);
 				give_spe(spe,msg);
 				event_classe=false;
-				if_classe=0;
+				id_classe.splice(index,1);
 				return true;
 				break;
 			case "terre":
@@ -1067,7 +1071,7 @@ function event_specialization(msg){
 				spe=add_spe(4,spe);
 				give_spe(spe,msg);
 				event_classe=false;
-				if_classe=0;
+				id_classe.splice(index,1);
 				return true;
 				break;
 			default :
@@ -1816,8 +1820,6 @@ function initminijeu(msg){
 					msg.guild.channels.get(result.id).send("Qui osera défier le péril ?");
 					break;
 			}
-			
-
 		});
 		minijeu_status=true;
 		r=Math.random();
@@ -2113,8 +2115,118 @@ function to_prison(msg){
 	prison_id=msg.author.id;
 }
 
+function loadgame(){
+	install = save["install"];
+	start = save["start"];
+	event_classe = save["event_classe"];
+	id_classe = save["id_classe"];
+	event_race = save["event_race"];
+	id_race = save["id_race"];
+	god = save["god"];
+	piege_safe = save["piege_safe"];
+	minijeu_status = save["minijeu_status"];
+	prison = save["prison"];
+	day_light = save["day_light"];
+	bank_levels = save["bank_levels"];
+	bank_folie = save["bank_folie"];
+	prison_id = save["prison_id"];
+	day = save["day"];
+	players = save["players"];
+	levels = save["levels"];
+	folies = save["folies"];
+	floor = save["floor"];
+	minijeu_type = save["minijeu_type"];
+	minijeu_status = save["minijeu_status"];
+	miniboss_nom = save["miniboss_nom"];
+	n_dealdevil = save["n_dealdevil"];
+	boss_id = save["boss_id"];
+	boss_name = save["boss_name"];
+	chaos = save["chaos"];
+	heros = save["heros"];
+	fous = save["fous"];
+	dieu_id = save["dieu_id"];
+	dechu = save["dechu"];
+	dieu_username = save["dieu_username"];
+	MP = save["MP"];
+	chaos_decided = save["chaos_decided"];
+	combo_id = save["combo_id"];
+	combo_count = save["combo_count"];
+	highest_floor = save["highest_floor"];
+	event_floor_up = save["event_floor_up"];
+	event_floor_down = save["event_floor_down"];
+	event_team = save["event_team"];
+	leader_id = save["leader_id"];
+	leader_name = save["leader_name"];
+	event_leader = save["event_leader"];
+	diff = save["diff"];
+	msg_count = save["msg_count"];
+	curse = save["curse"];
+	camisole_id = save["camisole_id"];
+	muets = save["muets"];
+	nopotion = save["nopotion"];
+	channel_id = save["channel_id"];
+	end = save["end"];
+}
+
+function savegame(){
+	save["install"]=install;
+	save["start"]=start;
+	save["event_classe"]=event_classe;
+	save["id_classe"]=id_classe;
+	save["event_race"]=event_race;
+	save["id_race"]=id_race;
+	save["god"]=god;
+	save["piege_safe"]=piege_safe;
+	save["minijeu_status"]=minijeu_status;
+	save["prison"]=prison;
+	save["day_light"]=day_light;
+	save["bank_levels"]=bank_levels;
+	save["bank_folie"]=bank_folie;
+	save["prison_id"]=prison_id;
+	save["day"]=day;
+	save["players"]=players;
+	save["levels"]=levels;
+	save["folies"]=folies;
+	save["floor"]=floor;
+	save["minijeu_type"]=minijeu_type;
+	save["minijeu_status"]=minijeu_status;
+	save["miniboss_nom"]=miniboss_nom;
+	save["n_dealdevil"]=n_dealdevil;
+	save["boss_id"]=boss_id;
+	save["boss_name"]=boss_name;
+	save["chaos"]=chaos;
+	save["heros"]=heros;
+	save["fous"]=fous;
+	save["dieu_id"]=dieu_id;
+	save["dechu"]=dechu;
+	save["dieu_username"]=dieu_username;
+	save["MP"]=MP;
+	save["chaos_decided"]=chaos_decided;
+	save["combo_id"]=combo_id;
+	save["combo_count"]=combo_count;
+	save["highest_floor"]=highest_floor;
+	save["event_floor_up"]=event_floor_up;
+	save["event_floor_down"]=event_floor_down;
+	save["event_team"]=event_team;
+	save["leader_id"]=leader_id;
+	save["leader_name"]=leader_name;
+	save["event_leader"]=event_leader;
+	save["diff"]=diff;
+	save["msg_count"]=msg_count;
+	save["curse"]=curse;
+	save["camisole_id"]=camisole_id;
+	save["muets"]=muets;
+	save["nopotion"]=nopotion;
+	save["channel_id"]=channel_id;
+	save["end"]=end;
+	fs.writeFile('./save.json', JSON.stringify(save), function (err) {
+	if (err) return console.log(err);
+	});
+}
+
 //TODO
 function gameover(){
+	end=true;
 }
 
 bot.on("error", (e) => console.error(e));
