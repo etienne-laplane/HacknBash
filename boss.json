@@ -16,32 +16,32 @@
 		"Rat":{
             "Victoire":{
                 "normal":"Furtif, %username% le Rat évite facilement l'assaut.",
-                "critique":"Un combat de titan commence, %username% l'Ours déploie sa forcé fénoménale pour combattre Yurgen le Kraken malheureusement ce dernier bien plus à l'aise dans l'eau fini par l'emporter laissant %username% à l'article de la mort. En le soignant ses compagnons retrouvent un bout de tentacule côlté à sa fourrure, probablement arraché par un coup de griffe. Ils décident de donner le tentacule à %username% à son réveil.",
+                "critique":"Réussite critique ! %username% le Rat voyant le coup venir tranche un tentacule avant même que le combat ne commence. Yurgen le Kraken se replie et attendra une prochaine opportunité pour bondir...",
                 "loot":"Tentacule de Yurgen"
                 },
             "Défaite":{
-                "normal":"Yurgen le Kraken apparait ! Il plonge son regard dans celui de %username% l'Ours et le fait tomber dans la folie !",
-                "critique":"Echec critique ! %username% l'Ours se débat en essayant de se libérer de l'étreinte de Yurgen le Kraken, et se défait de son équipement pour survivre !",
-                "loot":"lose_all_items"
+                "normal":"Yurgen le Kraken apparait ! Il plonge son regard dans celui de %username% le Rat et le fait tomber dans la folie !",
+                "critique":"Yurgen le Kraken apparait ! Il plonge son regard dans celui de %username% le Rat et le fait tomber dans la folie !",
+                "loot":"no"
                 }
             },
 		"Humain":{
             "Victoire":{
-                "normal":"Furtif, %username% le Rat évite facilement l'assaut.",
+                "normal":"Victoire !",
                 "critique":"Un combat de titan commence, %username% l'Ours déploie sa forcé fénoménale pour combattre Yurgen le Kraken malheureusement ce dernier bien plus à l'aise dans l'eau fini par l'emporter laissant %username% à l'article de la mort. En le soignant ses compagnons retrouvent un bout de tentacule côlté à sa fourrure, probablement arraché par un coup de griffe. Ils décident de donner le tentacule à %username% à son réveil.",
-                "loot":"Tentacule de Yurgen"
+                "loot":"no"
                 },
             "Défaite":{
                 "normal":"Yurgen le Kraken apparait ! Il plonge son regard dans celui de %username% l'Ours et le fait tomber dans la folie !",
                 "critique":"Echec critique ! %username% l'Ours se débat en essayant de se libérer de l'étreinte de Yurgen le Kraken, et se défait de son équipement pour survivre !",
-                "loot":"lose_all_items"
+                "loot":"no"
                 }
             },
 		"Elfe":{
             "Victoire":{
                 "normal":"Furtif, %username% le Rat évite facilement l'assaut.",
                 "critique":"Un combat de titan commence, %username% l'Ours déploie sa forcé fénoménale pour combattre Yurgen le Kraken malheureusement ce dernier bien plus à l'aise dans l'eau fini par l'emporter laissant %username% à l'article de la mort. En le soignant ses compagnons retrouvent un bout de tentacule côlté à sa fourrure, probablement arraché par un coup de griffe. Ils décident de donner le tentacule à %username% à son réveil.",
-                "loot":"Tentacule de Yurgen"
+                "loot":"no"
                 },
             "Défaite":{
                 "normal":"Yurgen le Kraken apparait ! Il plonge son regard dans celui de %username% l'Ours et le fait tomber dans la folie !",

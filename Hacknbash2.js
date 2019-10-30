@@ -73,7 +73,7 @@ var end=false;
 var save = require('./save.json');
 var priere=[];
 
-savegame();
+loadgame();
 //trahison
 //event monter/descendre
 //commandes
@@ -697,6 +697,8 @@ function drop_boss(name,msg){//name of the reward, in string
 		case "lose_all_items":
 			lose_all_items(msg);
 			break;
+		case "no":
+			break;
 		default:
 			drop_unique(msg,name);
 			break;
@@ -728,18 +730,30 @@ function day_night(msg){
 	if (day<0){
 		setTimeout(function(){ 
 			day=Math.random(); 
+			if (day>0.9){
+				day=1;
+				msg.guild.channels.find(function(channel){
+				return channel.name=="niveau-ni-cochon";
+				}).send("Etincellant, le soleil se lève, éclairant les moindres recoints de la tour. Galvanisé, le groupe se reprend en main et se dépêche de progresser dans les étages.",{code:true});
+			}
 			day_night(msg);
 			msg.guild.channels.find(function(channel){
 				return channel.name=="niveau-ni-cochon";
-				}).send("C'est la nuit",{code:true});
+				}).send("Le jour se lève enfin, et le soleil illumine doucement le "+floor+"è étage.",{code:true});
 		}, 800000*r+100000);
 	} else {
 			setTimeout(function(){ 
 			day=-Math.random(); 
+			if (day<-0.9){
+				day=-1;
+				msg.guild.channels.find(function(channel){
+				return channel.name=="niveau-ni-cochon";
+				}).send("Le soleil se couche, et la nuit semble plus sombre que d'habitude. Les chances de tomber dans la folies sont encore plus grandes, et l'envie de redescendre se fait pressante.",{code:true});
+			}
 			day_night(msg);
 			msg.guild.channels.find(function(channel){
 				return channel.name=="niveau-ni-cochon";
-				}).send("C'est le jour",{code:true});
+				}).send("La lumière qui filtre par les fenêtres se change en obscurité alors que la nuit tombe... Errant toujours dans le "+floor+"è étage, le groupe se trouve plus vulnérable aux tentations et aux voix qui viennent des ombres...",{code:true});
 		}, 800000*r+100000);
 	}
 	
