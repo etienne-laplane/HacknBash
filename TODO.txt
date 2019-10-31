@@ -22,8 +22,7 @@ message à la disparition du mini boss ?
 
 
 
-LIMITE ITEM 3
-EVENT SUPPRESSION / STATS ITEMS ----------------------------------------------------------------
+
 
 >Commandes
 leader OK
@@ -39,11 +38,9 @@ reset folie
 
 >effet immédiat au drop d'item ?
 
+VICTOIRE SOMMET TOUR -----------------------------------------------------------------------------------------------
 
-
-Stats -------------------------------------------------------------------------------------------
 gameover ----------------------------------------DELETE ROLES------------------------------------
-Leaderboard -------------------------------------------------------------------------------------
 réponse en réaction ?
 
 CHECKLIST
@@ -61,6 +58,3 @@ dés - OK
 rejoindre faction - OK
 floor - OK
 drop camisole OK;
-
-BUGS--------------------------------------------------------------------------MP AUX BOTS--------------------chance de tuer un miniboss proportionnel à la longueur du texte-------DE AVEC SOI MEME---CREATION EQUIPE. COMPTAGE DES COMBOS. COMMANDE JOUR/NUIT COMMADE ETAGE COMMANDE MALEDITION, message au curse, proba de tuer les mini boss DIFF = 4, LEADER
-Je suis l'agent du chaos qui reigne dans cette tour. Le 197.24307309478795ème à s'exprimer recevra une faveur unique.
