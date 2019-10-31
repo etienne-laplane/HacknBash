@@ -106,7 +106,7 @@
 			"desc":"Terrifie les adversaires",
 			"atk":1,
 			"def":1,
-			"mad":1,
+			"mad":0,
 			"drop":0,
 			"levelup":0,
 			"leveldown":1,
@@ -125,8 +125,8 @@
 		"Bouclier à pointes":{
 			"desc":"Augmente l'attaque et la défense, mais le porteur developpe une attirance pour les forces occultes",
 			"atk":1,
-			"def":1,
-			"mad":1,
+			"def":2,
+			"mad":0,
 			"drop":0,
 			"levelup":0,
 			"leveldown":0,
@@ -137,7 +137,7 @@
 			"atk":0,
 			"def":0,
 			"mad":0,
-			"drop":0,
+			"drop":1,
 			"levelup":1,
 			"leveldown":1,
 			"prison":0
@@ -147,7 +147,7 @@
 			"atk":0,
 			"def":0,
 			"mad":1,
-			"drop":0,
+			"drop":1,
 			"levelup":0,
 			"leveldown":0,
 			"prison":0
@@ -166,10 +166,10 @@
 			"desc":"Le porteur galvanise le groupe, rendant tout le monde plus résistant à la folie et plus combatif.",
 			"atk":1,
 			"def":0,
-			"mad":1,
+			"mad":0,
 			"drop":0,
 			"levelup":0,
-			"leveldown":1,
+			"leveldown":2,
 			"prison":0
 		},
 		"Falchion enchanté":{
@@ -186,11 +186,11 @@
 	"rar":{
 		"Coeur de Démon":{
 			"desc":"Le porteur devient fou, mais sa puissance augmente considérablement",
-			"atk":1,
+			"atk":2,
 			"def":0,
 			"mad":2,
 			"drop":0,
-			"levelup":1,
+			"levelup":2,
 			"leveldown":0,
 			"prison":0
 		},
@@ -216,11 +216,11 @@
 		},
 		"Masque Vengeur":{
 			"desc":"Crâne d'un géant porté comme heaume, il inspire la terreur aux adversaires.",
-			"atk":0,
+			"atk":1,
 			"def":0,
-			"mad":-1,
+			"mad":-2,
 			"drop":0,
-			"levelup":1,
+			"levelup":2,
 			"leveldown":1,
 			"prison":1
 		},
@@ -228,7 +228,7 @@
 			"desc":"Pierre enchassée au bout d'un baton de druide, contient l'essence primale du froid. Augmente énormément la résistance à la perte de niveaux.",
 			"atk":0,
 			"def":1,
-			"mad":0,
+			"mad":-1,
 			"drop":0,
 			"levelup":0,
 			"leveldown":5,
@@ -238,9 +238,9 @@
 			"desc":"Pierre du chef du clan des ours, son effet est négligeable sans le set complet des médaillons du chaos",
 			"atk":0,
 			"def":0,
-			"mad":2,
+			"mad":3,
 			"drop":0,
-			"levelup":-1,
+			"levelup":-3,
 			"leveldown":0,
 			"prison":0
 		},
