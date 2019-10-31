@@ -62,7 +62,7 @@ var coef=1;
 var leader_id=0;
 var leader_name="tous";
 var event_leader=false//pour etre sur que le leader change
-var diff=5;
+var diff=4;
 var msg_count=1;
 var curse=0;
 var camisole_id=0; //le user qui peut utiliser une camisole
@@ -165,7 +165,7 @@ bot.on('message', msg => {
 		console.log("DAYYYY");
 		day_light=false;
 	}
-	if(msg.author.id=="625993776397287424") return;//le bot ne joue pas.
+	if(msg.author.id=="625993776397287424"||msg.author.bot) return;//les bots ne jouent pas.
 	if(msg_precedent==null) msg_precedent=msg;//just in case.
 	msg_count++;
 	if(msg_count%10==0){
@@ -217,7 +217,7 @@ bot.on('message', msg => {
 	}
 	if(event_leader){
 		if(msg.author.id!=leader_id){
-			// setleader(msg);
+			setleader(msg);
 		}
 	}
 	if(prison){
@@ -355,7 +355,7 @@ function commande(msg){
 	//boire potion
 	if(msg.content.includes("boire")&&msg.content.includes("potion")){
 		if(nopotion<0){
-			if(get_faction(msg)=="chaos"){
+			if(get_faction(msg)=="chaos"||curse==0){
 				msg.channel.send(msg.author.username + " boit une gorgée de potion, mais celle ci n'a aucun effet.");
 				nopotion=333;
 				return true;
@@ -391,6 +391,20 @@ function commande(msg){
 		msg.channel.send("N'oubliez pas que "+leader_name+" est votre guide pour cet étage ("+floor+"). Sa mission est de vous mener jusqu'à l'étage suivant. En échange, vous lui devez admiration et respect.");
 		return true;
 	}
+	//leader
+	if(msg.cleanContent.toLowerCase().includes("étage") && msg.content.includes("?")){
+		msg.channel.send("Votre groupe se trouve présentement au "+floor+"è étage.");
+		return true;
+	}
+	//jour nuit
+	if((msg.cleanContent.toLowerCase().includes("jour") && msg.content.includes("?"))||(msg.cleanContent.toLowerCase().includes("nuit") && msg.content.includes("?"))){
+		if(day<0){
+			msg.channel.send("C'est la nuit, ne craignez pas l'obscurité, ne redescendez pas !");
+		} else{
+			msg.channel.send("C'est le jour, le moment propice pour progresser.");
+		}
+		return true;
+	}
 	//prison
 	if(msg.cleanContent.toLowerCase().includes("prison") && msg.content.includes("?")){
 		if(prison_id!="0"){
@@ -410,7 +424,7 @@ function commande(msg){
 	if(msg.content.includes("équipe ?")){
 		for(var exKey in teams){
 			if(msg.member.roles.some(r=>[exKey].includes(r.name))){
-				msg.channel.send(teams[exKey][0]+" et "+teams[exKey][1]+" forment l'équipe "+exKey+"(niveau :"+teams[exKey][2]+") et ne peuvent pas s'attaquer l'un l'autre.");
+				msg.reply("Tu es dans l'équipe des "+exKey+"(niveau :"+teams[exKey][2]+")");
 			}
 		}
 		msg.channel.send(msg.author.username+" n'est dans aucune équipe. Peut-être que quelqu'un s'alliera avant que la solitude ne le plonge dans la folie.");
@@ -1488,7 +1502,7 @@ function levelup(msg){
 				break;
 		}
 	} else {
-		combo_count=0;
+		combo_count=1;
 	}
 	combo_id=msg.author.id;
 }
@@ -1885,7 +1899,7 @@ function initminijeu(msg){
 			msg.channel.send("Une apparition divine de "+nom+" vous frappe tous. Vous agenouillez-vous ?");
 		}else if(r<0.06){
 			later_minijeu_type="deal_devil";
-			n_dealdevil=3+r*3700;
+			n_dealdevil=Math.floor(3+(r-0.05)*3700);
 			miniboss_nom = "Pacte avec le chaos";
 			msg.channel.send("Le chaos se manifeste devant les yeux ébahis du groupe !");
 		}else if(r<0.11){
@@ -1997,10 +2011,8 @@ function proba_minijeu(msg){
 }
 
 function proba_killminiboss(msg){
-	console.log("OUUIIIIIIIIIIIIIIIIIII");
-	console.log(((5/100)+(proba_attaque(msg))+1-proba_def(msg))*coef);
-	console.log("OUUIIIIIIIIIIIIIIIIIII>>>>>>>>>>>");
-	return ((5/100)+(proba_attaque(msg))+1-proba_def(msg))*coef;
+	s=msg.cleanContent.length-1;
+	return (s/10)*((proba_attaque(msg))+1-proba_def(msg))*coef;
 }
 
 function proba_eviter_piege(msg){
