@@ -62,4 +62,4 @@ rejoindre faction - OK
 floor - OK
 drop camisole OK;
 
-BUGS--------------------------------------------------------------------------------------------------------CREATION EQUIPE. COMPTAGE DES COMBOS. COMMANDE JOUR/NUIT COMMADE ETAGE, message au curse, proba de tuer les mini boss DIFF = 4, LEADER
+BUGS--------------------------------------------------------------------------MP AUX BOTS--------------------chance de tuer un miniboss proportionnel à la longueur du texte-------DE AVEC SOI MEME---CREATION EQUIPE. COMPTAGE DES COMBOS. COMMANDE JOUR/NUIT COMMADE ETAGE COMMANDE MALEDITION, message au curse, proba de tuer les mini boss DIFF = 4, LEADER
