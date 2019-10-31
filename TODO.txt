@@ -61,3 +61,5 @@ dés - OK
 rejoindre faction - OK
 floor - OK
 drop camisole OK;
+
+BUGS--------------------------------------------------------------------------------------------------------CREATION EQUIPE. COMPTAGE DES COMBOS. COMMANDE JOUR/NUIT COMMADE ETAGE, message au curse, proba de tuer les mini boss DIFF = 4, LEADER

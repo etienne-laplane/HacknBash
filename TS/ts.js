@@ -12,6 +12,7 @@ var s="";
 var t="";
 //https://discordapp.com/oauth2/authorize?client_id=634047192574984223&scope=bot&permissions=8 - TS
 //https://discordapp.com/oauth2/authorize?client_id=625993776397287424&scope=bot&permissions=8 - ROBIN
+//https://discordapp.com/oauth2/authorize?client_id=625988662454386698&scope=bot&permissions=8 - ROBERT 625988662454386698
 
 bot.on('message', msg => {
 	if (msg.content=="!ts"){

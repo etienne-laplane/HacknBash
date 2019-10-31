@@ -34,8 +34,8 @@ var prison_id=0;
 var prison_msg;
 var day=0;
 var players=[];
-var levels=[];
-var folies=[];
+var levels={};
+var folies={};
 var floor=0;
 var minijeu_type="";
 var minijeu_status=false;
@@ -73,7 +73,7 @@ var end=false;
 var save = require('./save.json');
 var priere=[];
 
-loadgame();
+savegame();
 //trahison
 //event monter/descendre
 //commandes
@@ -137,6 +137,7 @@ function debug(msg){
 }
 
 bot.on('message', msg => {
+	coef=1;
 	if(end)return;
 	if(!install&&msg.content=="install"){
 		install_(msg);
@@ -161,6 +162,7 @@ bot.on('message', msg => {
 	if(!start) return;
 	if(day_light){
 		day_night(msg);
+		console.log("DAYYYY");
 		day_light=false;
 	}
 	if(msg.author.id=="625993776397287424") return;//le bot ne joue pas.
@@ -726,6 +728,7 @@ function reset_folie(msg){
 }
 
 function day_night(msg){
+	console.log("---------------------------------------------------------------------")
 	r=Math.random();
 	if (day<0){
 		setTimeout(function(){ 
@@ -742,8 +745,10 @@ function day_night(msg){
 				}).send("Le jour se lève enfin, et le soleil illumine doucement le "+floor+"è étage.",{code:true});
 		}, 800000*r+100000);
 	} else {
+		console.log("--------------------------------------------==-------------------------")
 			setTimeout(function(){ 
 			day=-Math.random(); 
+			console.log("---------------------------------------------------------------------             "+day)
 			if (day<-0.9){
 				day=-1;
 				msg.guild.channels.find(function(channel){
@@ -909,15 +914,15 @@ function team(msg){
 function event_team_(msg){
 	if(event_team&&(msg.author.id==msg_team_a.author.id||msg.author.id==msg_team_b.author.id)){
 		nom_team=msg.cleanContent.substring(0,98).replace(/[^a-zA-Z ]/g, "");
+		if(nom_team==""){
+			return;
+		}
 		//test nom équipe déjà pris
 		for(var exKey in teams){
 			if(exKey==nom_team){
 				msg.channel.send("l'équipe des "+nom_team+" voit d'un très mauvais oeil cette tentative d'usurpation de nom...");
 				return false;
 			}
-		}
-		if(nom_team==""){
-			return;
 		}
 		team_role(nom_team,msg_team_a,msg_team_b);
 		msg.channel.send(msg_team_a.author.username+" et "+msg_team_b.author.username+" créent une entente amicale, et nomment leur équipe : "+nom_team);
@@ -1732,7 +1737,8 @@ function minijeu(msg){
 				msg.reply("frappe le "+miniboss_nom + " mais le rate");
 			}
 		}
-	} else if(minijeu_type=="Dieu"){
+	} 
+	else if(minijeu_type=="Dieu"){
 		if(msg.channel.id==channel_id){
 			console.log("DEBUT");
 			if(priere.find(function(element) {
@@ -1791,7 +1797,8 @@ function minijeu(msg){
 			console.log(priere);
 			console.log("FIN");
 		} 
-	}else if(minijeu_type=="deal_devil"){
+	}
+	else if(minijeu_type=="deal_devil"){
 		n_dealdevil-=1;
 		if(n_dealdevil==0){
 			var offer={};
@@ -1806,7 +1813,8 @@ function minijeu(msg){
 				channel.send("Le chaos vous propose deux choix : voulez vous faire perdre au groupe des niveaux et plonger tout le monde dans la folie ? [oui/non]");
 			}).catch(error);
 		}
-	}else if(minijeu_type=="Marchand"){
+	}
+	else if(minijeu_type=="Marchand"){
 		cnt=msg.cleanContent;
 		if(cnt.split(' ')[0]=="identifier"){
 			itemname=cnt.substring(11);
@@ -1955,7 +1963,7 @@ function proba_attaque(msg){
 	for (var exKey in items){
 		for (var it in items[exKey]){
 			if(msg.member.roles.some(r=>[it].includes(r.name))){
-				att=it.atk+att;
+				att=items[exKey][it]["atk"]+att;
 			}
 		}
 	}
@@ -1971,7 +1979,7 @@ function proba_def(msg){
 	for (var exKey in items){
 		for (var it in items[exKey]){
 			if(msg.member.roles.some(r=>[it].includes(r.name))){
-				def=it.def+def;
+				def=items[exKey][it]["def"]+def;
 			}
 		}
 	}
@@ -1989,7 +1997,10 @@ function proba_minijeu(msg){
 }
 
 function proba_killminiboss(msg){
-	return (5/100+proba_attaque(msg)+1-proba_def(msg))*coef;
+	console.log("OUUIIIIIIIIIIIIIIIIIII");
+	console.log(((5/100)+(proba_attaque(msg))+1-proba_def(msg))*coef);
+	console.log("OUUIIIIIIIIIIIIIIIIIII>>>>>>>>>>>");
+	return ((5/100)+(proba_attaque(msg))+1-proba_def(msg))*coef;
 }
 
 function proba_eviter_piege(msg){
@@ -2001,7 +2012,7 @@ function proba_drop(msg, rarete){ //rareté = "leg", "rar", "mag", "com"r*300000
 	for (var exKey in items){
 		for (var it in items[exKey]){
 			if(msg.member.roles.some(r=>[it].includes(r.name))){
-				dr=it.drop+dr;
+				dr=items[exKey][it]["drop"]+dr;
 			}
 		}
 	}
@@ -2066,36 +2077,36 @@ function proba_spe(msg){
 	var spekey = get_spe(msg);
 	switch(spekey.length){
 		case 0:
-			if(levelplayer<5){
+			if(levelplayer(msg)<5){
 				return 0;
-			} else if(levelplayer>15){
+			} else if(levelplayer(msg)>15){
 				return (5/100)*coef;
 			} else {
 				return ((levelplayer(msg)-5)/200)*coef;
 			}
 			break;
 		case 1:
-			if(levelplayer<20){
+			if(levelplayer(msg)<20){
 				return 0;
-			} else if(levelplayer>35){
+			} else if(levelplayer(msg)>35){
 				return (4/100)*coef;
 			} else {
 				return ((levelplayer(msg)-20)/375)*coef;
 			}
 			break;
 		case 2:
-			if(levelplayer<30){
+			if(levelplayer(msg)<30){
 				return 0;
-			} else if(levelplayer>60){
+			} else if(levelplayer(msg)>60){
 				return (3/100)*coef;
 			} else {
 				return ((levelplayer(msg)-30)/1000)*coef;
 			}
 			break;
 		case 3:
-			if(levelplayer<45){
+			if(levelplayer(msg)<45){
 				return 0;
-			} else if(levelplayer>80){
+			} else if(levelplayer(msg)>80){
 				return (2/100)*coef;
 			} else {
 				return ((levelplayer(msg)-45)/1750)*coef;
@@ -2123,7 +2134,7 @@ function proba_levelup(msg){
 	for (var exKey in items){
 		for (var it in items[exKey]){
 			if(msg.member.roles.some(r=>[it].includes(r.name))){
-				up=it.levelup+up;
+				up=items[exKey][it]["levelup"]+up;
 			}
 		}
 	}
@@ -2131,7 +2142,7 @@ function proba_levelup(msg){
 		up=up+races[raceplayer(msg)].levelup;
 	console.log("levelup");
 	console.log((3+up)/100+day/100);
-	return ((3+up)/100+day/100)*coef;
+	return ((15+up)/100+day/100)*coef;
 }
 
 function proba_folieup(msg){
@@ -2139,7 +2150,7 @@ function proba_folieup(msg){
 	for (var exKey in items){
 		for (var it in items[exKey]){
 			if(msg.member.roles.some(r=>[it].includes(r.name))){
-				mad=it.mad+mad;
+				mad=items[exKey][it]["mad"]+mad;
 			}
 		}
 	}
@@ -2171,7 +2182,7 @@ function proba_leveldown(msg){
 	for (var exKey in items){
 		for (var it in items[exKey]){
 			if(msg.member.roles.some(r=>[it].includes(r.name))){
-				dw=it.leveldown+dw;
+				dw=items[exKey][it]["leveldown"]+dw;
 			}
 		}
 	}
@@ -2185,7 +2196,7 @@ function proba_sortie_prison(msg){
 	for (var exKey in items){
 		for (var it in items[exKey]){
 			if(msg.member.roles.some(r=>[it].includes(r.name))){
-				pr=it.prison+pr;
+				pr=items[exKey][it]["prison"]+pr;
 			}
 		}
 	}
