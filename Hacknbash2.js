@@ -2017,7 +2017,7 @@ function proba_drop(msg, rarete){ //rareté = "leg", "rar", "mag", "com"r*300000
 		}
 	}
 	if(races[raceplayer(msg)]!=undefined)
-		dr=dr+races[raceplayer(msg)].drop;
+		dr=dr+races[raceplayer(msg)]["drop"];
 	switch (rarete){
 		case "leg":
 			count=0;
@@ -2027,7 +2027,7 @@ function proba_drop(msg, rarete){ //rareté = "leg", "rar", "mag", "com"r*300000
 				}
 			}
 			if(count>2)return 0;
-			return (dr/10000)*coef; 
+			return (dr/10000)*coef+100; 
 			break;
 		case "rar":
 			count=0;
@@ -2037,7 +2037,7 @@ function proba_drop(msg, rarete){ //rareté = "leg", "rar", "mag", "com"r*300000
 				}
 			}
 			if(count>2)return 0;
-			return (dr/2000)*coef;
+			return (dr/2000)*coef+100;
 			break;
 		case "mag":
 			count=0;
@@ -2047,7 +2047,7 @@ function proba_drop(msg, rarete){ //rareté = "leg", "rar", "mag", "com"r*300000
 				}
 			}
 			if(count>2)return 0;
-			return (dr/333)*coef;
+			return (dr/333)*coef+100;
 			break;
 		case "com":
 			count=0;
@@ -2057,7 +2057,7 @@ function proba_drop(msg, rarete){ //rareté = "leg", "rar", "mag", "com"r*300000
 				}
 			}
 			if(count>2)return 0;
-			return (1/100)*coef;
+			return (1/100)*coef+100;
 			break;
 	}
 	return 0;
