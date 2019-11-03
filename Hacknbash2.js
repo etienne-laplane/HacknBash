@@ -81,8 +81,10 @@ var droprar=false;
 var madglobal=0;
 var vul=0;
 var victoire = false;
+var malusfloor=1;
+var channelignored=[];
 
-savegame();
+loadgame();
 //trahison
 //event monter/descendre
 //commandes
@@ -146,7 +148,9 @@ function debug(msg){
 }
 
 bot.on('message', msg => {
-	coef=1;
+	if(channelignored.findIndex(element=>element==msg.channel.id)>-1){
+		return;
+	}
 	if(end)return;
 	if(!install&&msg.content=="install"){
 		install_(msg);
@@ -157,7 +161,7 @@ bot.on('message', msg => {
 	if(!install) return;
 	if(!start&&msg.content=="start"){
 		start=true;
-		msg.channel.send("Votre groupe d'aventuriers se retrouve au bas d'une tour. Il est dit que toutes les réponses se trouvent en haut de la tour. Mais pour trouver les réponses que vous êtes venus chercher, il faudra traverser 100 étages. Les pieges sont peu nombreux, et les monstres quasiment inexistants... Qu'est ce qui rendait alors le périple si difficile ? Est-ce... vous même ? En tous cas, il est temps de se mettre en route !");
+		msg.channel.send("Votre groupe d'aventuriers se retrouve au bas d'une tour. Il est dit que toutes les réponses se trouvent en haut de la tour. Mais pour trouver les réponses que vous êtes venus chercher, il faudra traverser "+objectif+" étages. Les pieges sont peu nombreux, et les monstres quasiment inexistants... Qu'est ce qui rendait alors le périple si difficile ? Est-ce... vous même ? En tous cas, il est temps de se mettre en route !");
 		msg.guild.channels.find("name","niveau-ni-cochon").send("CHOIX DES CLANS : \n\n"+
 																"[Humain] : Habile et robuste, il ne perd pas ce qu'il a acquis, l'humain est l'opposé de l'ours, ses nombreux talents le tireront de nombreuses situations. \n\n"+
 																"[Elfe] : Combatif, il ne succombe que rarement aux tentations, et saura être chanceux lors qu'il le faudra. \n\n"+
@@ -174,8 +178,8 @@ bot.on('message', msg => {
 		day_night(msg);
 		day_light=false;
 	}
-	//if(msg.author.id=="625993776397287424"||msg.author.bot) return;//les bots ne jouent pas.
-	if(msg.author.id=="625993776397287424") return;//les bots ne jouent pas.
+	if(msg.author.id=="625993776397287424"||msg.author.bot) return;//les bots ne jouent pas.
+	//if(msg.author.id=="625993776397287424") return;//les bots ne jouent pas.
 	if(msg_precedent==null) msg_precedent=msg;//just in case.
 	msg_count++;
 	if(msg_count%10==0){
@@ -202,10 +206,13 @@ bot.on('message', msg => {
 		if (curse == 10){
 			msg.channel.send("GAME OVER : Le groupe tourne en rond depuis des jours et des jours, le chaos reignant dans la tour a enfin eu raison de tous. Seul l'envoyé du chaos s'en sort, corrompu jusqu'au bout de son âme !");
 			msg.guild.channels.find("name","niveau-ni-cochon").send("GAME OVER : WINNER : "+winnerchaos(),{code:true});
-			gameover();
+			gameover(msg);
 			return;
 		}
 		msg.channel.send("La malédiction se renforce... Il est peut-être temps d'utiliser une potion ? ["+chiffre_rom(curse)+"]");
+	}
+	if(prison_msg==undefined){
+		prison_id=0;
 	}
 	if(msg.author.id==prison_id&&!msg_precedent.author.bot){
 		var r=Math.random();
@@ -223,6 +230,7 @@ bot.on('message', msg => {
 		if(get_spe(msg)==""+vul+""+vul+""+vul+""+vul){
 			msg.channel.send("Les mots de "+msg.author.username+" le "+raceplayer(msg)+", Seigneur "+vulstring(vul)+" retentirent dans tout l'univers ! \""+msg.cleanContent+"\", par ces mots, que le chaos disparaisse !");
 			victoire = true;
+			combat_final=false;
 		} else {
 		}
 	}
@@ -260,7 +268,7 @@ bot.on('message', msg => {
 		msg_precedent=msg;
 		return;
 	}	
-	if(boss_id==msg.author.id){
+	if(boss_id==msg.author.id&&false){
 		fight_boss(msg);
 		msg_precedent=msg;
 		return;
@@ -334,7 +342,7 @@ bot.on('message', msg => {
 				console.error(error);
 			});	
 		}
-		else if(players.length/(2.4)>fous.length){
+		else if(players.length/(3.1)>fous.length){
 			if(get_faction(msg)=="neutre"){
 				offer_join_lunatics(msg);
 			}
@@ -397,36 +405,49 @@ function drop_camisole(msg){
 
 //fonction principale
 function commande(msg){
+	//admincmd
+	if(msg.author.id=="98810512950726656"&&msg.content=="!ignorechannel"){
+		channelignored.push(msg.channel.id);
+	}
+	if(msg.author.id=="98810512950726656"&&msg.content=="!gameover"){
+		console.log("gameover");
+		gameover(msg);
+	}
 	//boire potion
-	if(msg.content.includes("boire")&&msg.content.includes("potion")){
+	if(msg.content.toLowerCase().includes("boire")&&msg.content.toLowerCase().includes("potion")){
 		if(nopotion<0){
 			if(get_faction(msg)=="chaos"||curse==0){
 				msg.channel.send(msg.author.username + " boit une gorgée de potion, mais celle ci n'a aucun effet.");
-				nopotion=objectif*7;
+				nopotion=objectif*12;
 				return true;
 			}else {
 				r=Math.random();
 				if(r<0.25){
 					msg.channel.send(msg.author.username + " boit une gorgée de potion, mais celle ci n'a aucun effet.");
+					nopotion=objectif*5;
 					return true;
 				} else if(r<0.75){
 					msg.channel.send(msg.author.username + " boit une gorgée de potion, et au prix de sa santé mentale et d'un peu d'experience, la malédiction se dissipe un peu.");
 					curse--;
 					folieup(msg);
 					leveldown(msg);
+					nopotion=objectif*5;
 					return true;
 				} else if(r<0.99){
 					msg.channel.send(msg.author.username + " boit une gorgée de potion, concentre une importante energie autour de lui, et dissipe la malédiction.");
 					curse--;
 					levelup(msg);
+					nopotion=objectif*5;
 					return true;
 				} else{
 					msg.channel.send(msg.author.username + " conjure la puissance cachée du clan des "+raceplayer(msg)+" et lève toute la malédiction qui freinait le groupe dans sa progression.");
 					levelup(msg);
 					folieup(msg);
 					bank_levels++;
+					nopotion=objectif*5;
 					return true;
 				}
+				
 			}
 		}
 		msg.channel.send("La source de la malédiction est pour l'instant intraçable. Même en augmentant leurs capacités magiques, le groupe ne parvient pas à la contenir.");
@@ -456,7 +477,11 @@ function commande(msg){
 	}
 	//prison
 	if(msg.cleanContent.toLowerCase().includes("prison") && msg.content.includes("?")){
-		if(prison_id!="0"){
+		if(prison_id!=0){
+			if(prison_msg.author==undefined){
+				msg.channel.send("Quelqu'un est en prison, mais le groupe a oublié qui...");
+				return true;
+			}
 			msg.channel.send(prison_msg.author.username +" tourne en rond dans la petite cellule. Il maugrée en boucle ces paroles qui lui méritèrent le cachot : "+prison_msg.cleanContent);
 		}
 		else{
@@ -466,14 +491,15 @@ function commande(msg){
 	}
 	//niveau
 	if(msg.cleanContent.toLowerCase().includes("niveau") && msg.content.includes("?")){
-		msg.channel.send(msg.author.username +" - Niveau : " +levelplayer(msg)+" - Folie : " +folieplayer(msg));
+		msg.channel.send(msg.author.username +" - Niveau : " +levelplayer(msg)+" ("+proba_levelup(msg) +"%) - Folie : " +folieplayer(msg)+" ("+proba_folieup(msg)+"%)");
 		return true;
 	}
 	//équipe
-	if(msg.content.includes("équipe ?")){
+	if(msg.content.toLowerCase().includes("équipe ?")||msg.content.toLowerCase().includes("equipe ?")){
 		for(var exKey in teams){
 			if(msg.member.roles.some(r=>[exKey].includes(r.name))){
 				msg.reply("Vous êtes membre de l'équipe des "+exKey+" (niveau :"+teams[exKey][2]+")");
+				return true;
 			}
 		}
 		msg.channel.send(msg.author.username+" n'est dans aucune équipe. Peut-être que quelqu'un s'alliera avant que la solitude ne le plonge dans la folie.");
@@ -532,7 +558,7 @@ function floor_(msg){
 		return true;
 	}
 	r=Math.random();
-	if(r<0.2){
+	if(r<0.2/malusfloor){
 		if(day<0){// c'est la nuit, on propose de redescendre.
 			if(bank_folie>diff&&highest_floor>objectif/5){
 				msg.channel.send("Avec le manque de lumière en cette sombre nuit, le groupe appeuré considère la possibilité de redescendre d'un étage... Pensez-vous que c'est la solution ? [oui/non]");
@@ -554,6 +580,7 @@ function event_floor_up_res(msg){
 	if(muets.includes(msg.author.id)){
 		return;
 	}
+	r=Math.random();
 	if(msg.content.toLowerCase()=="oui"){
 		floor++;
 		if(floor==objectif){
@@ -565,6 +592,7 @@ function event_floor_up_res(msg){
 		event_floor_up=false;
 	}
 	if(msg.content.toLowerCase()=="non"){
+		malusfloor=20;
 		nomouvement_up(msg);
 		event_floor_up=false;
 	}
@@ -577,10 +605,12 @@ function event_floor_down_res(msg){
 	}
 	if(msg.content.toLowerCase()=="oui"){
 		floordown(msg);
-		bank_levels-=diff;
+		bank_folie-=diff;
+		bank_folie--;
 		event_floor_down=false;
 	}
 	if(msg.content.toLowerCase()=="non"){
+		malusfloor=20;
 		nomouvement_down(msg);
 		event_floor_down=false;
 	}
@@ -797,6 +827,15 @@ function lose_all_items(msg){
 	}
 }
 
+function reset_spe(msg){
+	for (var exKey in spes){
+		if(msg.member.roles.some(r=>[spes[exKey].nom].includes(r.name))){
+			myRole = msg.guild.roles.find(role => role.name === spes[exKey].nom);
+			msg.member.removeRole(myRole);
+		}
+	}	
+}
+
 function reset_level(msg){
 	levels[msg.author.id]=0;
 }
@@ -806,36 +845,38 @@ function reset_folie(msg){
 }
 
 function day_night(msg){
+	malusfloor=1;
 	r=Math.random();
 	if (day<0){
 		setTimeout(function(){ 
 			day=Math.random(); 
 			if (day>0.9){
 				day=1;
-				msg.guild.channels.find(function(channel){
-				return channel.name=="niveau-ni-cochon";
-				}).send("Etincellant, le soleil se lève, éclairant les moindres recoints de la tour. Galvanisé, le groupe se reprend en main et se dépêche de progresser dans les étages.",{code:true});
+				//msg.guild.channels.find(function(channel){
+				//return channel.name=="niveau-ni-cochon";
+				//}).send("Etincellant, le soleil se lève, éclairant les moindres recoints de la tour. Galvanisé, le groupe se reprend en main et se dépêche de progresser dans les étages.",{code:true});
 			}
 			day_night(msg);
-			msg.guild.channels.find(function(channel){
-				return channel.name=="niveau-ni-cochon";
-				}).send("Le jour se lève enfin, et le soleil illumine doucement le "+floor+"è étage.",{code:true});
-		}, 800000*r+100000);
+			//msg.guild.channels.find(function(channel){
+				//return channel.name=="niveau-ni-cochon";
+				//}).send("Le jour se lève enfin, et le soleil illumine doucement le "+floor+"è étage.",{code:true});
+		}, 180000*r+180000);
 	} else {
 			setTimeout(function(){ 
 			day=-Math.random(); 
 			if (day<-0.9){
 				day=-1;
-				msg.guild.channels.find(function(channel){
-				return channel.name=="niveau-ni-cochon";
-				}).send("Le soleil se couche, et la nuit semble plus sombre que d'habitude. Les chances de tomber dans la folies sont encore plus grandes, et l'envie de redescendre se fait pressante.",{code:true});
+				//msg.guild.channels.find(function(channel){
+				//return channel.name=="niveau-ni-cochon";
+				//}).send("Le soleil se couche, et la nuit semble plus sombre que d'habitude. Les chances de tomber dans la folies sont encore plus grandes, et l'envie de redescendre se fait pressante.",{code:true});
 			}
 			day_night(msg);
-			msg.guild.channels.find(function(channel){
-				return channel.name=="niveau-ni-cochon";
-				}).send("La lumière qui filtre par les fenêtres se change en obscurité alors que la nuit tombe... Errant toujours dans le "+floor+"è étage, le groupe se trouve plus vulnérable aux tentations et aux voix qui viennent des ombres...",{code:true});
-		}, 800000*r+100000);
+			//msg.guild.channels.find(function(channel){
+				//return channel.name=="niveau-ni-cochon";
+				//}).send("La lumière qui filtre par les fenêtres se change en obscurité alors que la nuit tombe... Errant toujours dans le "+floor+"è étage, le groupe se trouve plus vulnérable aux tentations et aux voix qui viennent des ombres...",{code:true});
+		}, 180000*r+180000);
 	}
+	console.log(day);
 	
 }
 
@@ -989,6 +1030,7 @@ function team(msg){
 function event_team_(msg){
 	if(event_team&&(msg.author.id==msg_team_a.author.id||msg.author.id==msg_team_b.author.id)){
 		nom_team=msg.cleanContent.substring(0,98).replace(/[^a-zA-Z ]/g, "");
+		nom_team=nom_team.trim();
 		if(nom_team==""){
 			return;
 		}
@@ -1275,6 +1317,12 @@ function join_dieu(msg){
 }
 
 function offer_join_lunatics(msg){
+	index = MP.findIndex(function(offer){
+		return offer.authorid==msg.author.id;
+	});
+	if (index>-1){
+		return;
+	}
 	var offer={};
 	msg.author.createDM().then(function(channel){
 		offer={
@@ -1325,7 +1373,7 @@ function winlunatics(msg){
 	});
 	msg.channel.send("GAME OVER : Le groupe a sombré dans la folie et a totalement oublié quelle était sa quête... Pendant que les héros essayaient vaillamment de monter d'autres fondaient un culte, et ils réussirent finalement à prendre le pouvoir !");
 	msg.guild.channels.find("name","niveau-ni-cochon").send("GAME OVER : VICTOIRE DE LA SECTE DES LUNATIQUES :\n"+result,{code:true});
-	gameover();
+	gameover(msg);
 }
 
 function winheros(msg){
@@ -1335,7 +1383,7 @@ function winheros(msg){
 	});
 	msg.channel.send("VICTOIRE PARFAITE CONTRE LE CHAOS ! Le groupe a vaincu Yurgen le Kraken, et ainsi rétabli l'ordre de l'univers.");
 	msg.guild.channels.find("name","niveau-ni-cochon").send("GAME OVER : Tous ceux qui n'étaient pas dans la secte des fous ou des envoyés du chaos gagnent ! Mention honorable aux héros :\n"+result,{code:true});
-	gameover();
+	gameover(msg);
 }
 
 function lunaticstotal(){
@@ -1417,9 +1465,11 @@ function check_dm(msg){
 					MP.splice(index,1);
 				break;
 				case 'trahison':
-					levels[offer.authorid]++;
-					folies[offer.authorid]++;
+					levelup_noreply(msg.author.id);
+					folieup_noreply(msg.author.id);
+					bank_folie++;
 					msg.channel.send("Très bien, le chaos t'offre un niveau dans le plus grand secret... Mais attention peut-être que ton partenaire prendra la même décision.");
+					MP.splice(index,1);
 				break;
 			}
 		} else if(msg.cleanContent.toLowerCase()=="non"){
@@ -1439,6 +1489,7 @@ function check_dm(msg){
 					bank_levels++;
 					bank_folie--;
 					msg.channel.send("Sage décision ! Le groupe tout entier en est récompensé !");
+					MP.splice(index,1);
 				break;
 			}
 		}
@@ -1465,13 +1516,11 @@ function dé(msg){
 	if(r<proba_dé(msg)){
 		typ="com";
 		r=Math.random();
-		if(r<0.2){
-			typ="unique";
-		} else if(r<0.4){
+		if(r<0.25){
 			typ="leg";
-		} else if(r<0.6){
+		} else if(r<0.5){
 			typ="rar";
-		} else if(r<0.8){
+		} else if(r<0.75){
 			typ="mag";
 		}
 		for(var exKey in items[typ]) {
@@ -1509,7 +1558,10 @@ function add_player(msg){
 	if(!find_player(msg)){
 		players.push([msg.author.id,msg.author.username]);
 		id_race.push(msg.author.id);
-		msg.reply("Bienvenue dans l'aventure! A quel clan souhaitez vous appartenir ?");
+		chan = msg.guild.channels.find(function(channel){
+		return channel.name=="niveau-ni-cochon";
+		});
+		msg.reply("Bienvenue dans l'aventure! A quel clan souhaitez vous appartenir ? [description dans "+chan+"]");
 	}
 }
 
@@ -1528,46 +1580,57 @@ function levelup(msg){
 		levels[msg.author.id]+=1;
 	}
 	log_levelup(msg);
-	msg.reply("gagne un niveau !");
 	if(combo_id==msg.author.id){
 		combo_count++;
 		switch (combo_count){
+			case 1:
+				msg.reply("gagne un niveau !");
+				break;
+			case 2:
+				msg.reply("gagne un niveau !");
+				break;
 			case 3:
-				msg.reply("TRIPLE LEVELUP !");
+				msg.reply("gagne un niveau : TRIPLE LEVELUP !");
 				break;
 			case 4:
-				msg.reply("QUAD LEVELUP !");
+				msg.reply("gagne un niveau : QUAD LEVELUP !");
 				break;
 			case 5:
-				msg.reply("ULTRA LEVELUP !");
+				msg.reply("gagne un niveau : ULTRA LEVELUP !");
 				break;
 			case 6:
-				msg.reply("DOMINATION !");
+				msg.reply("gagne un niveau : DOMINATION !");
 				folieup(msg);
 				break;
 			case 7:
-				msg.reply("DIVIN !");
+				msg.reply("gagne un niveau : DIVIN !");
 				folieup(msg);
 				break;
 			case 8:
-				msg.reply("BENI PAR LE DIEU DU CHAOS!");
+				msg.reply("gagne un niveau : BENI PAR LE DIEU DU CHAOS!");
 				folieup(msg);
 				bank_folie+=5;
 				break;
 			case 9:
-				msg.reply("SE RAPPROCHE DE LA CORRUPTION !");
+				msg.reply("gagne un niveau : SE RAPPROCHE DE LA CORRUPTION !");
 				folieup(msg);
 				bank_folie+=5;
 				break;
 			case 10:
-				msg.reply("DEPASSE LES LIMITES DU DIVIN ET DU CHAOS!");
+				msg.reply("gagne un niveau : DEPASSE LES LIMITES DU DIVIN ET DU CHAOS!");
 				folieup(msg);
 				bank_folie+=10;
 				bank_levels-=5;
 				leveldown(msg);
 				break;
+			default :
+				msg.reply("gagne un niveau !!!");
+				folieup(msg);
+				levelup(msg);
+				break;
 		}
 	} else {
+		msg.reply("gagne un niveau !");
 		combo_count=1;
 	}
 	combo_id=msg.author.id;
@@ -1739,7 +1802,7 @@ function log_foliedown(msg){
 }
 
 function log_floorup(msg){
-	if (leader_name=="tous"){
+	if (leader_name=="tous"||leader_name==""){
 		msg.guild.channels.find(function(channel){
 		return channel.name=="niveau-ni-cochon";
 	}).send("Le groupe parvient enfin à grimper un étage : "+floor+"\n",{code:true});
@@ -1862,7 +1925,7 @@ catch(error) {
 						//5% de chances de drop item benediction divine
 					}
 					else {
-						msg.channel.send("Les cieux se déchirèrent et la voix de "+go_msg+"retenti : \"Tu oses t'agenouiller devant "+miniboss_nom+" ? Puisque c'est ainsi, souffre mon couroux !");
+						msg.channel.send("Les cieux se déchirèrent et la voix de "+go_msg+" retenti : \"Tu oses t'agenouiller devant "+miniboss_nom+" ? Puisque c'est ainsi, souffre mon couroux !");
 						if(get_faction(msg)=="lunatiques"){
 							leveldown();
 						} else {
@@ -1909,19 +1972,29 @@ catch(error) {
 	}
 	else if(minijeu_type=="Marchand"){
 		cnt=msg.cleanContent;
-		if(cnt.split(' ')[0]=="identifier"){
+		if(cnt.split(' ')[0].toLowerCase()=="identifier"){
 			itemname=cnt.substring(11);
 			if(msg.member.roles.some(r=>[itemname].includes(r.name))){
 				msg.reply(print_stats(itemname));
 			}
 		}
-		if(cnt.split(' ')[0]=="donner"){
+		if(cnt.split(' ')[0].toLowerCase()=="donner"){
 			itemname=cnt.substring(7);
-			if(msg.member.roles.some(r=>[itemname].includes(r.name))){
-				msg.reply("Le marchand te déleste de ton "+itemname+" avec grand plaisir.");
-				myRole = msg.guild.roles.find(role => role.name === itemname);
-				msg.member.removeRole(myRole);
+			if(msg.member.roles.some(r=>[itemname.toLowerCase()].includes(r.name.toLowerCase()))){
+				for (var exKey in items){
+					for (var it in items[exKey]){
+						if(itemname.toLowerCase()==it.toLowerCase()){
+						msg.reply("Le marchand te déleste de ton "+itemname+" avec grand plaisir.");
+						myRole = msg.guild.roles.find(role => role.name.toLowerCase() === itemname.toLowerCase());
+						msg.member.removeRole(myRole);
+						}
+					}
+				}
 			}
+		}
+		if(cnt=="gouter potion verte"){
+			msg.reply("Le marchand te fait gouter son immonde brevage en ricanant. L'effet est foudroyant, et lorsque toute la magie s'est dissipé, toute l'experience élémentaire acquise s'est volatisée.");
+			reset_spe(msg);
 		}
 	}
 }
@@ -1932,6 +2005,27 @@ function print_stats(itemname){
 		for(var exKey in items["leg"][itemname]){
 			if (items["leg"][itemname][exKey]!=0){
 				toReturn=toReturn + exKeyitemtoString(exKey)+" : "+items["leg"][itemname][exKey]+"\n";
+			}
+		}
+	}
+	if (items["rar"][itemname]!=undefined){
+		for(var exKey in items["rar"][itemname]){
+			if (items["rar"][itemname][exKey]!=0){
+				toReturn=toReturn + exKeyitemtoString(exKey)+" : "+items["rar"][itemname][exKey]+"\n";
+			}
+		}
+	}
+	if (items["mag"][itemname]!=undefined){
+		for(var exKey in items["mag"][itemname]){
+			if (items["mag"][itemname][exKey]!=0){
+				toReturn=toReturn + exKeyitemtoString(exKey)+" : "+items["mag"][itemname][exKey]+"\n";
+			}
+		}
+	}
+	if (items["com"][itemname]!=undefined){
+		for(var exKey in items["com"][itemname]){
+			if (items["com"][itemname][exKey]!=0){
+				toReturn=toReturn + exKeyitemtoString(exKey)+" : "+items["com"][itemname][exKey]+"\n";
 			}
 		}
 	}
@@ -1981,11 +2075,11 @@ function initminijeu(msg){
 			n_dealdevil=Math.floor(3+(r-0.05)*3700);
 			miniboss_nom = "Pacte avec le chaos";
 			msg.channel.send("Le chaos se manifeste devant les yeux ébahis du groupe !");
-		}else if(r<0.11&&dropcom){
+		}else if(r<0.16&&dropcom){
 			later_minijeu_type="Marchand";
 			miniboss_nom = "Marchand ambulant";
 			msg.channel.send("Un marchand ambulant s'arrête devant le groupe. Il vous propose d'identifier vos objets et de vous en débarrasser !");
-		}else if(r<0.51){
+		}else if(r<0.66){
 			later_minijeu_type="Mini-boss";
 			var nom = miniboss[Math.floor(Math.random()*miniboss.length)];
 			var adject = adj[Math.floor(Math.random()*adj.length)];
@@ -2003,7 +2097,7 @@ function initminijeu(msg){
 			minijeu_type=later_minijeu_type;
 			switch (minijeu_type){
 				case "Marchand":
-					msg.guild.channels.get(result.id).send("Le marchand vous propose d'identifier [identifier <nom de l'item>] et de vous débarrasser de vos objets [donner <nom de l'item]");
+					msg.guild.channels.get(result.id).send("Le marchand vous propose d'identifier [identifier <nom de l'item>] et de vous débarrasser de vos objets [donner <nom de l'item>]. Il vous propose aussi de gouter une étrange potion verte, qui ne vous inspire vraiment pas confiance... [gouter potion verte]");
 					break;
 				case "Dieu":
 					msg.guild.channels.get(result.id).send("Devant l'avatar de "+miniboss_nom+" comment réagissez-vous ? [prier]");
@@ -2024,6 +2118,9 @@ function initminijeu(msg){
 		if(minijeu_type=="Marchand"){
 			r=1;
 		}
+		if(minijeu_type=="Dieu"){
+			r=r/10;
+		}
 		setTimeout(function(){
 			try{	
 				msg.guild.channels.get(channel_id).delete();
@@ -2033,7 +2130,7 @@ function initminijeu(msg){
 				minijeu_status=false;
 				minijeu_type="";
 				priere=[];
-			},r*300000);
+			},120000);
 }
 
 function startminijeu(msg){
@@ -2078,7 +2175,9 @@ function proba_def(msg){
 }
 
 function proba_minijeu(msg){
-	return (1/100+folieplayer(msg)/1000)*coef;
+	if(floor==objectif)
+		return -1;
+	return (5/100+folieplayer(msg)/1000)*coef;
 }
 
 function proba_killminiboss(msg){
@@ -2113,7 +2212,7 @@ function proba_drop(msg, rarete){ //rareté = "leg", "rar", "mag", "com"r*300000
 				}
 			}
 			if(count>2||!droprar)return 0;
-			return (dr/10000+(levelplayer(msg)/20000)+(folieplayer(msg)/20000))*coef; 
+			return (1/100+dr/10000+(levelplayer(msg)/20000)+(folieplayer(msg)/20000))*coef; 
 			break;
 		case "rar":
 			count=0;
@@ -2123,7 +2222,7 @@ function proba_drop(msg, rarete){ //rareté = "leg", "rar", "mag", "com"r*300000
 				}
 			}
 			if(count>2||!dropmag)return 0;
-			return (dr/2000+(levelplayer(msg)/15000)+(folieplayer(msg)/15000))*coef;
+			return (1/100+dr/2000+(levelplayer(msg)/15000)+(folieplayer(msg)/15000))*coef;
 			break;
 		case "mag":
 			count=0;
@@ -2133,7 +2232,7 @@ function proba_drop(msg, rarete){ //rareté = "leg", "rar", "mag", "com"r*300000
 				}
 			}
 			if(count>2||!dropcom)return 0;
-			return (dr/333+(levelplayer(msg)/10000)+(folieplayer(msg)/10000))*coef;
+			return (3/100+dr/333+(levelplayer(msg)/10000)+(folieplayer(msg)/10000))*coef;
 			break;
 		case "com":
 			count=0;
@@ -2143,7 +2242,7 @@ function proba_drop(msg, rarete){ //rareté = "leg", "rar", "mag", "com"r*300000
 				}
 			}
 			if(count>2)return 0;
-			return (1/100+(levelplayer(msg)/10000)+(folieplayer(msg)/10000))*coef;
+			return (5/100+(levelplayer(msg)/10000)+(folieplayer(msg)/10000))*coef;
 			break;
 	}
 	return 0;
@@ -2161,39 +2260,39 @@ function proba_spe(msg){
 	var spekey = get_spe(msg);
 	switch(spekey.length){
 		case 0:
-			if(levelplayer(msg)<5){
+			if(levelplayer(msg)<0){
 				return 0;
-			} else if(levelplayer(msg)>15){
+			} else if(levelplayer(msg)>10){
 				return (5/100)*coef;
 			} else {
-				return ((levelplayer(msg)-5)/200)*coef;
+				return ((levelplayer(msg))/200)*coef;
 			}
 			break;
 		case 1:
-			if(levelplayer(msg)<20){
+			if(levelplayer(msg)<10){
 				return 0;
-			} else if(levelplayer(msg)>35){
-				return (4/100)*coef;
+			} else if(levelplayer(msg)>20){
+				return (5/100)*coef;
 			} else {
-				return ((levelplayer(msg)-20)/375)*coef;
+				return ((levelplayer(msg)-10)/200)*coef;
 			}
 			break;
 		case 2:
-			if(levelplayer(msg)<30){
+			if(levelplayer(msg)<20){
 				return 0;
-			} else if(levelplayer(msg)>60){
-				return (3/100)*coef;
+			} else if(levelplayer(msg)>50){
+				return (5/100)*coef;
 			} else {
-				return ((levelplayer(msg)-30)/1000)*coef;
+				return ((levelplayer(msg)-20)/200)*coef;
 			}
 			break;
 		case 3:
-			if(levelplayer(msg)<45){
+			if(levelplayer(msg)<30){
 				return 0;
-			} else if(levelplayer(msg)>80){
-				return (2/100)*coef;
+			} else if(levelplayer(msg)>40){
+				return (5/100)*coef;
 			} else {
-				return ((levelplayer(msg)-45)/1750)*coef;
+				return ((levelplayer(msg)-30)/200)*coef;
 			}
 			break;
 	}
@@ -2228,7 +2327,8 @@ function proba_levelup(msg){
 	if(get_faction(msg)=="heros"){
 		bonus=5;
 	}
-	return ((2+up+bonus)/100+day/100)*coef;
+	console.log((4+up+bonus)/100+day/100);
+	return ((4+up+bonus)/100+day/100)*coef;
 }
 
 function proba_folieup(msg){
@@ -2248,19 +2348,20 @@ function proba_folieup(msg){
 	n3=0;
 	n4=0;
 	for (exKey in get_spe(msg)){
-		if(spes[exKey]=="1"){
+		if(exKey=="1"){
 			n1++;
 		}
-		if(spes[exKey]=="2"){
+		if(exKey=="2"){
 			n2++;
 		}
-		if(spes[exKey]=="3"){
+		if(exKey=="3"){
 			n3++;
 		}
-		if(spes[exKey]=="4"){
+		if(exKey=="4"){
 			n4++;
 		}
 	}
+	n_opp=0;
 	if(vul==1)n_opp=n2;
 	if(vul==2)n_opp=n1;
 	if(vul==3)n_opp=n4;
@@ -2268,7 +2369,14 @@ function proba_folieup(msg){
 	if(n_opp==4){
 		bonus=5;
 	}
-	return (madglobal/100+(mad/1000)-day/1000+2*(n1*n2*n3*n4+n1*n2+n3*n4)/100+bonus)*coef;
+		if(n_opp==3){
+		bonus=3;
+	}
+			if(n_opp==2){
+		bonus=1;
+	}
+	console.log((7*madglobal/100+(mad/1000)-day/1000+2*(n1*n2*n3*n4+n1*n2+n3*n4)/100+bonus)*coef);
+	return (7*madglobal/100+(mad/300)-day/1000+2*(n1*n2*n3*n4+n1*n2+n3*n4)/100+bonus)*coef;
 }
 
 function proba_leveldown(msg){
@@ -2296,7 +2404,7 @@ function proba_sortie_prison(msg){
 	}
 	if(races[raceplayer(msg)]!=undefined)
 		pr=pr+races[raceplayer(msg)].prison;
-	return ((1+pr)/100)*coef;
+	return ((3+pr)/100)*coef;
 }
 
 function chiffre_rom(curs){
@@ -2350,6 +2458,7 @@ function to_prison(msg){
 }
 
 function loadgame(){
+	day_light=true;
 	install = save["install"];
 	start = save["start"];
 	event_classe = save["event_classe"];
@@ -2360,7 +2469,6 @@ function loadgame(){
 	piege_safe = save["piege_safe"];
 	minijeu_status = save["minijeu_status"];
 	prison = save["prison"];
-	day_light = save["day_light"];
 	bank_levels = save["bank_levels"];
 	bank_folie = save["bank_folie"];
 	prison_id = save["prison_id"];
@@ -2400,6 +2508,14 @@ function loadgame(){
 	nopotion = save["nopotion"];
 	channel_id = save["channel_id"];
 	end = save["end"];
+	dropcom=save["dropcom"];
+	dropmag=save["dropmag"];
+	droprar=save["droprar"];
+	madglobal=save["madglobal"];
+	vul=save["vul"];
+	victoire=save["victoire"];
+	malusfloor=save["malusfloor"];
+	channelignored=save["channelignored"];
 }
 
 function savegame(){
@@ -2413,7 +2529,6 @@ function savegame(){
 	save["piege_safe"]=piege_safe;
 	save["minijeu_status"]=minijeu_status;
 	save["prison"]=prison;
-	save["day_light"]=day_light;
 	save["bank_levels"]=bank_levels;
 	save["bank_folie"]=bank_folie;
 	save["prison_id"]=prison_id;
@@ -2453,14 +2568,165 @@ function savegame(){
 	save["nopotion"]=nopotion;
 	save["channel_id"]=channel_id;
 	save["end"]=end;
+	save["dropcom"]=dropcom;
+	save["dropmag"]=dropmag;
+	save["droprar"]=droprar;
+	save["madglobal"]=madglobal;
+	save["vul"]=vul;
+	save["victoire"]=victoire;
+	save["malusfloor"]=malusfloor;
+	save["channelignored"]=channelignored;
 	fs.writeFile('./save.json', JSON.stringify(save), function (err) {
 	if (err) return console.log(err);
 	});
 }
 
+function delete_roles(msg){
+	for (var exKey in spes){
+		console.log("trying to delete "+spes[exKey].nom);
+		myRole = msg.guild.roles.find(role => role.name === spes[exKey].nom);
+		// Delete a role
+		if (myRole!=undefined&&myRole!=null){
+			myRole.delete('The role needed to go')
+			.then(deleted => console.log(`Deleted role ${deleted.name}`))
+			.catch(console.error);
+					sleep(666);
+		}
+
+	}
+	for (var exKey in items){
+		console.log(exKey);
+		for(var it in items[exKey]){
+			console.log("trying to delete "+it);
+			myRole = msg.guild.roles.find(role => role.name === it);
+			// Delete a role
+			if (myRole!=undefined&&myRole!=null){
+				myRole.delete('The role needed to go')
+				.then(deleted => console.log(`Deleted role ${deleted.name}`))
+				.catch(console.error);
+			}
+			sleep(666);
+		}
+	}
+	
+	for (var exKey in teams){
+		console.log("trying to delete "+exKey);
+		myRole = msg.guild.roles.find(role => role.name === exKey);
+		// Delete a role
+		if (myRole!=undefined&&myRole!=null){
+			myRole.delete('The role needed to go')
+			.then(deleted => console.log(`Deleted role ${deleted.name}`))
+			.catch(console.error);
+		}
+		sleep(666);
+	}
+	
+	for (var exKey in races){
+		console.log("trying to delete "+exKey);
+		myRole = msg.guild.roles.find(role => role.name === exKey);
+		// Delete a role
+		if (myRole!=undefined&&myRole!=null){
+			myRole.delete('The role needed to go')
+			.then(deleted => console.log(`Deleted role ${deleted.name}`))
+			.catch(console.error);
+		}
+		sleep(666);
+	}
+	//delete les teams.
+	teams={};
+	fs.writeFile('./teams.json', JSON.stringify(teams), function (err) {
+	if (err) return console.log(err);
+	});
+	clean_fous();
+	//set var par defaut
+	install = false;
+	start = false;
+	event_classe = false;
+	id_classe = [];
+	event_race = false;
+	id_race = [];
+	god=[];
+	piege_safe;
+	msg_precedent;
+	minijeu_status=false;
+	prison=false;
+	day_light=true;
+	bank_levels=0;
+	bank_folie=0;
+	prison_id=0;
+	prison_msg;
+	day=0;
+	players=[];
+	levels={};
+	folies={};
+	floor=0;
+	minijeu_type="";
+	minijeu_status=false;
+	miniboss_nom="";
+	n_dealdevil = -1;
+	boss_id=0;
+	boss_name="";
+	chaos=[]; //agents du chaos
+	heros=[]; //heros
+	fous=[]; //lunatiques
+	dieu_id=0; //envoyé divin
+	dechu=[];//pour les id des envoyés déchus
+	dieu_username; //envoyé divin
+	MP=[]; //channelID/authorID
+	chaos_decided=false; //devient vrai quand l'event chaos/divin est arrivé. Permet de ne pas double drop.
+	combo_id=0;
+	combo_count=0;
+	highest_floor=0;
+	event_floor_up=false;
+	event_floor_down=false;
+	event_team=false;
+	coef=1;
+	leader_id=0;
+	leader_name="";
+	event_leader=false//pour etre sur que le leader change
+	diff=4;
+	msg_count=1;
+	curse=0;
+	camisole_id=0; //le user qui peut utiliser une camisole
+	muets=[];
+	nopotion=200;
+	channel_id=0;
+	end=false;
+	priere=[];
+	objectif=12;
+	combat_final=false;
+	dropcom=false;
+	dropmag=false;
+	droprar=false;
+	madglobal=0;
+	vul=0;
+	victoire = false;
+	malusfloor=1;
+	channelignored=[];
+	//save.
+	savegame();
+}
+
+function clean_fous(){
+	guild=bot.guilds.get("636282932700512303");
+	guild.members.forEach(function(element){
+		element.kick();
+	});
+}
+
+function sleep(milliseconds) {
+  var start = new Date().getTime();
+  for (var i = 0; i < 1e7; i++) {
+    if ((new Date().getTime() - start) > milliseconds){
+      break;
+    }
+  }
+}
+
 //TODO
-function gameover(){
+function gameover(msg){
 	end=true;
+	delete_roles(msg);
 }
 
 bot.on("error", (e) => console.error(e));

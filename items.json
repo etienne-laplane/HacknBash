@@ -52,11 +52,11 @@
 		},
 		"Falchion":{
 			"desc":"Augmente la résistance à la perte de niveaux",
-			"atk":0,
+			"atk":1,
 			"def":0,
 			"mad":0,
 			"drop":0,
-			"levelup":1,
+			"levelup":0,
 			"leveldown":1,
 			"prison":0
 		},
@@ -76,7 +76,7 @@
 			"def":0,
 			"mad":0,
 			"drop":0,
-			"levelup":0,
+			"levelup":1,
 			"leveldown":1,
 			"prison":0
 		},
@@ -86,7 +86,7 @@
 			"def":0,
 			"mad":0,
 			"drop":1,
-			"levelup":0,
+			"levelup":1,
 			"leveldown":0,
 			"prison":0
 		}
@@ -106,7 +106,7 @@
 			"desc":"Terrifie les adversaires",
 			"atk":1,
 			"def":1,
-			"mad":0,
+			"mad":-1,
 			"drop":0,
 			"levelup":0,
 			"leveldown":1,
@@ -116,19 +116,19 @@
 			"desc":"Augmente l'attaque, au prix de la défense",
 			"atk":2,
 			"def":-1,
-			"mad":0,
+			"mad":1,
 			"drop":0,
 			"levelup":0,
-			"leveldown":0,
+			"leveldown":1,
 			"prison":0
 		},
 		"Bouclier à pointes":{
 			"desc":"Augmente l'attaque et la défense, mais le porteur developpe une attirance pour les forces occultes",
 			"atk":1,
 			"def":2,
-			"mad":0,
+			"mad":-1,
 			"drop":0,
-			"levelup":0,
+			"levelup":1,
 			"leveldown":0,
 			"prison":0
 		},
@@ -136,7 +136,7 @@
 			"desc":"Forgé par les Cultistes, il est dit que le porteur est béni par les dieux. Son efficacité n'est pas prouvée...",
 			"atk":0,
 			"def":0,
-			"mad":0,
+			"mad":1,
 			"drop":1,
 			"levelup":1,
 			"leveldown":1,
@@ -148,7 +148,7 @@
 			"def":0,
 			"mad":1,
 			"drop":1,
-			"levelup":0,
+			"levelup":-1,
 			"leveldown":0,
 			"prison":0
 		},
@@ -156,11 +156,11 @@
 			"desc":"Pratique pour empaler ses ennemis... Ou faire cuire des saucisses de loin.",
 			"atk":1,
 			"def":0,
-			"mad":0,
+			"mad":1,
 			"drop":0,
-			"levelup":0,
-			"leveldown":0,
-			"prison":1
+			"levelup":1,
+			"leveldown":1,
+			"prison":0
 		},
 		"Cor de guerre":{
 			"desc":"Le porteur galvanise le groupe, rendant tout le monde plus résistant à la folie et plus combatif.",
@@ -181,6 +181,16 @@
 			"levelup":1,
 			"leveldown":1,
 			"prison":0
+		},
+		"Clef Magique":{
+			"desc":"PLACEHOLDER",
+			"atk":0,
+			"def":0,
+			"mad":0,
+			"drop":1,
+			"levelup":0,
+			"leveldown":0,
+			"prison":2
 		}
 	},
 	"rar":{
@@ -197,18 +207,18 @@
 		"Arc Elfique":{
 			"desc":"Augmente l'attaque et la chance du porteur. S'utilise avec des carreaux elfiques.",
 			"atk":2,
-			"def":0,
-			"mad":0,
+			"def":1,
+			"mad":-1,
 			"drop":0,
 			"levelup":1,
 			"leveldown":0,
-			"prison":0
+			"prison":1
 		},
 		"Carreau Elfiques":{
 			"desc":"Riposte automatique à la prochaine attaque. Nécessite un arc",
 			"atk":0,
 			"def":0,
-			"mad":0,
+			"mad":-1,
 			"drop":0,
 			"levelup":0,
 			"leveldown":0,
@@ -234,25 +244,55 @@
 			"leveldown":5,
 			"prison":1
 		},
-		"Médaillon du chaos véritable":{
+		"Médaillon du Chaos véritable":{
 			"desc":"Pierre du chef du clan des ours, son effet est négligeable sans le set complet des médaillons du chaos",
 			"atk":0,
 			"def":0,
 			"mad":3,
 			"drop":0,
 			"levelup":-3,
-			"leveldown":0,
+			"leveldown":-3,
 			"prison":0
 		},
-		"Marteau des gnomes":{
+		"Marteau des Gnomes":{
 			"desc":"Preuve du talent de forgeron des Gnomes, il augmente l'experience du porteur, sans aucune conséquence négative pour le porteur.",
 			"atk":0,
 			"def":0,
-			"mad":2,
+			"mad":-1,
 			"drop":0,
-			"levelup":2,
+			"levelup":3,
 			"leveldown":0,
 			"prison":1
+		},
+		"Falchion Divin":{
+			"desc":"PLACEHOLDER",
+			"atk":3,
+			"def":1,
+			"mad":2,
+			"drop":1,
+			"levelup":0,
+			"leveldown":1,
+			"prison":0
+		},
+		"Clef Parfaite":{
+			"desc":"PLACEHOLDER",
+			"atk":0,
+			"def":0,
+			"mad":1,
+			"drop":1,
+			"levelup":1,
+			"leveldown":1,
+			"prison":5
+		},
+		"Trident de Nehma":{
+			"desc":"PLACEHOLDER",
+			"atk":2,
+			"def":2,
+			"mad":2,
+			"drop":1,
+			"levelup":-1,
+			"leveldown":0,
+			"prison":0
 		}
 	},
 	"leg":{
@@ -260,9 +300,9 @@
 			"desc":"Anneau forgé par les nains, augmente grandement la résistance à la perte de niveau.",
 			"atk":0,
 			"def":0,
-			"mad":0,
+			"mad":-1,
 			"drop":0,
-			"levelup":0,
+			"levelup":4,
 			"leveldown":5,
 			"prison":0
 		},
@@ -280,9 +320,9 @@
 			"desc":"Armure épaisse, qui protège le porteur des attaques des fous, et le rend insensible aux proposition des servants du chaos",
 			"atk":0,
 			"def":7,
-			"mad":-1,
+			"mad":-2,
 			"drop":0,
-			"levelup":0,
+			"levelup":1,
 			"leveldown":0,
 			"prison":0
 		},
@@ -290,24 +330,22 @@
 			"desc":"Epée courte sertie de toutes les pierres magiques du clan des Rats.",
 			"atk":3,
 			"def":0,
-			"mad":1,
-			"drop":0,
-			"levelup":1,
-			"leveldown":0,
-			"prison":0
+			"mad":3,
+			"drop":1,
+			"levelup":-1,
+			"leveldown":1,
+			"prison":2
 		},
 		"Médaillon du chaos total":{
 			"desc":"Pierre du set du chaos, seuls les fous oseront porter les 3 médaillons en même temps.",
 			"atk":0,
 			"def":0,
-			"mad":3,
+			"mad":4,
 			"drop":0,
 			"levelup":-2,
-			"leveldown":0,
+			"leveldown":-3,
 			"prison":0
-		}
-	},
-	"unique":{
+		},
 		"Bénédiction Divine":{
 			"desc":"La fortune divine les héros et les plus fous !",
 			"atk":0,
@@ -315,14 +353,14 @@
 			"mad":-2,
 			"drop":0,
 			"levelup":2,
-			"leveldown":0,
+			"leveldown":3,
 			"prison":0
 		},
 		"Tentacule de Yurgen":{
 			"desc":"Renforce la férocité du porteur, au prix de sa sanité",
 			"atk":2,
 			"def":0,
-			"mad":-1,
+			"mad":-2,
 			"drop":0,
 			"levelup":0,
 			"leveldown":0,
@@ -330,21 +368,21 @@
 		},
 		"Miroir magique":{
 			"desc":"La prochaine personne qui vous attaque s'attaquera elle même à la place.",
-			"atk":0,
-			"def":0,
-			"mad":1,
-			"drop":0,
+			"atk":1,
+			"def":1,
+			"mad":3,
+			"drop":1,
 			"levelup":2,
 			"leveldown":0,
-			"prison":0
+			"prison":1
 		},
 		"Casque Hydre":{
 			"desc":"Heaume de l'Hydre. Augmente considérablement la défense, le porteur devient terrifiant, ne peut plus être contenu dans une prison très longtemps...",
 			"atk":0,
 			"def":4,
-			"mad":0,
-			"drop":0,
-			"levelup":0,
+			"mad":-1,
+			"drop":1,
+			"levelup":1,
 			"leveldown":-1,
 			"prison":10
 		},
@@ -352,19 +390,19 @@
 			"desc":"Lame baignée dans le sang des chevaliers de l'apocalypse, le porteur est empli d'un terrible fardeau.",
 			"atk":2,
 			"def":0,
-			"mad":1,
+			"mad":5,
 			"drop":0,
-			"levelup":0,
+			"levelup":-3,
 			"leveldown":-3,
 			"prison":0
 		},
 		"Oeil du Griffon":{
-			"desc":"",
-			"atk":0,
-			"def":0,
-			"mad":0,
+			"desc":"PLACEHOLDER",
+			"atk":5,
+			"def":5,
+			"mad":3,
 			"drop":0,
-			"levelup":0,
+			"levelup":-1,
 			"leveldown":0,
 			"prison":0
 		}

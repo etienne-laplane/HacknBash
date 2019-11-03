@@ -23,14 +23,17 @@ message à la disparition du mini boss ?
 
 
 
+donner/identifier > tolowercase
+
+message quand nouveau fou
+Kick les fous
 
 >Commandes
 leader OK
 level OK
 team OK
 boire potion OK
-ECRIRE DES ITEMS --------------------------------------------------------------------------------
-ECRIRE DES BOSS ---------------------------------------------------------------------------------
+
 reset level
 reset folie
 >Commandes admin
@@ -38,9 +41,11 @@ reset folie
 
 >effet immédiat au drop d'item ?
 
-VICTOIRE SOMMET TOUR -----------------------------------------------------------------------------------------------
+!disablechannel
+malus floorup/down if non
 
-gameover ----------------------------------------DELETE ROLES------------------------------------
+
+gameover ----------------------------------------DELETE ROLES-:ITEMS/SPE/RACES/TEAM-----------------------------------
 réponse en réaction ?
 
 CHECKLIST
