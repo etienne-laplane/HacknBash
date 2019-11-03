@@ -33,7 +33,7 @@
 		{
 		"atk":5,
 		"def":1,
-		"mad":1,
+		"mad":2,
 		"drop":1,
 		"levelup":1,
 		"leveldown":-1,
@@ -43,7 +43,7 @@
 		{
 		"atk":0,
 		"def":-1,
-		"mad":3,
+		"mad":2,
 		"drop":1,
 		"levelup":3,
 		"leveldown":3,
@@ -65,7 +65,7 @@
 		"def":2,
 		"mad":-1,
 		"drop":2,
-		"levelup":1,
+		"levelup":2,
 		"leveldown":1,
 		"prison":1
 		}

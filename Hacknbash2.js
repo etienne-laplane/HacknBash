@@ -491,7 +491,9 @@ function commande(msg){
 	}
 	//niveau
 	if(msg.cleanContent.toLowerCase().includes("niveau") && msg.content.includes("?")){
-		msg.channel.send(msg.author.username +" - Niveau : " +levelplayer(msg)+" ("+proba_levelup(msg) +"%) - Folie : " +folieplayer(msg)+" ("+proba_folieup(msg)+"%)");
+		lvl=(proba_levelup(msg)*100).toString().substring(0,3);
+		fli=(proba_folieup(msg)*100).toString().substring(0,3);
+		msg.channel.send(msg.author.username +" - Niveau : " +levelplayer(msg)+" ("+lvl+"%) - Folie : " +folieplayer(msg)+" ("+fli+"%)");
 		return true;
 	}
 	//équipe
@@ -1827,7 +1829,7 @@ function install_(msg){
 	if (chan==undefined){
 		msg.guild.createChannel('niveau-ni-cochon',  'text' )
 			.then(channel=>channel.send(str+"\n"+msg.cleanContent,{code:true}))
-		.catch(error);
+		.catch();
 	}
 	//initialisation du cycle jour nuit.
 	day_night(msg);
@@ -2702,8 +2704,12 @@ function delete_roles(msg){
 	vul=0;
 	victoire = false;
 	malusfloor=1;
-	channelignored=[];
 	//save.
+	//supprimer niveau-ni-cochon
+	chan = msg.guild.channels.find(function(channel){
+		return channel.name=="niveau-ni-cochon";
+	});
+	chan.delete();
 	savegame();
 }
 
