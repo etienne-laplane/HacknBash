@@ -82,16 +82,17 @@ var vul=0;
 var victoire = false;
 var malusfloor=1;
 var channelignored=[];
+var paliers =[0,10,20,30,40];
 //A SAUVER (nouveau)
 var hard = false;
 var spe_hard = "";
-var boss_list={"Yurgen le Kraken",
+var boss_list=["Yurgen le Kraken",
 				"Arykidre l'Hydre",
 				"Polisson le Griffon",
 				"Pipou le Lapin du Chaos",
 				"Barnabé le Scarabé",
 				"Hippolyte l'Hippogryphe",
-				"Akhan l'avatar de Nehma"};
+				"Akhan l'avatar de Nehma"];
 var nom_boss ="Yurgen le Kraken";
 
 loadgame();
@@ -164,12 +165,34 @@ bot.on('message', msg => {
 	if(end)return;
 	if(!install&&msg.content=="install"){
 		install_(msg);
-		vul=Math.floor(Math.random()*4+1)
 		install=true;
+		nom_boss=boss_list[Math.floor(Math.random()*boss_list.length)];
 		msg.channel.send("Hack'n'Bash est un jeu d'aventure discord, basé sur la chance et les décisions. Chaque événement est basé sur de l'aléatoire et il n'y a aucun moyen de manipuler ceci par le contenu des messages. Certains événements demandent aux joueurs (membres du discord) de répondre à des questions. Ces moments sont les seuls pendant lesquels le contenu du message est analysé. Il n'existe pas de commande cachée et il n'y a aucun moyen d'arrêter l'aventure avant la victoire ou la défaite du groupe. Il existe 3 fins différentes, et il est possible de bien jouer, ou de faire n'importe quoi. Les décisions importantes personnelles (choix de classe ou de race par exemple) ne pourront être répondues que par le joueur concerné. Si vous acceptez ces règles, et que vous concevez que l'anarchie règnera, que tout le monde peut prendre les décisions pour tout le monde, tapez 'start'.");
 	}
 	if(!install) return;
 	if(!start&&msg.content=="start"){
+		start=true;
+		vul=Math.floor(Math.random()*4+1);
+		msg.channel.send("Votre groupe d'aventuriers se retrouve au bas d'une tour. Il est dit que toutes les réponses se trouvent en haut de la tour. Mais pour trouver les réponses que vous êtes venus chercher, il faudra traverser "+objectif+" étages. Les pieges sont peu nombreux, et les monstres quasiment inexistants... Qu'est ce qui rendait alors le périple si difficile ? Est-ce... vous même ? En tous cas, il est temps de se mettre en route !");
+		msg.guild.channels.find("name","niveau-ni-cochon").send("CHOIX DES CLANS : \n\n"+
+																"[Humain] : Habile et robuste, il ne perd pas ce qu'il a acquis, l'humain est l'opposé de l'ours, ses nombreux talents le tireront de nombreuses situations. \n\n"+
+																"[Elfe] : Combatif, il ne succombe que rarement aux tentations, et saura être chanceux lors qu'il le faudra. \n\n"+
+																"[Gnome] : Intelligent, le gnome est la créature qui progresse le plus vite, quelque soit la situation. Il sera aussi difficile de le réduire au silence. \n\n"+
+																"[Ours] : C'est LE combattant par excellence. Attention, cela dit, car sa soif de sang le fait vite tomber dans une rage inarretable. \n\n"+
+																"[Cultiste] : Dévoué, c'est les cultistes qui ont monté cette expedition pour trouver des réponses. Il est très sensible aux appels divins, mais aussi chaotiques... \n\n"+
+																"[Nain] : Orfèvre délicat, le nain forge les meilleurs équipement, sait rester intègre, et ne garde pas sa langue dans sa poche. \n\n"+
+																"[Rat] : Furtif et rusés, les rats sont les créatures les plus solides, les plus sournoises, et la meilleure chance de succès dans la mission."
+																,{code:true});
+	return;
+	}
+		if(!start&&msg.content=="start hard"){
+		hard=true;
+		randomiser_classes();
+		spe_hard=Math.floor(Math.random()*4+1)+"";
+		spe_hard=add_spe(Math.floor(Math.random()*4+1),spe_hard);
+		spe_hard=add_spe(Math.floor(Math.random()*4+1),spe_hard);
+		spe_hard=add_spe(Math.floor(Math.random()*4+1),spe_hard);*
+		paliers=[10*Math.random(),5+20*Math.random(),15+30*Math.random(),25+40*Math.random(),35+50*Math.random()];
 		start=true;
 		msg.channel.send("Votre groupe d'aventuriers se retrouve au bas d'une tour. Il est dit que toutes les réponses se trouvent en haut de la tour. Mais pour trouver les réponses que vous êtes venus chercher, il faudra traverser "+objectif+" étages. Les pieges sont peu nombreux, et les monstres quasiment inexistants... Qu'est ce qui rendait alors le périple si difficile ? Est-ce... vous même ? En tous cas, il est temps de se mettre en route !");
 		msg.guild.channels.find("name","niveau-ni-cochon").send("CHOIX DES CLANS : \n\n"+
@@ -238,7 +261,7 @@ bot.on('message', msg => {
 	if(msg.member==null) return;//les gens offline ne jouent pas.
 	if(combat_final==true){
 		if(get_spe(msg)==""+vul+""+vul+""+vul+""+vul){
-			msg.channel.send("Les mots de "+msg.author.username+" le "+raceplayer(msg)+", Seigneur "+vulstring(vul)+" retentirent dans tout l'univers ! \""+msg.cleanContent+"\", par ces mots, que le chaos disparaisse !");
+			msg.channel.send("Les mots de "+msg.author.username+" le "+raceplayer(msg)+", "+vulstring(vul)+" retentirent dans tout l'univers ! \""+msg.cleanContent+"\", par ces mots, que le chaos disparaisse !");
 			victoire = true;
 			combat_final=false;
 		} else {
@@ -345,7 +368,7 @@ bot.on('message', msg => {
 		if(heros.length==0 && get_faction(msg)=="neutre"){
 			msg.author.createDM().then(function(channel){
 				join_heros(msg);
-				channel.send("Les dieux t'ont désigné comme heros ! Votre mission reste la même : guider le groupe d'aventuriers jusqu'au sommet de la tour. Pour vaincre, il faudra que l'un d'entre vous devienne un Seigneur "+vulstring(vul)+". Attention, les lunatiques qui se cachent parmi vous vont tout faire pour saboter la mission. Vous gagnez un important bonus de levelup, de drop ainsi que la possibilité de récupérer des camisoles de force pour empêcher les fous de prendre des décisions !");
+				channel.send("Les dieux t'ont désigné comme heros ! Votre mission reste la même : guider le groupe d'aventuriers jusqu'au sommet de la tour. Pour vaincre, il faudra que l'un d'entre vous devienne un "+vulstring(vul)+". Attention, les lunatiques qui se cachent parmi vous vont tout faire pour saboter la mission. Vous gagnez un important bonus de levelup, de drop ainsi que la possibilité de récupérer des camisoles de force pour empêcher les fous de prendre des décisions !");
 			}).catch(function(error) {
 				console.error(error);
 			});	
@@ -382,7 +405,7 @@ function randomiser_classes(){
 
 function final_boss(msg){
 	//send message de rencontre du boss.
-	msg.channel.send("Dans l'obscurité du dernier étage de la tour, se dresse la manifestation véritable du Chaos : Yurgen le Kraken. Votre objectif est de le tuer ! Serez vous assez braves ? Seul un Seigneur "+vulstring(vul)+" pourra le tuer. Vite, qu'il lance un sort avant que la réalité soit encore altérée !");
+	msg.channel.send("Dans l'obscurité du dernier étage de la tour, se dresse la manifestation véritable du Chaos : "+nom_boss+". Votre objectif est de le tuer ! Serez vous assez braves ? Seul un "+vulstring(vul)+" pourra le tuer. Vite, qu'il lance un sort avant que la réalité soit encore altérée !");
 	combat_final=true;
 	setTimeout(function(){ 
 		victoire_final(msg);
@@ -396,7 +419,7 @@ function victoire_final(msg){
 		//message de victoir
 		winheros(msg);
 	} else{
-		msg.channel.send("Personne ne parvient à venir à bout de Yurgen le Kraken ! Manipulant les energies chaotiques, il déplace l'univers, le temps et l'espace, dans une réalité alternative. Le groupe se réveille au "+objectif/2+"è étage...");
+		msg.channel.send("Personne ne parvient à venir à bout de "+nom_boss+" ! Manipulant les energies chaotiques, il déplace l'univers, le temps et l'espace, dans une réalité alternative. Le groupe se réveille au "+objectif/2+"è étage...");
 		madglobal++;
 		floor=objectif/2;
 		combat_final=false;
@@ -505,7 +528,8 @@ function commande(msg){
 	if(msg.cleanContent.toLowerCase().includes("niveau") && msg.content.includes("?")){
 		lvl=(proba_levelup(msg)*100).toString().substring(0,3);
 		fli=(proba_folieup(msg)*100).toString().substring(0,3);
-		msg.channel.send(msg.author.username +" - Niveau : " +levelplayer(msg)+" ("+lvl+"%) - Folie : " +folieplayer(msg)+" ("+fli+"%)");
+		//msg.channel.send(msg.author.username +" - Niveau : " +levelplayer(msg)+" ("+lvl+"%) - Folie : " +folieplayer(msg)+" ("+fli+"%)");
+		msg.channel.send(msg.author.username +" - Niveau : " +levelplayer(msg)+" - Folie : " +folieplayer(msg));
 		return true;
 	}
 	//équipe
@@ -1395,7 +1419,7 @@ function winheros(msg){
 	heros.forEach(function(element){
 		result=result+element.username+"\n";
 	});
-	msg.channel.send("VICTOIRE PARFAITE CONTRE LE CHAOS ! Le groupe a vaincu Yurgen le Kraken, et ainsi rétabli l'ordre de l'univers.")
+	msg.channel.send("VICTOIRE PARFAITE CONTRE LE CHAOS ! Le groupe a vaincu "+nom_boss+", et ainsi rétabli l'ordre de l'univers.")
 	.then(msg.guild.channels.find("name","niveau-ni-cochon").send("GAME OVER : Tous ceux qui n'étaient pas dans la secte des fous ou des envoyés du chaos gagnent ! Mention honorable aux héros :\n"+result,{code:true}))
 	.then(gameover(msg));
 }
@@ -1490,7 +1514,7 @@ function check_dm(msg){
 			switch (offer.Type){
 				case 'fou':
 					join_heros(msg);
-					msg.channel.send("Bienvenue chez les heros ! Votre mission reste la même : guider le groupe d'aventuriers jusqu'au sommet de la tour. Pour vaincre, il faudra que l'un d'entre vous devienne un Seigneur "+vulstring(vul)+". Attention, les lunatiques qui se cachent parmi vous vont tout faire pour saboter la mission. Vous gagnez un important bonus de levelup, drop ainsi que la possibilité de récupérer des camisoles de force pour empêcher les fous de prendre des décisions !");
+					msg.channel.send("Bienvenue chez les heros ! Votre mission reste la même : guider le groupe d'aventuriers jusqu'au sommet de la tour. Pour vaincre, il faudra que l'un d'entre vous devienne un "+vulstring(vul)+". Attention, les lunatiques qui se cachent parmi vous vont tout faire pour saboter la mission. Vous gagnez un important bonus de levelup, drop ainsi que la possibilité de récupérer des camisoles de force pour empêcher les fous de prendre des décisions !");
 					MP.splice(index,1);
 				break;
 				case 'deal_devil':
@@ -1514,10 +1538,19 @@ function check_dm(msg){
 }
 
 function vulstring(vul){
-	if(vul==1){return "Pyromancien";}
-	if(vul==2){return "Hydromancien";}
-	if(vul==3){return "Aéromancien";}
-	if(vul==4){return "Géomancien";}
+	if(hard){
+		for (var exKey in spes){
+			if(exKey==spe_hard){
+				return spes[exKey]["nom"];
+			}
+		}
+	}
+	else {
+		if(vul==1){return "Seigneur Pyromancien";}
+		if(vul==2){return "Seigneur Hydromancien";}
+		if(vul==3){return "Seigneur Aéromancien";}
+		if(vul==4){return "Seigneur Géomancien";}
+	}
 }
 
 function dé(msg){
@@ -2275,37 +2308,37 @@ function proba_spe(msg){
 		case 0:
 			if(levelplayer(msg)<0){
 				return 0;
-			} else if(levelplayer(msg)>10){
+			} else if(levelplayer(msg)>paliers[0]){
 				return (5/100)*coef;
 			} else {
-				return ((levelplayer(msg))/200)*coef;
+				return ((levelplayer(msg)-paliers[0])/200)*coef;
 			}
 			break;
 		case 1:
-			if(levelplayer(msg)<10){
+			if(levelplayer(msg)<paliers[1]){
 				return 0;
-			} else if(levelplayer(msg)>20){
+			} else if(levelplayer(msg)>paliers[2]){
 				return (5/100)*coef;
 			} else {
-				return ((levelplayer(msg)-10)/200)*coef;
+				return ((levelplayer(msg)-paliers[1])/200)*coef;
 			}
 			break;
 		case 2:
-			if(levelplayer(msg)<20){
+			if(levelplayer(msg)<paliers[2]){
 				return 0;
-			} else if(levelplayer(msg)>50){
+			} else if(levelplayer(msg)>paliers[3]){
 				return (5/100)*coef;
 			} else {
-				return ((levelplayer(msg)-20)/200)*coef;
+				return ((levelplayer(msg)-paliers[2])/200)*coef;
 			}
 			break;
 		case 3:
-			if(levelplayer(msg)<30){
+			if(levelplayer(msg)<paliers[3]){
 				return 0;
-			} else if(levelplayer(msg)>40){
+			} else if(levelplayer(msg)>paliers[4]){
 				return (5/100)*coef;
 			} else {
-				return ((levelplayer(msg)-30)/200)*coef;
+				return ((levelplayer(msg)-paliers[3])/200)*coef;
 			}
 			break;
 	}

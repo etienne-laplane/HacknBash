@@ -23,11 +23,11 @@ message à la disparition du mini boss ?
 TESTER LES VICTOIRES
 TESTER L'INSTALL
 mise de hb2 sur le bot hnb.
-mode hard (random races, spe necessaire par nom) start hard.
-supprimer les proba de levelup / folie up. ?
+mode hard (random races, spe necessaire par nom, randomiser paliers.) start hard.
 remplacer les PLACEHOLDER
 NOM DE BOSS
-randomiser les items.
+randomiser les items. / races
+Message de victoire heros
 
 donner/identifier > tolowercase
 
