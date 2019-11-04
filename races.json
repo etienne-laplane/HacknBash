@@ -24,8 +24,8 @@
 		"atk":1,
 		"def":0,
 		"mad":1,
-		"drop":0,
-		"levelup":4,
+		"drop":2,
+		"levelup":2,
 		"leveldown":1,
 		"prison":5
 		},
