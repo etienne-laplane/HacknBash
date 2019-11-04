@@ -74,7 +74,6 @@ var save = require('./save.json');
 var priere=[];
 var objectif=12;
 var combat_final=false;
-//A SAUVER (nouveau)
 var dropcom=false;
 var dropmag=false;
 var droprar=false;
@@ -83,6 +82,17 @@ var vul=0;
 var victoire = false;
 var malusfloor=1;
 var channelignored=[];
+//A SAUVER (nouveau)
+var hard = false;
+var spe_hard = "";
+var boss_list={"Yurgen le Kraken",
+				"Arykidre l'Hydre",
+				"Polisson le Griffon",
+				"Pipou le Lapin du Chaos",
+				"Barnabé le Scarabé",
+				"Hippolyte l'Hippogryphe",
+				"Akhan l'avatar de Nehma"};
+var nom_boss ="Yurgen le Kraken";
 
 loadgame();
 //trahison
@@ -204,9 +214,9 @@ bot.on('message', msg => {
 	if(msg_count%(objectif*10)==0){
 		curse++;
 		if (curse == 10){
-			msg.channel.send("GAME OVER : Le groupe tourne en rond depuis des jours et des jours, le chaos reignant dans la tour a enfin eu raison de tous. Seul l'envoyé du chaos s'en sort, corrompu jusqu'au bout de son âme !");
-			msg.guild.channels.find("name","niveau-ni-cochon").send("GAME OVER : WINNER : "+winnerchaos(),{code:true});
-			gameover(msg);
+			msg.channel.send("GAME OVER : Le groupe tourne en rond depuis des jours et des jours, le chaos reignant dans la tour a enfin eu raison de tous. Seul l'envoyé du chaos s'en sort, corrompu jusqu'au bout de son âme !")
+				.then(msg.guild.channels.find("name","niveau-ni-cochon").send("GAME OVER : WINNER : "+winnerchaos(),{code:true}))
+				.then(gameover(msg));
 			return;
 		}
 		msg.channel.send("La malédiction se renforce... Il est peut-être temps d'utiliser une potion ? ["+chiffre_rom(curse)+"]");
@@ -335,8 +345,6 @@ bot.on('message', msg => {
 		if(heros.length==0 && get_faction(msg)=="neutre"){
 			msg.author.createDM().then(function(channel){
 				join_heros(msg);
-				dieu_id=msg.author.id;
-				dieu_id=msg.author.username;
 				channel.send("Les dieux t'ont désigné comme heros ! Votre mission reste la même : guider le groupe d'aventuriers jusqu'au sommet de la tour. Pour vaincre, il faudra que l'un d'entre vous devienne un Seigneur "+vulstring(vul)+". Attention, les lunatiques qui se cachent parmi vous vont tout faire pour saboter la mission. Vous gagnez un important bonus de levelup, de drop ainsi que la possibilité de récupérer des camisoles de force pour empêcher les fous de prendre des décisions !");
 			}).catch(function(error) {
 				console.error(error);
@@ -366,6 +374,10 @@ function load(){
 }
 
 function save(){
+}
+
+//TODO
+function randomiser_classes(){
 }
 
 function final_boss(msg){
@@ -1373,9 +1385,9 @@ function winlunatics(msg){
 	fous.forEach(function(element){
 		result=result+element.username+"\n";
 	});
-	msg.channel.send("GAME OVER : Le groupe a sombré dans la folie et a totalement oublié quelle était sa quête... Pendant que les héros essayaient vaillamment de monter d'autres fondaient un culte, et ils réussirent finalement à prendre le pouvoir !");
-	msg.guild.channels.find("name","niveau-ni-cochon").send("GAME OVER : VICTOIRE DE LA SECTE DES LUNATIQUES :\n"+result,{code:true});
-	gameover(msg);
+	msg.channel.send("GAME OVER : Le groupe a sombré dans la folie et a totalement oublié quelle était sa quête... Pendant que les héros essayaient vaillamment de monter d'autres fondaient un culte, et ils réussirent finalement à prendre le pouvoir !")
+	.then(msg.guild.channels.find("name","niveau-ni-cochon").send("GAME OVER : VICTOIRE DE LA SECTE DES LUNATIQUES :\n"+result,{code:true}))
+	.then(gameover(msg));
 }
 
 function winheros(msg){
@@ -1383,9 +1395,9 @@ function winheros(msg){
 	heros.forEach(function(element){
 		result=result+element.username+"\n";
 	});
-	msg.channel.send("VICTOIRE PARFAITE CONTRE LE CHAOS ! Le groupe a vaincu Yurgen le Kraken, et ainsi rétabli l'ordre de l'univers.");
-	msg.guild.channels.find("name","niveau-ni-cochon").send("GAME OVER : Tous ceux qui n'étaient pas dans la secte des fous ou des envoyés du chaos gagnent ! Mention honorable aux héros :\n"+result,{code:true});
-	gameover(msg);
+	msg.channel.send("VICTOIRE PARFAITE CONTRE LE CHAOS ! Le groupe a vaincu Yurgen le Kraken, et ainsi rétabli l'ordre de l'univers.")
+	.then(msg.guild.channels.find("name","niveau-ni-cochon").send("GAME OVER : Tous ceux qui n'étaient pas dans la secte des fous ou des envoyés du chaos gagnent ! Mention honorable aux héros :\n"+result,{code:true}))
+	.then(gameover(msg));
 }
 
 function lunaticstotal(){
@@ -1826,11 +1838,10 @@ function install_(msg){
 	chan = msg.guild.channels.find(function(channel){
 		return channel.name=="niveau-ni-cochon";
 	});
-	if (chan==undefined){
-		msg.guild.createChannel('niveau-ni-cochon',  'text' )
-			.then(channel=>channel.send(str+"\n"+msg.cleanContent,{code:true}))
-		.catch();
-	}
+	chan.delete();
+	msg.guild.createChannel('niveau-ni-cochon',  'text' )
+		.then(channel=>channel.send(str+"\n"+msg.cleanContent,{code:true}))
+	.catch();
 	//initialisation du cycle jour nuit.
 	day_night(msg);
 	day_light=false;
@@ -2706,10 +2717,6 @@ function delete_roles(msg){
 	malusfloor=1;
 	//save.
 	//supprimer niveau-ni-cochon
-	chan = msg.guild.channels.find(function(channel){
-		return channel.name=="niveau-ni-cochon";
-	});
-	chan.delete();
 	savegame();
 }
 

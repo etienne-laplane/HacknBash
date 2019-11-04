@@ -20,8 +20,14 @@ message à la disparition du mini boss ?
 
 
 
-
-
+TESTER LES VICTOIRES
+TESTER L'INSTALL
+mise de hb2 sur le bot hnb.
+mode hard (random races, spe necessaire par nom) start hard.
+supprimer les proba de levelup / folie up. ?
+remplacer les PLACEHOLDER
+NOM DE BOSS
+randomiser les items.
 
 donner/identifier > tolowercase
 
