@@ -188,6 +188,7 @@ bot.on('message', msg => {
 		if(!start&&msg.content=="start hard"){
 		hard=true;
 		randomiser_classes();
+		randomiser_items();
 		spe_hard=Math.floor(Math.random()*4+1)+"";
 		spe_hard=add_spe(Math.floor(Math.random()*4+1),spe_hard);
 		spe_hard=add_spe(Math.floor(Math.random()*4+1),spe_hard);
@@ -399,8 +400,55 @@ function load(){
 function save(){
 }
 
-//TODO
 function randomiser_classes(){
+	for (var exKey in races){
+		races[exKey]["atk"]=Math.floor(Math.random()*6)-2;
+		races[exKey]["def"]=Math.floor(Math.random()*6)-2;
+		races[exKey]["mad"]=Math.floor(Math.random()*6)-2;
+		races[exKey]["drop"]=Math.floor(Math.random()*6)-2;
+		races[exKey]["levelup"]=Math.floor(Math.random()*6)-2;
+		races[exKey]["leveldown"]=Math.floor(Math.random()*6)-2;
+		races[exKey]["prison"]=Math.floor(Math.random()*6)-2;
+	}
+}
+
+function randomiser_items(){
+	for (var exKey in items["com"]){
+		items["com"][exKey]["atk"]=Math.floor(Math.random()*2);
+		items["com"][exKey]["def"]=Math.floor(Math.random()*2);
+		items["com"][exKey]["mad"]=Math.floor(Math.random()*2);
+		items["com"][exKey]["drop"]=Math.floor(Math.random()*2);
+		items["com"][exKey]["levelup"]=Math.floor(Math.random()*2);
+		items["com"][exKey]["leveldown"]=Math.floor(Math.random()*2);
+		items["com"][exKey]["prison"]=Math.floor(Math.random()*2);
+	}
+	for (var exKey in items["mag"]){
+		items["mag"][exKey]["atk"]=Math.floor(Math.random()*4)-1;
+		items["mag"][exKey]["def"]=Math.floor(Math.random()*4)-1;
+		items["mag"][exKey]["mad"]=Math.floor(Math.random()*4)-1;
+		items["mag"][exKey]["drop"]=Math.floor(Math.random()*4)-1;
+		items["mag"][exKey]["levelup"]=Math.floor(Math.random()*4)-1;
+		items["mag"][exKey]["leveldown"]=Math.floor(Math.random()*4)-1;
+		items["mag"][exKey]["prison"]=Math.floor(Math.random()*4)-1;
+	}
+	for (var exKey in items["rar"]){
+		items["rar"][exKey]["atk"]=Math.floor(Math.random()*6)-2;
+		items["rar"][exKey]["def"]=Math.floor(Math.random()*6)-2;
+		items["rar"][exKey]["mad"]=Math.floor(Math.random()*6)-2;
+		items["rar"][exKey]["drop"]=Math.floor(Math.random()*6)-2;
+		items["rar"][exKey]["levelup"]=Math.floor(Math.random()*6)-2;
+		items["rar"][exKey]["leveldown"]=Math.floor(Math.random()*6)-2;
+		items["rar"][exKey]["prison"]=Math.floor(Math.random()*6)-2;
+	}
+	for (var exKey in items["leg"]){
+		items["leg"][exKey]["atk"]=Math.floor(Math.random()*8)-4;
+		items["leg"][exKey]["def"]=Math.floor(Math.random()*8)-4;
+		items["leg"][exKey]["mad"]=Math.floor(Math.random()*8)-4;
+		items["leg"][exKey]["drop"]=Math.floor(Math.random()*8)-4;
+		items["leg"][exKey]["levelup"]=Math.floor(Math.random()*8)-4;
+		items["leg"][exKey]["leveldown"]=Math.floor(Math.random()*8)-4;
+		items["leg"][exKey]["prison"]=Math.floor(Math.random()*8)-4;
+	}
 }
 
 function final_boss(msg){
