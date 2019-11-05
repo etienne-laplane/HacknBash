@@ -20,12 +20,11 @@ message à la disparition du mini boss ?
 
 
 
-TESTER LES VICTOIRES
-TESTER L'INSTALL
-TESTER LE NOM DE BOSS (VICTOIRES)
-TESTER LE MODE HARD RANDOM RACES, RANDOM SPE, RANDOM PALIERS, RANDOM ITEMS
-remplacer les PLACEHOLDER
+
+
 mise de hb2 sur le bot hnb.
+
+
 
 
 Message de victoire heros

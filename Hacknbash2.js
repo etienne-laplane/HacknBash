@@ -83,9 +83,6 @@ var victoire = false;
 var malusfloor=1;
 var channelignored=[];
 var paliers =[0,10,20,30,40];
-//A SAUVER (nouveau)
-var hard = false;
-var spe_hard = "";
 var boss_list=["Yurgen le Kraken",
 				"Arykidre l'Hydre",
 				"Polisson le Griffon",
@@ -93,7 +90,12 @@ var boss_list=["Yurgen le Kraken",
 				"Barnabé le Scarabé",
 				"Hippolyte l'Hippogryphe",
 				"Akhan l'avatar de Nehma"];
+//A SAUVER (nouveau)
+var hard = false;
+var spe_hard = "";
 var nom_boss ="Yurgen le Kraken";
+var Game_over=false;
+var cam_type="mag";
 
 loadgame();
 //trahison
@@ -159,9 +161,11 @@ function debug(msg){
 }
 
 bot.on('message', msg => {
+	if(msg.author.id=="625993776397287424"||msg.author.bot) return;//les bots ne jouent pas.
 	if(channelignored.findIndex(element=>element==msg.channel.id)>-1){
 		return;
 	}
+	if(Game_over)gameover(msg);
 	if(end)return;
 	if(!install&&msg.content=="install"){
 		install_(msg);
@@ -185,14 +189,19 @@ bot.on('message', msg => {
 																,{code:true});
 	return;
 	}
+	
 		if(!start&&msg.content=="start hard"){
 		hard=true;
 		randomiser_classes();
 		randomiser_items();
+		vul=Math.floor(Math.random()*4+1);
 		spe_hard=Math.floor(Math.random()*4+1)+"";
 		spe_hard=add_spe(Math.floor(Math.random()*4+1),spe_hard);
 		spe_hard=add_spe(Math.floor(Math.random()*4+1),spe_hard);
-		spe_hard=add_spe(Math.floor(Math.random()*4+1),spe_hard);*
+		spe_hard=add_spe(Math.floor(Math.random()*4+1),spe_hard);
+		if(vul==2){cam_type="rar"};
+		if(vul==3){cam_type="leg"};
+		if(vul==4){cam_type="com"};
 		paliers=[10*Math.random(),5+20*Math.random(),15+30*Math.random(),25+40*Math.random(),35+50*Math.random()];
 		start=true;
 		msg.channel.send("Votre groupe d'aventuriers se retrouve au bas d'une tour. Il est dit que toutes les réponses se trouvent en haut de la tour. Mais pour trouver les réponses que vous êtes venus chercher, il faudra traverser "+objectif+" étages. Les pieges sont peu nombreux, et les monstres quasiment inexistants... Qu'est ce qui rendait alors le périple si difficile ? Est-ce... vous même ? En tous cas, il est temps de se mettre en route !");
@@ -212,8 +221,6 @@ bot.on('message', msg => {
 		day_night(msg);
 		day_light=false;
 	}
-	if(msg.author.id=="625993776397287424"||msg.author.bot) return;//les bots ne jouent pas.
-	//if(msg.author.id=="625993776397287424") return;//les bots ne jouent pas.
 	if(msg_precedent==null) msg_precedent=msg;//just in case.
 	msg_count++;
 	if(msg_count%10==0){
@@ -227,6 +234,7 @@ bot.on('message', msg => {
 	add_player(msg);
 	//quand un meme joueur spam, le coef diminue jusqu'a atteindre 0.
 	//toutes les probas sont x coef.
+		winheros(msg);
 	if(msg.author.id==msg_precedent.author.id||msg.author.bot||msg_precedent.author.bot){
 		coef-=0.01;
 	} else {
@@ -238,9 +246,9 @@ bot.on('message', msg => {
 	if(msg_count%(objectif*10)==0){
 		curse++;
 		if (curse == 10){
-			msg.channel.send("GAME OVER : Le groupe tourne en rond depuis des jours et des jours, le chaos reignant dans la tour a enfin eu raison de tous. Seul l'envoyé du chaos s'en sort, corrompu jusqu'au bout de son âme !")
-				.then(msg.guild.channels.find("name","niveau-ni-cochon").send("GAME OVER : WINNER : "+winnerchaos(),{code:true}))
-				.then(gameover(msg));
+			msg.channel.send("GAME OVER : Le groupe tourne en rond depuis des jours et des jours, le chaos reignant dans la tour a enfin eu raison de tous. Seul l'envoyé du chaos s'en sort, corrompu jusqu'au bout de son âme !");
+			msg.guild.channels.find("name","niveau-ni-cochon").send("GAME OVER : WINNER : "+winnerchaos(),{code:true});
+			Game_over=true;
 			return;
 		}
 		msg.channel.send("La malédiction se renforce... Il est peut-être temps d'utiliser une potion ? ["+chiffre_rom(curse)+"]");
@@ -357,7 +365,7 @@ bot.on('message', msg => {
 		if(get_faction(msg)=="heros"){
 			if(camisole_id==0){
 				r=Math.random();
-				if(r<(5*proba_drop(msg,"mag"))){
+				if(r<(5*proba_drop(msg,cam_type))){
 					drop_camisole(msg);
 				}
 			}
@@ -405,8 +413,8 @@ function randomiser_classes(){
 		races[exKey]["atk"]=Math.floor(Math.random()*6)-2;
 		races[exKey]["def"]=Math.floor(Math.random()*6)-2;
 		races[exKey]["mad"]=Math.floor(Math.random()*6)-2;
-		races[exKey]["drop"]=Math.floor(Math.random()*6)-2;
-		races[exKey]["levelup"]=Math.floor(Math.random()*6)-2;
+		races[exKey]["drop"]=Math.floor(Math.random()*4)+1;
+		races[exKey]["levelup"]=Math.floor(Math.random()*4)+1;
 		races[exKey]["leveldown"]=Math.floor(Math.random()*6)-2;
 		races[exKey]["prison"]=Math.floor(Math.random()*6)-2;
 	}
@@ -496,6 +504,13 @@ function commande(msg){
 		console.log("gameover");
 		gameover(msg);
 	}
+	if(msg.content=="!help"){
+		chan = msg.guild.channels.find(function(channel){
+			return channel.name=="niveau-ni-cochon";
+		});
+		msg.reply("Hack'n'Bash est un jeu d'aventure : votre but collectif est de monter en haut d'une tour de 12 étages. Vous pouvez demander à quel étage vous en êtes en posant une question du type [On est à quel étage ?] Aléatoirement, le bot vous donne des niveaux, de la folie, des objets, et des interactions arrivent avec les autres joueurs. Selon ces interactions vous pouvez en tirer des conclusions sur leurs intentions... Des questions vous seront de temps en temps adressées, prêtez-y attention ! Le bot vous propose toujours de commencer par choisir une classe. Reportez vous au salon "+chan+" en premier message vous pourrez faire votre choix. Ensuite, laissez vous porter... Attention aux traitres !");
+		return true;
+	}
 	//boire potion
 	if(msg.content.toLowerCase().includes("boire")&&msg.content.toLowerCase().includes("potion")){
 		if(nopotion<0){
@@ -503,7 +518,10 @@ function commande(msg){
 				msg.channel.send(msg.author.username + " boit une gorgée de potion, mais celle ci n'a aucun effet.");
 				nopotion=objectif*12;
 				return true;
-			}else {
+			} else if (muets.includes(msg.author.id)){
+				msg.channel.send(msg.author.username + " essaye tant bien que mal de boire la potion, mais dans sa camisole de force, c'est un peu délicat.");
+				return true;
+			} else {
 				r=Math.random();
 				if(r<0.25){
 					msg.channel.send(msg.author.username + " boit une gorgée de potion, mais celle ci n'a aucun effet.");
@@ -663,7 +681,8 @@ function floor_(msg){
 }
 
 function event_floor_up_res(msg){
-	if(muets.includes(msg.author.id)){
+	if(muets.includes(msg.author.id)&&(msg.content.toLowerCase()=="oui"||msg.content.toLowerCase()=="non")){
+		msg.channel.send("Tout le monde ignore la proposition de "+msg.author.username+" qui gesticule comme un forcené dans sa camisole de force");
 		return;
 	}
 	r=Math.random();
@@ -686,7 +705,8 @@ function event_floor_up_res(msg){
 }
 
 function event_floor_down_res(msg){
-	if(muets.includes(msg.author.id)){
+	if(muets.includes(msg.author.id)&&(msg.content.toLowerCase()=="oui"||msg.content.toLowerCase()=="non")){
+		msg.channel.send("Tout le monde ignore les conseils de "+msg.author.username+" qui gesticule sans arrêt dans sa camisole de force");
 		return;
 	}
 	if(msg.content.toLowerCase()=="oui"){
@@ -1457,9 +1477,9 @@ function winlunatics(msg){
 	fous.forEach(function(element){
 		result=result+element.username+"\n";
 	});
-	msg.channel.send("GAME OVER : Le groupe a sombré dans la folie et a totalement oublié quelle était sa quête... Pendant que les héros essayaient vaillamment de monter d'autres fondaient un culte, et ils réussirent finalement à prendre le pouvoir !")
-	.then(msg.guild.channels.find("name","niveau-ni-cochon").send("GAME OVER : VICTOIRE DE LA SECTE DES LUNATIQUES :\n"+result,{code:true}))
-	.then(gameover(msg));
+	msg.channel.send("GAME OVER : Le groupe a sombré dans la folie et a totalement oublié quelle était sa quête... Pendant que les héros essayaient vaillamment de monter d'autres fondaient un culte, et ils réussirent finalement à prendre le pouvoir !");
+	msg.guild.channels.find("name","niveau-ni-cochon").send("GAME OVER : VICTOIRE DE LA SECTE DES LUNATIQUES :\n"+result,{code:true});
+	Game_over=true;
 }
 
 function winheros(msg){
@@ -1467,9 +1487,21 @@ function winheros(msg){
 	heros.forEach(function(element){
 		result=result+element.username+"\n";
 	});
-	msg.channel.send("VICTOIRE PARFAITE CONTRE LE CHAOS ! Le groupe a vaincu "+nom_boss+", et ainsi rétabli l'ordre de l'univers.")
-	.then(msg.guild.channels.find("name","niveau-ni-cochon").send("GAME OVER : Tous ceux qui n'étaient pas dans la secte des fous ou des envoyés du chaos gagnent ! Mention honorable aux héros :\n"+result,{code:true}))
-	.then(gameover(msg));
+	envoy_div = ""; 
+	players.forEach(function(element){
+		if (element[0]==dieu_id){
+			envoy_div=element[1];
+		}
+	});
+	neutres = "";
+	players.forEach(function(element){
+		if (!fous.includes(element[0])){
+			neutres=neutres+element[1]+"\n";
+		}
+	});
+	msg.channel.send("VICTOIRE PARFAITE CONTRE LE CHAOS ! Le groupe a vaincu "+nom_boss+", et ainsi rétabli l'ordre de l'univers.");
+	msg.guild.channels.find("name","niveau-ni-cochon").send("GAME OVER : Tous ceux qui n'étaient pas dans la secte des fous ou des envoyés du chaos gagnent ! Mention honorable aux héros :\n"+result+"\nAinsi qu'à l'envoyé divin :\n"+envoy_div+"\nEt aux autres gagnants : \n"+neutres,{code:true});
+	Game_over=true;
 }
 
 function lunaticstotal(){
@@ -1919,10 +1951,9 @@ function install_(msg){
 	chan = msg.guild.channels.find(function(channel){
 		return channel.name=="niveau-ni-cochon";
 	});
+	if(chan!=null&&chan!=undefined)
 	chan.delete();
-	msg.guild.createChannel('niveau-ni-cochon',  'text' )
-		.then(channel=>channel.send(str+"\n"+msg.cleanContent,{code:true}))
-	.catch();
+	msg.guild.createChannel('niveau-ni-cochon',  'text' );
 	//initialisation du cycle jour nuit.
 	day_night(msg);
 	day_light=false;
@@ -2610,6 +2641,11 @@ function loadgame(){
 	victoire=save["victoire"];
 	malusfloor=save["malusfloor"];
 	channelignored=save["channelignored"];
+	hard = save["hard"];
+	spe_hard = save["spe_hard"];
+	nom_boss = save["nom_boss"];
+	Game_over= save["Game_over"];
+	cam_type=save["cam_type"];
 }
 
 function savegame(){
@@ -2670,6 +2706,11 @@ function savegame(){
 	save["victoire"]=victoire;
 	save["malusfloor"]=malusfloor;
 	save["channelignored"]=channelignored;
+	save["hard"]=hard;
+	save["spe_hard"]=spe_hard;
+	save["nom_boss"]=nom_boss;
+	save["Game_over"]=Game_over;
+	save["cam_type"]=cam_type;
 	fs.writeFile('./save.json', JSON.stringify(save), function (err) {
 	if (err) return console.log(err);
 	});
@@ -2796,6 +2837,12 @@ function delete_roles(msg){
 	vul=0;
 	victoire = false;
 	malusfloor=1;
+	hard = false;
+	spe_hard = "";
+	nom_boss ="Yurgen le Kraken";
+	Game_over=false;
+	paliers =[0,10,20,30,40];
+	cam_type="mag";
 	//save.
 	//supprimer niveau-ni-cochon
 	savegame();
