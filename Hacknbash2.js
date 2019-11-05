@@ -174,7 +174,7 @@ bot.on('message', msg => {
 				t_o.splice(i, 1); 
 			}
 		}
-	}, 2000);
+	}, 400);
 	console.log(t_o);
 	if(Game_over)gameover(msg);
 	if(end)return;
@@ -198,7 +198,7 @@ bot.on('message', msg => {
 																"[Nain] : Orfèvre délicat, le nain forge les meilleurs équipement, sait rester intègre, et ne garde pas sa langue dans sa poche. \n\n"+
 																"[Rat] : Furtif et rusés, les rats sont les créatures les plus solides, les plus sournoises, et la meilleure chance de succès dans la mission."
 																,{code:true});
-	return;
+		return;
 	}
 	
 		if(!start&&msg.content=="start hard"){
@@ -225,7 +225,7 @@ bot.on('message', msg => {
 																"[Nain] : Orfèvre délicat, le nain forge les meilleurs équipement, sait rester intègre, et ne garde pas sa langue dans sa poche. \n\n"+
 																"[Rat] : Furtif et rusés, les rats sont les créatures les plus solides, les plus sournoises, et la meilleure chance de succès dans la mission."
 																,{code:true});
-	return;
+		return;
 	}
 	if(!start) return;
 	if(day_light){
@@ -233,11 +233,15 @@ bot.on('message', msg => {
 		day_light=false;
 	}
 	if(msg_precedent==null) msg_precedent=msg;//just in case.
+	if(!minijeu_status){
+	
 	msg_count++;
 	if(msg_count%10==0){
 		savegame();
 		//debug(msg);
 	}
+	}
+	
 	nopotion--;
 	if (event_race_(msg)){
 		return;
@@ -253,10 +257,10 @@ bot.on('message', msg => {
 	if(dm(msg)){
 		return;
 	}
-	if(msg_count%(objectif*10)==0){
+	if(msg_count%(objectif*10)==0&&!minijeu_status){
 		curse++;
 		if (curse == 10){
-			msg.channel.send("GAME OVER : Le groupe tourne en rond depuis des jours et des jours, le chaos reignant dans la tour a enfin eu raison de tous. Seul l'envoyé du chaos s'en sort, corrompu jusqu'au bout de son âme !");
+			msg.channel.send("MALEDICTION [X] ! GAME OVER : Le groupe tourne en rond depuis des jours et des jours, le chaos reignant dans la tour a enfin eu raison de tous. Seul l'envoyé du chaos s'en sort, corrompu jusqu'au bout de son âme !");
 			msg.guild.channels.find("name","niveau-ni-cochon").send("GAME OVER : WINNER : "+winnerchaos(),{code:true});
 			Game_over=true;
 			return;
@@ -383,7 +387,13 @@ bot.on('message', msg => {
 	}	
 	//EN DERNIER : REJOINDRE UNE FACTION
 	//LUNATICS-HEROS
-	if(highest_floor>1&&!msg.author.bot&&Math.random()<0.25){
+	canMP=true;
+	MP.forEach(function(element){
+		if(element["channelid"]==msg.author.id){
+			canMP=false;
+		}
+	});
+	if(highest_floor>1&&!msg.author.bot&&Math.random()<0.25&&canMP){
 		if(heros.length==0 && get_faction(msg)=="neutre"){
 			msg.author.createDM().then(function(channel){
 				join_heros(msg);
@@ -399,7 +409,7 @@ bot.on('message', msg => {
 		}
 	}
 	//DIEU-CHAOS
-	if(msg_precedent.author.id!=msg.author.id&&highest_floor>(objectif/4)&&!msg.author.bot&&!msg_precedent.author.bot){
+	if(msg_precedent.author.id!=msg.author.id&&highest_floor>(objectif/4)&&!msg.author.bot&&!msg_precedent.author.bot&&canMP){
 		if(dieu_id==0){
 			if((get_faction(msg)=="neutre")&&(get_faction(msg_precedent)=="neutre")&&!dechu.includes(msg_precedent.author.id)){
 				offer_join_chaos(msg);
@@ -526,7 +536,7 @@ function commande(msg){
 		if(nopotion<0){
 			if(get_faction(msg)=="chaos"||curse==0){
 				msg.channel.send(msg.author.username + " boit une gorgée de potion, mais celle ci n'a aucun effet.");
-				nopotion=objectif*12;
+				nopotion=objectif*9;
 				return true;
 			} else if (muets.includes(msg.author.id)){
 				msg.channel.send(msg.author.username + " essaye tant bien que mal de boire la potion, mais dans sa camisole de force, c'est un peu délicat.");
@@ -535,27 +545,33 @@ function commande(msg){
 				r=Math.random();
 				if(r<0.25){
 					msg.channel.send(msg.author.username + " boit une gorgée de potion, mais celle ci n'a aucun effet.");
+					nopotion=objectif*2;
+					return true;
+				} else if(r<0.5){
+					msg.channel.send(msg.author.username + " boit une gorgée de potion. La malédiction se dissipe un peu.");
+					curse--;
 					nopotion=objectif*5;
 					return true;
 				} else if(r<0.75){
 					msg.channel.send(msg.author.username + " boit une gorgée de potion, et au prix de sa santé mentale et d'un peu d'experience, la malédiction se dissipe un peu.");
 					curse--;
+					nopotion=objectif*8;
 					folieup(msg);
 					leveldown(msg);
-					nopotion=objectif*5;
 					return true;
 				} else if(r<0.99){
 					msg.channel.send(msg.author.username + " boit une gorgée de potion, concentre une importante energie autour de lui, et dissipe la malédiction.");
 					curse--;
 					levelup(msg);
-					nopotion=objectif*5;
+					nopotion=objectif*12;
 					return true;
 				} else{
 					msg.channel.send(msg.author.username + " conjure la puissance cachée du clan des "+raceplayer(msg)+" et lève toute la malédiction qui freinait le groupe dans sa progression.");
 					levelup(msg);
 					folieup(msg);
+					nopotion=objectif*15;
+					curse=0;
 					bank_levels++;
-					nopotion=objectif*5;
 					return true;
 				}
 				
@@ -1984,17 +2000,10 @@ function minijeu(msg){
 		} else {
 			if(piege_safe.indexOf(msg.author.id)<0){
 				leveldown(msg);
-				try{
-					msg.channel.send(msg.author.username + " se prend la "+ miniboss_nom +" de plein fouet et perd un niveau");
-					msg.guild.channels.get(channel_id).delete();
-					channel_id=0;
-					piege_safe=Array();
-					minijeu_status=false;		
-					minijeu_type="";				
-				}
-				catch(error) {
-					console.error(error);
-				}	
+				msg.channel.send(msg.author.username + " se prend la "+ miniboss_nom +" de plein fouet et perd un niveau");
+				piege_safe=Array();
+				minijeu_status=false;		
+				minijeu_type="";				
 			}
 		}
 	}
@@ -2243,15 +2252,12 @@ function initminijeu(msg){
 			r=r/10;
 		}
 		setTimeout(function(){
-			try{	
 				msg.guild.channels.get(channel_id).delete();
-				}catch(error){
-				}
 				channel_id=0;
 				minijeu_status=false;
 				minijeu_type="";
 				priere=[];
-			},150000);
+			},120000);
 }
 
 function startminijeu(msg){
@@ -2332,7 +2338,7 @@ function proba_drop(msg, rarete){ //rareté = "leg", "rar", "mag", "com"r*300000
 					count++;
 				}
 			}
-			if(count>2||droprar)return 0;
+			if(count>2||!droprar)return 0;
 			return (1/100+dr/10000+(levelplayer(msg)/20000)+(folieplayer(msg)/20000))*coef; 
 			break;
 		case "rar":
@@ -2342,7 +2348,7 @@ function proba_drop(msg, rarete){ //rareté = "leg", "rar", "mag", "com"r*300000
 					count++;
 				}
 			}
-			if(count>2||dropmag)return 0;
+			if(count>2||!dropmag)return 0;
 			return (1/100+dr/2000+(levelplayer(msg)/15000)+(folieplayer(msg)/15000))*coef;
 			break;
 		case "mag":
@@ -2352,7 +2358,7 @@ function proba_drop(msg, rarete){ //rareté = "leg", "rar", "mag", "com"r*300000
 					count++;
 				}
 			}
-			if(count>2||dropcom)return 0;
+			if(count>2||!dropcom)return 0;
 			return (3/100+dr/333+(levelplayer(msg)/10000)+(folieplayer(msg)/10000))*coef;
 			break;
 		case "com":
@@ -2769,6 +2775,9 @@ function delete_roles(msg){
 	if (err) return console.log(err);
 	});
 	clean_fous();
+	if(channel_id!=0){
+		msg.guild.channels.get(channel_id).delete();
+	}
 	//set var par defaut
 	install = false;
 	start = false;
