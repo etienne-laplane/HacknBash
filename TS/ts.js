@@ -15,7 +15,7 @@ var t="";
 //https://discordapp.com/oauth2/authorize?client_id=625988662454386698&scope=bot&permissions=8 - ROBERT 625988662454386698
 
 bot.on('message', msg => {
-	if (msg.content=="!ts"){
+	if (msg.content.includes("!ts")){
 		r=Math.random();
 		if(r<2){
 			t = t2["adj"][Math.floor(Math.random()*t2["adj"].length)];
