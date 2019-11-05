@@ -95,6 +95,7 @@ var spe_hard = "";
 var nom_boss ="Yurgen le Kraken";
 var Game_over=false;
 var cam_type="mag";
+var t_o=[];
 //A SAUVER (nouveau)
 
 loadgame();
@@ -162,6 +163,15 @@ function debug(msg){
 
 bot.on('message', msg => {
 	if(msg.author.id=="625993776397287424"||msg.author.bot) return;//les bots ne jouent pas.
+	if(t_o.includes(msg.author.id)){return;}
+	t_o.push(msg.author.id);
+	setTimeout(function(){ 
+		for( var i = 0; i < t_o.length; i++){ 
+			if ( t_o[i] === msg.author.id) {
+				t_o.splice(i, 1); 
+			}
+		}
+	}, 1000);
 	if(channelignored.findIndex(element=>element==msg.channel.id)>-1){
 		return;
 	}
@@ -2003,22 +2013,9 @@ catch(error) {
 				msg.reply("frappe le "+miniboss_nom + " et le tue");
 				levelup(msg);
 				alive=false;
-				setTimeout(function(){
-					try{
-						msg.guild.channels.get(channel_id).delete();
-					}
-catch(error) {
-  console.error(error);
-  // expected output: ReferenceError: nonExistentFunction is not defined
-  // Note - error messages will vary depending on browser
-}
-					minijeu_status=false;
-					channel_id=0;
-				},100000);
 				minijeu_type="";
 			}
 			else {
-				msg.reply("frappe le "+miniboss_nom + " mais le rate");
 			}
 		}
 	} 
