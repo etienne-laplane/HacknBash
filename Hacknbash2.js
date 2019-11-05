@@ -372,7 +372,7 @@ bot.on('message', msg => {
 	}	
 	//EN DERNIER : REJOINDRE UNE FACTION
 	//LUNATICS-HEROS
-	if(highest_floor>1&&!msg.author.bot){
+	if(highest_floor>1&&!msg.author.bot&&Math.random()<0.25){
 		if(heros.length==0 && get_faction(msg)=="neutre"){
 			msg.author.createDM().then(function(channel){
 				join_heros(msg);
@@ -2014,7 +2014,7 @@ catch(error) {
 }
 					minijeu_status=false;
 					channel_id=0;
-				},10000);
+				},100000);
 				minijeu_type="";
 			}
 			else {
@@ -2254,7 +2254,7 @@ function initminijeu(msg){
 				minijeu_status=false;
 				minijeu_type="";
 				priere=[];
-			},120000);
+			},300000);
 }
 
 function startminijeu(msg){
@@ -2335,7 +2335,7 @@ function proba_drop(msg, rarete){ //rareté = "leg", "rar", "mag", "com"r*300000
 					count++;
 				}
 			}
-			if(count>2||!droprar)return 0;
+			if(count>2||droprar)return 0;
 			return (1/100+dr/10000+(levelplayer(msg)/20000)+(folieplayer(msg)/20000))*coef; 
 			break;
 		case "rar":
@@ -2345,7 +2345,7 @@ function proba_drop(msg, rarete){ //rareté = "leg", "rar", "mag", "com"r*300000
 					count++;
 				}
 			}
-			if(count>2||!dropmag)return 0;
+			if(count>2||dropmag)return 0;
 			return (1/100+dr/2000+(levelplayer(msg)/15000)+(folieplayer(msg)/15000))*coef;
 			break;
 		case "mag":
@@ -2355,7 +2355,7 @@ function proba_drop(msg, rarete){ //rareté = "leg", "rar", "mag", "com"r*300000
 					count++;
 				}
 			}
-			if(count>2||!dropcom)return 0;
+			if(count>2||dropcom)return 0;
 			return (3/100+dr/333+(levelplayer(msg)/10000)+(folieplayer(msg)/10000))*coef;
 			break;
 		case "com":
