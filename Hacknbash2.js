@@ -174,7 +174,8 @@ bot.on('message', msg => {
 				t_o.splice(i, 1); 
 			}
 		}
-	}, 1000);
+	}, 2000);
+	console.log(t_o);
 	if(Game_over)gameover(msg);
 	if(end)return;
 	if(!install&&msg.content=="install"){
@@ -1991,11 +1992,9 @@ function minijeu(msg){
 					minijeu_status=false;		
 					minijeu_type="";				
 				}
-catch(error) {
-  console.error(error);
-
-}
-					
+				catch(error) {
+					console.error(error);
+				}	
 			}
 		}
 	}
@@ -2013,6 +2012,7 @@ catch(error) {
 				msg.reply("frappe le "+miniboss_nom + " et le tue");
 				levelup(msg);
 				alive=false;
+				minijeu_status=false;
 				minijeu_type="";
 			}
 			else {
@@ -2251,7 +2251,7 @@ function initminijeu(msg){
 				minijeu_status=false;
 				minijeu_type="";
 				priere=[];
-			},300000);
+			},150000);
 }
 
 function startminijeu(msg){

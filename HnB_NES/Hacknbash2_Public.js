@@ -1992,17 +1992,13 @@ function minijeu(msg){
 				leveldown(msg);
 				try{
 					msg.channel.send(msg.author.username + " se prend la "+ miniboss_nom +" de plein fouet et perd un niveau");
-					msg.guild.channels.get(channel_id).delete();
-					channel_id=0;
 					piege_safe=Array();
 					minijeu_status=false;		
 					minijeu_type="";				
 				}
-catch(error) {
-  console.error(error);
-
-}
-					
+				catch(error) {
+					console.error(error);
+				}	
 			}
 		}
 	}
@@ -2020,6 +2016,7 @@ catch(error) {
 				msg.reply("frappe le "+miniboss_nom + " et le tue");
 				levelup(msg);
 				alive=false;
+				minijeu_status=false;
 				minijeu_type="";
 			}
 			else {
@@ -2258,7 +2255,7 @@ function initminijeu(msg){
 				minijeu_status=false;
 				minijeu_type="";
 				priere=[];
-			},300000);
+			},150000);
 }
 
 function startminijeu(msg){
