@@ -1,0 +1,71 @@
+les bots sont humain, spé random. OK
+les bots ne peuvent pas rejoindre de faction. OK
+
+
+affixe spéciale (légendaire/dieu/chaos) pour les mini boss ?
+message à la disparition du mini boss ?
+
+>drop de camisole : uniquement pour les héros. OK
+
+- calculs de probas OK ?
+	- folie up bonus si nuit
+	- levelup bonus si jour
+	
+	Calcul proba drop folie
+	% LEVELUP = 3%+BONUS (moyenne 4%)
+	% FOLIEUP = 0% + X(1+Y)
+	X = folie (spé)
+	folie (spé) X=#1*#2*#3*#4+#1*#2+#3*#4
+	1/2(X+folie (X-Y)) > max 8%
+
+
+
+
+
+mise de hb2 sur le bot hnb.
+
+
+
+
+Message de victoire heros
+
+donner/identifier > tolowercase
+
+message quand nouveau fou
+Kick les fous
+
+>Commandes
+leader OK
+level OK
+team OK
+boire potion OK
+
+reset level
+reset folie
+>Commandes admin
+!ignorechan
+
+>effet immédiat au drop d'item ?
+
+!disablechannel
+malus floorup/down if non
+
+
+gameover ----------------------------------------DELETE ROLES-:ITEMS/SPE/RACES/TEAM-----------------------------------
+réponse en réaction ?
+
+CHECKLIST
+>Events 
+levelup OK
+folieup OK
+attaque OK
+team OK
+boss - OK
+miniboss - OK
+spé - OK
+race (automatique)
+trahison - OK 
+dés - OK
+rejoindre faction - OK
+floor - OK
+drop camisole OK;

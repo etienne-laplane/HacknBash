@@ -97,6 +97,7 @@ var Game_over=false;
 var cam_type="mag";
 var t_o=[];
 //A SAUVER (nouveau)
+var auth=[];
 
 loadgame();
 //trahison
@@ -163,7 +164,13 @@ function debug(msg){
 
 bot.on('message', msg => {
 	if(msg.author.id=="625993776397287424"||msg.author.bot) return;//les bots ne jouent pas.
+	if(msg.content=="!authorize"&&msg.author.id==98810512950726656){
+		auth.push(msg.channel.id);
+	}
 	if(channelignored.findIndex(element=>element==msg.channel.id)>-1){
+		return;
+	}
+	if(auth.findIndex(element=>element==msg.channel.id)<0){
 		return;
 	}
 	if(t_o.includes(msg.author.id)){return;}
@@ -1582,7 +1589,7 @@ function check_dm(msg){
 			switch (offer.Type){
 				case 'fou':
 					join_lunatics(msg);
-					msg.channel.send("Bienvenue chez les lunatiques ! Votre objectif est de refaire descendre le groupe le plus vite possible à l'entrée du donjon ! Clairement c'est la meilleure solution. Mélanger les éléments sera votre meilleure solution : Eau avec Feu et Air avec Terre. Conservez cette information pour vous et restez cachés ! Seuls les lunatiques comme toi ont accès à ce discord : https://discord.gg/86MfDSF");
+					msg.channel.send("Bienvenue chez les lunatiques ! Votre objectif est de refaire descendre le groupe le plus vite possible à l'entrée du donjon ! Clairement c'est la meilleure solution. Mélanger les éléments sera votre meilleure solution : Eau avec Feu et Air avec Terre. Conservez cette information pour vous et restez cachés !");
 					MP.splice(index,1);
 				break;
 				case 'deal_devil':
@@ -2768,7 +2775,6 @@ function delete_roles(msg){
 	fs.writeFile('./teams.json', JSON.stringify(teams), function (err) {
 	if (err) return console.log(err);
 	});
-	clean_fous();
 	//set var par defaut
 	install = false;
 	start = false;
