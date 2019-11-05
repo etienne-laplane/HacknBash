@@ -90,12 +90,12 @@ var boss_list=["Yurgen le Kraken",
 				"Barnabé le Scarabé",
 				"Hippolyte l'Hippogryphe",
 				"Akhan l'avatar de Nehma"];
-//A SAUVER (nouveau)
 var hard = false;
 var spe_hard = "";
 var nom_boss ="Yurgen le Kraken";
 var Game_over=false;
 var cam_type="mag";
+//A SAUVER (nouveau)
 
 loadgame();
 //trahison
@@ -234,7 +234,6 @@ bot.on('message', msg => {
 	add_player(msg);
 	//quand un meme joueur spam, le coef diminue jusqu'a atteindre 0.
 	//toutes les probas sont x coef.
-		winheros(msg);
 	if(msg.author.id==msg_precedent.author.id||msg.author.bot||msg_precedent.author.bot){
 		coef-=0.01;
 	} else {
