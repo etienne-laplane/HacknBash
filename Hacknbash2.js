@@ -1186,12 +1186,9 @@ function event_team_(msg){
 //fonction principale : return true si qqch se passe, false sinon.
 function event_prison(msg){
 	if(msg.content.toLowerCase()=="oui"){
-		if(prison_id!=0){
-			msg.channel.send("La sentence est tombée : " +msg_precedent.author.username+" prend la place de "+prison_name+" en prison !");
-		}else {
 			msg.channel.send("La sentence est tombée : " +msg_precedent.author.username+" doit aller en prison.");
 				folieup(msg);
-		}
+		
 		to_prison(msg_precedent);
 		prison=false;
 	} else if(msg.content.toLowerCase()=="non"){
@@ -1235,6 +1232,10 @@ function team_level_up(nom){
 function event_race_(msg){
 	index = id_race.findIndex(element=>element==msg.author.id);
 	var msg_clean=msg.cleanContent.toLowerCase();
+	if(msg_clean=="random"){
+		r=["humain","elfe","gnome","ours","cultiste","nain","rat"];
+		msg_clean=r[Math.floor(Math.random()*r.length)];
+	}
 	if(index>=0){
 		if(msg.author.bot){
 			msg_clean="humain";
