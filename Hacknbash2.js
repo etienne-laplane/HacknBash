@@ -177,6 +177,7 @@ bot.on('message', msg => {
 	}, 400);
 	console.log(t_o);
 	if(Game_over&&msg.content=="gameover")gameover(msg);
+	if(Game_over)return;
 	if(end)return;
 	if(!install&&msg.content=="install"){
 		install_(msg);
@@ -1161,7 +1162,7 @@ function team(msg){
 //fonction principale : return true si qqch se passe, false sinon.
 function event_team_(msg){
 	if(event_team&&(msg.author.id==msg_team_a.author.id||msg.author.id==msg_team_b.author.id)){
-		if(!msg.cleanContent.startsWith("nom : "){return false;}
+		if(!msg.cleanContent.startsWith("nom : ")){return false;}
 		nom_team=msg.cleanContent.substring(0,98).replace("nom : ","").replace(/[^a-zA-Zéèà ]/g, "");
 		nom_team=nom_team.trim();
 		if(nom_team==""){

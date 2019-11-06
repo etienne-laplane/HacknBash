@@ -362,8 +362,8 @@
 			"def":0,
 			"mad":-2,
 			"drop":0,
-			"levelup":0,
-			"leveldown":0,
+			"levelup":1,
+			"leveldown":5,
 			"prison":0
 		},
 		"Miroir magique":{
