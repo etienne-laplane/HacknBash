@@ -176,7 +176,7 @@ bot.on('message', msg => {
 		}
 	}, 400);
 	console.log(t_o);
-	if(Game_over)gameover(msg);
+	if(Game_over&&msg.content=="gameover")gameover(msg);
 	if(end)return;
 	if(!install&&msg.content=="install"){
 		install_(msg);
@@ -402,7 +402,7 @@ bot.on('message', msg => {
 				console.error(error);
 			});	
 		}
-		else if(players.length/(3.1)>fous.length){
+		else if(highest_floor>4&&players.length/(3.1)>fous.length){
 			if(get_faction(msg)=="neutre"){
 				offer_join_lunatics(msg);
 			}
@@ -2253,7 +2253,13 @@ function initminijeu(msg){
 			r=r/10;
 		}
 		setTimeout(function(){
+			if(channel_id!=0){
+				try{
 				msg.guild.channels.get(channel_id).delete();
+				}catch(error) {
+					console.error(error);
+				}
+			}
 				channel_id=0;
 				minijeu_status=false;
 				minijeu_type="";
