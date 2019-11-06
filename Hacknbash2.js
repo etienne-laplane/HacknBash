@@ -1133,7 +1133,7 @@ function team(msg){
 					return false;
 				}
 			}
-			msg.channel.send("Sombrant toujours plus bas dans la folie, "+msg.author.username+" décide de s'allier avec une de ses autres personnalités... Quel nom allait-il donner à cette équipe ?");
+			msg.channel.send("Sombrant toujours plus bas dans la folie, "+msg.author.username+" décide de s'allier avec une de ses autres personnalités... Quel nom allait-il donner à cette équipe ? [nom : <Nom d'équipe>]");
 			event_team=true;
 			msg_team_a=msg;
 			msg_team_b=msg_precedent;
@@ -1149,7 +1149,7 @@ function team(msg){
 				return false;
 			}
 		}
-		msg.channel.send("Ces paroles étaient de bonne augure pour créer une alliance entre "+msg.author.username+" et "+msg_precedent.author.username+". Quel nom allait-on à cette équipe ?");
+		msg.channel.send("Ces paroles étaient de bonne augure pour créer une alliance entre "+msg.author.username+" et "+msg_precedent.author.username+". Quel nom allait-on à cette équipe ? [nom : <Nom d'équipe>]");
 		msg_team_a=msg;
 		msg_team_b=msg_precedent;
 		event_team=true;
@@ -1161,7 +1161,8 @@ function team(msg){
 //fonction principale : return true si qqch se passe, false sinon.
 function event_team_(msg){
 	if(event_team&&(msg.author.id==msg_team_a.author.id||msg.author.id==msg_team_b.author.id)){
-		nom_team=msg.cleanContent.substring(0,98).replace(/[^a-zA-Z ]/g, "");
+		if(!msg.cleanContent.startsWith("nom : "){return false;}
+		nom_team=msg.cleanContent.substring(0,98).replace("nom : ","").replace(/[^a-zA-Zéèà ]/g, "");
 		nom_team=nom_team.trim();
 		if(nom_team==""){
 			return;
@@ -1776,11 +1777,6 @@ function levelup(msg){
 				bank_folie+=10;
 				bank_levels-=5;
 				leveldown(msg);
-				break;
-			default :
-				msg.reply("gagne un niveau !!!");
-				folieup(msg);
-				levelup(msg);
 				break;
 		}
 	} else {
