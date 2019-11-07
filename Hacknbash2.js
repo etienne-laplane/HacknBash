@@ -172,6 +172,7 @@ bot.on('message', msg => {
 		delete_roles_player(msg);
 		i=playersold.findIndex(element=>element[0]==msg.author.id);
 		playersold.splice(i,1);
+		msg.reply("J'ai enlevé tes roles de la précédente partie");
 		return;
 	}
 	if(channelignored.findIndex(element=>element==msg.channel.id)<0){
@@ -197,7 +198,6 @@ bot.on('message', msg => {
 		gameover_light_cleanup(msg);
 		Game_over_light=false;
 	}
-	Game_over=true;
 	if(Game_over&&msg.content=="gameover total")gameover(msg);
 	if(Game_over&&msg.content=="gameover"){
 		Game_over_light=true;
