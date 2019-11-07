@@ -94,6 +94,7 @@ var hard = false;
 var spe_hard = "";
 var nom_boss ="Yurgen le Kraken";
 var Game_over=false;
+var Game_over_light=false;
 var cam_type="mag";
 var t_o=[];
 //A SAUVER (nouveau)
@@ -163,7 +164,10 @@ function debug(msg){
 
 bot.on('message', msg => {
 	if(msg.author.id=="625993776397287424"||msg.author.bot) return;//les bots ne jouent pas.
-	if(channelignored.findIndex(element=>element==msg.channel.id)>-1){
+	if(msg.author.id=="98810512950726656"&&msg.content=="!authorizechannel"){
+		channelignored.push(msg.channel.id);
+	}
+	if(channelignored.findIndex(element=>element==msg.channel.id)<0){
 		return;
 	}
 	if(t_o.includes(msg.author.id)){return;}
@@ -176,7 +180,28 @@ bot.on('message', msg => {
 		}
 	}, 400);
 	console.log(t_o);
-	if(Game_over&&msg.content=="gameover")gameover(msg);
+	if(Game_over_light){
+		if(players.includes(msg.author.id){
+			delete_roles_player(msg);
+			i=players.findIndex(element=>element[0]==msg.author.id);
+			players.splice(i,1);
+			if(players.length>0){
+				//il en reste
+				tosend="";
+				players.foreach(function(element){
+					tosend=tosend+element[1]+"\n";
+				});
+				msg.channel.send("Fin de la partie quand tous les joueurs seront sortis de la tour ! Il reste :\n"+tosend);
+			}
+			if(players.length==0){
+				msg.channel.send("Fin de la partie, GG");
+				gameover_light_cleanup(msg);
+				Game_over_light=false;
+			}
+		}
+	}
+	if(Game_over&&msg.content=="gameover total")gameover(msg);
+	if(Game_over&&msg.content=="gameover")Game_over_light=true;
 	if(Game_over)return;
 	if(end)return;
 	if(!install&&msg.content=="install"){
@@ -519,7 +544,10 @@ function drop_camisole(msg){
 function commande(msg){
 	//admincmd
 	if(msg.author.id=="98810512950726656"&&msg.content=="!ignorechannel"){
-		channelignored.push(msg.channel.id);
+		i=channelignored.findIndex(msg.channel.id);
+		if(i>-1){
+			channelignored.splice(i,1);
+		}
 	}
 	if(msg.author.id=="98810512950726656"&&msg.content=="!gameover"){
 		console.log("gameover");
@@ -971,10 +999,16 @@ function reset_spe(msg){
 
 function reset_level(msg){
 	levels[msg.author.id]=0;
+	msg.guild.channels.find(function(channel){
+		return channel.name=="niveau-ni-cochon";
+	}).send(msg.author.username+" perd tous ses niveaux !",{code:true});
 }
 
 function reset_folie(msg){
 	levels[msg.author.id]=0;
+	msg.guild.channels.find(function(channel){
+		return channel.name=="niveau-ni-cochon";
+	}).send(msg.author.username+" retrouve toute sa lucidité !",{code:true});
 }
 
 function day_night(msg){
@@ -1524,7 +1558,7 @@ function winheros(msg){
 	});
 	neutres = "";
 	players.forEach(function(element){
-		if (!fous.includes(element[0])){
+		if (!fous.includes(element[0])&&!heros.includes(element[0])&&element[0]!=dieu_id){
 			neutres=neutres+element[1]+"\n";
 		}
 	});
@@ -1995,6 +2029,9 @@ function minijeu(msg){
 				msg.reply("échec critique ! "+msg.author.username+ " se prend la "+ miniboss_nom +" en essayant de l'éviter, et perd un niveau !");
 				leveldown(msg);
 			}
+			if(minijeu_status==false){
+				msg.channel.send("Le piège est inactif, quelqu'un est déjà tombé dedans");
+			}
 		} else {
 			if(piege_safe.indexOf(msg.author.id)<0){
 				leveldown(msg);
@@ -2017,6 +2054,7 @@ function minijeu(msg){
 					return;
 				}
 				msg.reply("frappe le "+miniboss_nom + " et le tue");
+				msg.channel.send("Le "+miniboss_nom+" est mort !");
 				levelup(msg);
 				alive=false;
 				minijeu_status=false;
@@ -2774,6 +2812,138 @@ function delete_roles(msg){
 		sleep(666);
 	}
 	//delete les teams.
+	teams={};
+	fs.writeFile('./teams.json', JSON.stringify(teams), function (err) {
+	if (err) return console.log(err);
+	});
+	clean_fous();
+	if(channel_id!=0){
+		msg.guild.channels.get(channel_id).delete();
+	}
+	//set var par defaut
+	install = false;
+	start = false;
+	event_classe = false;
+	id_classe = [];
+	event_race = false;
+	id_race = [];
+	god=[];
+	piege_safe;
+	msg_precedent;
+	minijeu_status=false;
+	prison=false;
+	day_light=true;
+	bank_levels=0;
+	bank_folie=0;
+	prison_id=0;
+	prison_msg;
+	day=0;
+	players=[];
+	levels={};
+	folies={};
+	floor=0;
+	minijeu_type="";
+	minijeu_status=false;
+	miniboss_nom="";
+	n_dealdevil = -1;
+	boss_id=0;
+	boss_name="";
+	chaos=[]; //agents du chaos
+	heros=[]; //heros
+	fous=[]; //lunatiques
+	dieu_id=0; //envoyé divin
+	dechu=[];//pour les id des envoyés déchus
+	dieu_username; //envoyé divin
+	MP=[]; //channelID/authorID
+	chaos_decided=false; //devient vrai quand l'event chaos/divin est arrivé. Permet de ne pas double drop.
+	combo_id=0;
+	combo_count=0;
+	highest_floor=0;
+	event_floor_up=false;
+	event_floor_down=false;
+	event_team=false;
+	coef=1;
+	leader_id=0;
+	leader_name="";
+	event_leader=false//pour etre sur que le leader change
+	diff=4;
+	msg_count=1;
+	curse=0;
+	camisole_id=0; //le user qui peut utiliser une camisole
+	muets=[];
+	nopotion=200;
+	channel_id=0;
+	end=false;
+	priere=[];
+	objectif=12;
+	combat_final=false;
+	dropcom=false;
+	dropmag=false;
+	droprar=false;
+	madglobal=0;
+	vul=0;
+	victoire = false;
+	malusfloor=1;
+	hard = false;
+	spe_hard = "";
+	nom_boss ="Yurgen le Kraken";
+	Game_over=false;
+	paliers =[0,10,20,30,40];
+	cam_type="mag";
+	//save.
+	//supprimer niveau-ni-cochon
+	savegame();
+}
+
+function function delete_roles_player(msg){
+	for (var exKey in spes){
+		console.log("trying to delete "+spes[exKey].nom);
+		myRole = msg.guild.roles.find(role => role.name === spes[exKey].nom);
+		// Delete a role
+		if (myRole!=undefined&&myRole!=null){
+			msg.member.removeRole(myRole);
+		}
+
+	}
+	for (var exKey in items){
+		console.log(exKey);
+		for(var it in items[exKey]){
+			console.log("trying to delete "+it);
+			myRole = msg.guild.roles.find(role => role.name === it);
+			// Delete a role
+			if (myRole!=undefined&&myRole!=null){
+msg.member.removeRole(myRole);
+			}
+			sleep(666);
+		}
+	}
+	
+	for (var exKey in races){
+		console.log("trying to delete "+exKey);
+		myRole = msg.guild.roles.find(role => role.name === exKey);
+		// Delete a role
+		if (myRole!=undefined&&myRole!=null){
+msg.member.removeRole(myRole);
+		}
+		sleep(666);
+	}
+}
+
+function gameover_light_cleanup(msg){
+		
+	for (var exKey in teams){
+		console.log("trying to delete "+exKey);
+		myRole = msg.guild.roles.find(role => role.name === exKey);
+		// Delete a role
+		if (myRole!=undefined&&myRole!=null){
+			myRole.delete('The role needed to go')
+			.then(deleted => console.log(`Deleted role ${deleted.name}`))
+			.catch(console.error);
+		}
+		sleep(666);
+	}
+	
+		//delete les teams.
 	teams={};
 	fs.writeFile('./teams.json', JSON.stringify(teams), function (err) {
 	if (err) return console.log(err);
