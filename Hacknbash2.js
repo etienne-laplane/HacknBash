@@ -803,6 +803,7 @@ function trahison(msg){
 function offer_trahison(msg,autre,nom){
 	var offer={};
 	msg.author.createDM().then(function(channel){
+		channelignored.push(channel.id);
 		offer={
 			"channelid":channel.id,
 			"Type":"trahison",
@@ -1500,6 +1501,7 @@ function offer_join_lunatics(msg){
 	}
 	var offer={};
 	msg.author.createDM().then(function(channel){
+		channelignored.push(channel.id);
 		offer={
 			"channelid":channel.id,
 			"Type":"fou",
@@ -2130,6 +2132,7 @@ function minijeu(msg){
 			var offer={};
 			msg.reply("sans un son, l'envoyé du chaos disparait...");
 			msg.author.createDM().then(function(channel){
+				channelignored.push(channel.id);
 				offer={
 					"channelid":channel.id,
 					"Type":"deal_devil",
@@ -2825,7 +2828,9 @@ function delete_roles(msg){
 	});
 	clean_fous();
 	if(channel_id!=0){
+		try{
 		msg.guild.channels.get(channel_id).delete();
+		}catch(err){}
 	}
 	//set var par defaut
 	install = false;
