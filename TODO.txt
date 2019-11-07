@@ -20,6 +20,10 @@ message à la disparition du mini boss ?
 
 
 
+PLACEHOLDE
+LOGS DIVIN/CHAOS
+BOSS MORT,
+PIEGE DESACTIVE,
 
 
 

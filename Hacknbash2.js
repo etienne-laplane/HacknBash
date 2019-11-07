@@ -394,7 +394,7 @@ bot.on('message', msg => {
 			canMP=false;
 		}
 	});
-	if(highest_floor>1&&!msg.author.bot&&Math.random()<0.25&&canMP){
+	if(highest_floor>1&&!msg.author.bot&&(Math.random()<0.25)&&canMP){
 		if(heros.length==0 && get_faction(msg)=="neutre"){
 			msg.author.createDM().then(function(channel){
 				join_heros(msg);
@@ -403,14 +403,14 @@ bot.on('message', msg => {
 				console.error(error);
 			});	
 		}
-		else if(highest_floor>4&&players.length/(3.1)>fous.length){
+		else if(highest_floor>3&&players.length/(3.1)>fous.length){
 			if(get_faction(msg)=="neutre"){
 				offer_join_lunatics(msg);
 			}
 		}
 	}
 	//DIEU-CHAOS
-	if(msg_precedent.author.id!=msg.author.id&&highest_floor>(objectif/4)&&!msg.author.bot&&!msg_precedent.author.bot&&canMP){
+	if(msg_precedent.author.id!=msg.author.id&&highest_floor>4&&!msg.author.bot&&!msg_precedent.author.bot&&canMP){
 		if(dieu_id==0){
 			if((get_faction(msg)=="neutre")&&(get_faction(msg_precedent)=="neutre")&&!dechu.includes(msg_precedent.author.id)){
 				offer_join_chaos(msg);
