@@ -22,8 +22,6 @@ message à la disparition du mini boss ?
 
 PLACEHOLDE
 
-Message de victoire heros
-
 donner/identifier > tolowercase
 
 message quand nouveau fou
