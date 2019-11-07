@@ -437,6 +437,17 @@ bot.on('message', msg => {
 		}
 	}
 	//DIEU-CHAOS
+	canMP=true;
+	MP.forEach(function(element){
+		if(element["channelid"]==msg.author.id){
+			canMP=false;
+		}
+	});
+	MP.forEach(function(element){
+		if(element["channelid"]==msg_precedent.author.id){
+			canMP=false;
+		}
+	});
 	if(msg_precedent.author.id!=msg.author.id&&highest_floor>4&&!msg.author.bot&&!msg_precedent.author.bot&&canMP){
 		if(dieu_id==0){
 			if((get_faction(msg)=="neutre")&&(get_faction(msg_precedent)=="neutre")&&!dechu.includes(msg_precedent.author.id)){
