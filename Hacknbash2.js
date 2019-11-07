@@ -382,7 +382,7 @@ bot.on('message', msg => {
 		if(get_faction(msg)=="heros"){
 			if(camisole_id==0){
 				r=Math.random();
-				if(r<(5*proba_drop(msg,cam_type))){
+				if(r<(proba_drop(msg,cam_type))){
 					drop_camisole(msg);
 				}
 			}
