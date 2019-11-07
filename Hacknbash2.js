@@ -182,8 +182,11 @@ bot.on('message', msg => {
 	console.log(t_o);
 	if(Game_over_light){
 		players.forEach(function(element){
+			console.log("OK : "+element[1]);
 			bot.fetchUser(element[0]).then(function(u){
+				console.log("OK2 : "+u.username);
 				msg.guild.fetchMember(u).then(function(mem){
+					console.log("OK3");
 					delete_roles_member(mem);
 				}
 			});
