@@ -170,6 +170,8 @@ bot.on('message', msg => {
 	}
 	if(playersold.findIndex(element=>element[0]==msg.author.id)>-1){
 		delete_roles_player(msg);
+		i=playersold.findIndex(element=>element[0]==msg.author.id);
+		playersold.splice(i,1);
 		return;
 	}
 	if(channelignored.findIndex(element=>element==msg.channel.id)<0){
