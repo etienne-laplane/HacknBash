@@ -77,6 +77,7 @@ var combat_final=false;
 var dropcom=false;
 var dropmag=false;
 var droprar=false;
+var playersold=[];
 var madglobal=0;
 var vul=0;
 var victoire = false;
@@ -167,8 +168,18 @@ bot.on('message', msg => {
 	if(msg.author.id=="98810512950726656"&&msg.content=="!authorizechannel"){
 		channelignored.push(msg.channel.id);
 	}
+	if(playersold.findIndex(element=>element[0]==msg.author.id)>-1){
+		delete_roles_player(msg);
+		return;
+	}
 	if(channelignored.findIndex(element=>element==msg.channel.id)<0){
 		return;
+	}
+	if(!minijeu_status){
+		msg_count++;
+		if(msg_count%10==0){
+			savegame();
+		}
 	}
 	if(t_o.includes(msg.author.id)){return;}
 	t_o.push(msg.author.id);
@@ -179,24 +190,19 @@ bot.on('message', msg => {
 			}
 		}
 	}, 400);
-	console.log(t_o);
 	if(Game_over_light){
-		players.forEach(function(element){
-			console.log("OK : "+element[1]);
-			bot.fetchUser(element[0]).then(function(u){
-				console.log("OK2 : "+u.username);
-				msg.guild.fetchMember(u).then(function(mem){
-					console.log("OK3");
-					delete_roles_member(mem);
-				}
-			});
-		});
 		msg.channel.send("Fin de la partie, GG");
 		gameover_light_cleanup(msg);
 		Game_over_light=false;
 	}
+	Game_over=true;
 	if(Game_over&&msg.content=="gameover total")gameover(msg);
-	if(Game_over&&msg.content=="gameover")Game_over_light=true;
+	if(Game_over&&msg.content=="gameover"){
+		Game_over_light=true;
+		players.forEach(function(element){
+			playersold.push(element);
+		});
+	}
 	if(Game_over)return;
 	if(end)return;
 	if(!install&&msg.content=="install"){
@@ -256,14 +262,7 @@ bot.on('message', msg => {
 		day_light=false;
 	}
 	if(msg_precedent==null) msg_precedent=msg;//just in case.
-	if(!minijeu_status){
-	
-	msg_count++;
-	if(msg_count%10==0){
-		savegame();
-		//debug(msg);
-	}
-	}
+
 	
 	nopotion--;
 	if (event_race_(msg)){
@@ -2698,6 +2697,7 @@ function loadgame(){
 	nom_boss = save["nom_boss"];
 	Game_over= save["Game_over"];
 	cam_type=save["cam_type"];
+	playersold=save["playersold"];
 }
 
 function savegame(){
@@ -2763,6 +2763,7 @@ function savegame(){
 	save["nom_boss"]=nom_boss;
 	save["Game_over"]=Game_over;
 	save["cam_type"]=cam_type;
+	save["playersold"]=playersold;
 	fs.writeFile('./save.json', JSON.stringify(save), function (err) {
 	if (err) return console.log(err);
 	});
