@@ -342,7 +342,7 @@ bot.on('message', msg => {
 		return;
 	}
 	r=Math.random();
-	if(r<proba_spe(msg)){
+	if(r<proba_spe(msg)&&!id_classe.includes(msg.author.id)){
 		id_classe.push(msg.author.id);
 		msg.reply("Dans un éclair de lucidité, "+msg.author.username+" voit un bref instant la nature véritable du donjon. De cet enseignement il monte en compétence et choisi une affinité élémentaire ! [eau/feu/air/terre]");
 		msg_precedent=msg;
@@ -559,7 +559,6 @@ function commande(msg){
 		}
 	}
 	if(msg.author.id=="98810512950726656"&&msg.content=="!gameover"){
-		console.log("gameover");
 		gameover(msg);
 	}
 	if(msg.content=="!help"){
@@ -1052,8 +1051,6 @@ function day_night(msg){
 				//}).send("La lumière qui filtre par les fenêtres se change en obscurité alors que la nuit tombe... Errant toujours dans le "+floor+"è étage, le groupe se trouve plus vulnérable aux tentations et aux voix qui viennent des ombres...",{code:true});
 		}, 180000*r+180000);
 	}
-	console.log(day);
-	
 }
 
 //fonction principale : return true si qqch se passe, false sinon.
@@ -2505,7 +2502,6 @@ function proba_levelup(msg){
 	if(get_faction(msg)=="heros"){
 		bonus=5;
 	}
-	console.log((4+up+bonus)/100+day/100);
 	return ((4+up+bonus)/100+day/100)*coef;
 }
 
@@ -2553,7 +2549,6 @@ function proba_folieup(msg){
 			if(n_opp==2){
 		bonus=1;
 	}
-	console.log((7*madglobal/100+(mad/1000)-day/1000+2*(n1*n2*n3*n4+n1*n2+n3*n4)/100+bonus)*coef);
 	return (7*madglobal/100+(mad/300)-day/1000+2*(n1*n2*n3*n4+n1*n2+n3*n4)/100+bonus)*coef;
 }
 
@@ -3094,9 +3089,5 @@ function gameover(msg){
 	end=true;
 	delete_roles(msg);
 }
-
-bot.on("error", (e) => console.error(e));
-bot.on("warn", (e) => console.warn(e));
-bot.on("debug", (e) => console.info(e));
   
 bot.login(auth.token);
