@@ -181,24 +181,16 @@ bot.on('message', msg => {
 	}, 400);
 	console.log(t_o);
 	if(Game_over_light){
-		if(players.includes(msg.author.id){
-			delete_roles_player(msg);
-			i=players.findIndex(element=>element[0]==msg.author.id);
-			players.splice(i,1);
-			if(players.length>0){
-				//il en reste
-				tosend="";
-				players.foreach(function(element){
-					tosend=tosend+element[1]+"\n";
-				});
-				msg.channel.send("Fin de la partie quand tous les joueurs seront sortis de la tour ! Il reste :\n"+tosend);
-			}
-			if(players.length==0){
-				msg.channel.send("Fin de la partie, GG");
-				gameover_light_cleanup(msg);
-				Game_over_light=false;
-			}
-		}
+		players.forEach(function(element){
+			bot.fetchUser(element[0]).then(function(u){
+				msg.guild.fetchMember(u).then(function(mem){
+					delete_roles_member(mem);
+				}
+			});
+		});
+		msg.channel.send("Fin de la partie, GG");
+		gameover_light_cleanup(msg);
+		Game_over_light=false;
 	}
 	if(Game_over&&msg.content=="gameover total")gameover(msg);
 	if(Game_over&&msg.content=="gameover")Game_over_light=true;
@@ -2941,6 +2933,41 @@ msg.member.removeRole(myRole);
 		sleep(666);
 	}
 }
+
+function function delete_roles_member(mem){
+	for (var exKey in spes){
+		console.log("trying to delete "+spes[exKey].nom);
+		myRole = msg.guild.roles.find(role => role.name === spes[exKey].nom);
+		// Delete a role
+		if (myRole!=undefined&&myRole!=null){
+			mem.removeRole(myRole);
+		}
+
+	}
+	for (var exKey in items){
+		console.log(exKey);
+		for(var it in items[exKey]){
+			console.log("trying to delete "+it);
+			myRole = msg.guild.roles.find(role => role.name === it);
+			// Delete a role
+			if (myRole!=undefined&&myRole!=null){
+			mem.removeRole(myRole);
+			}
+			sleep(666);
+		}
+	}
+	
+	for (var exKey in races){
+		console.log("trying to delete "+exKey);
+		myRole = msg.guild.roles.find(role => role.name === exKey);
+		// Delete a role
+		if (myRole!=undefined&&myRole!=null){
+mem.removeRole(myRole);
+		}
+		sleep(666);
+	}
+}
+
 
 function gameover_light_cleanup(msg){
 		
