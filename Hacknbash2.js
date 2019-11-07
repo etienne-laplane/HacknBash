@@ -553,7 +553,7 @@ function drop_camisole(msg){
 function commande(msg){
 	//admincmd
 	if(msg.author.id=="98810512950726656"&&msg.content=="!ignorechannel"){
-		i=channelignored.findIndex(msg.channel.id);
+		i=channelignored.findIndex(element=>element==msg.channel.id);
 		if(i>-1){
 			channelignored.splice(i,1);
 		}
