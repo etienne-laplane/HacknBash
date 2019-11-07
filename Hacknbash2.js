@@ -79,6 +79,7 @@ var dropmag=false;
 var droprar=false;
 var playersold=[];
 var madglobal=0;
+var inac=true;
 var vul=0;
 var victoire = false;
 var malusfloor=1;
@@ -357,6 +358,14 @@ bot.on('message', msg => {
 		minijeu(msg);
 		msg_precedent=msg;
 		return;
+	}
+	if(minijeu_type=="Piege"){
+		if(msg.channel.id==channel_id){
+			if(inac){
+				msg.channel.send("Le piège est inactif, quelqu'un est déjà tombé dedans");
+				inac=false;
+			}
+		}
 	}
 	if(floor_(msg)){
 		msg_precedent=msg;
@@ -2316,6 +2325,7 @@ function startminijeu(msg){
 	var r = Math.random();
 	if(r<proba_minijeu(msg)&&channel_id==0){
 		initminijeu(msg);
+		inac=true;
 		return true;
 	}
 	return false;
