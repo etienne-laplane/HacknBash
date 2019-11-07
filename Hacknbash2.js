@@ -180,15 +180,18 @@ bot.on('message', msg => {
 		}
 	}, 400);
 	console.log(t_o);
+	Game_over_light=true;
+	console.log(Game_over_light);
 	if(Game_over_light){
-		if(players.includes(msg.author.id){
+		if(players.findIndex(element=>element[0]==msg.author.id)>-1){
+			console.log("suppr");
 			delete_roles_player(msg);
 			i=players.findIndex(element=>element[0]==msg.author.id);
 			players.splice(i,1);
 			if(players.length>0){
 				//il en reste
 				tosend="";
-				players.foreach(function(element){
+				players.forEach(function(element){
 					tosend=tosend+element[1]+"\n";
 				});
 				msg.channel.send("Fin de la partie quand tous les joueurs seront sortis de la tour ! Il reste :\n"+tosend);
@@ -199,6 +202,7 @@ bot.on('message', msg => {
 				Game_over_light=false;
 			}
 		}
+		return;
 	}
 	if(Game_over&&msg.content=="gameover total")gameover(msg);
 	if(Game_over&&msg.content=="gameover")Game_over_light=true;
@@ -2782,7 +2786,7 @@ function delete_roles(msg){
 			myRole.delete('The role needed to go')
 			.then(deleted => console.log(`Deleted role ${deleted.name}`))
 			.catch(console.error);
-					sleep(666);
+					sleep(200);
 		}
 
 	}
@@ -2797,7 +2801,7 @@ function delete_roles(msg){
 				.then(deleted => console.log(`Deleted role ${deleted.name}`))
 				.catch(console.error);
 			}
-			sleep(666);
+			sleep(200);
 		}
 	}
 	
@@ -2810,7 +2814,7 @@ function delete_roles(msg){
 			.then(deleted => console.log(`Deleted role ${deleted.name}`))
 			.catch(console.error);
 		}
-		sleep(666);
+		sleep(200);
 	}
 	
 	for (var exKey in races){
@@ -2822,7 +2826,7 @@ function delete_roles(msg){
 			.then(deleted => console.log(`Deleted role ${deleted.name}`))
 			.catch(console.error);
 		}
-		sleep(666);
+		sleep(200);
 	}
 	//delete les teams.
 	teams={};
@@ -2908,7 +2912,7 @@ function delete_roles(msg){
 	savegame();
 }
 
-function function delete_roles_player(msg){
+function delete_roles_player(msg){
 	for (var exKey in spes){
 		console.log("trying to delete "+spes[exKey].nom);
 		myRole = msg.guild.roles.find(role => role.name === spes[exKey].nom);
@@ -2927,7 +2931,6 @@ function function delete_roles_player(msg){
 			if (myRole!=undefined&&myRole!=null){
 msg.member.removeRole(myRole);
 			}
-			sleep(666);
 		}
 	}
 	
@@ -2938,7 +2941,6 @@ msg.member.removeRole(myRole);
 		if (myRole!=undefined&&myRole!=null){
 msg.member.removeRole(myRole);
 		}
-		sleep(666);
 	}
 }
 
@@ -2953,7 +2955,6 @@ function gameover_light_cleanup(msg){
 			.then(deleted => console.log(`Deleted role ${deleted.name}`))
 			.catch(console.error);
 		}
-		sleep(666);
 	}
 	
 		//delete les teams.
