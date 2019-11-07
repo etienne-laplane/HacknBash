@@ -2266,6 +2266,7 @@ function initminijeu(msg){
 		}
 		msg.guild.createChannel(miniboss_nom,'text').then(function(result){
 			channel_id = result.id;
+			channelignored.push(channel_id);
 			minijeu_type=later_minijeu_type;
 			switch (minijeu_type){
 				case "Marchand":
