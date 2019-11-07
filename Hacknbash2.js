@@ -1152,7 +1152,7 @@ function team(msg){
 				return false;
 			}
 		}
-		msg.channel.send("Ces paroles étaient de bonne augure pour créer une alliance entre "+msg.author.username+" et "+msg_precedent.author.username+". Quel nom allait-on à cette équipe ? [nom : <Nom d'équipe>]");
+		msg.channel.send("Ces paroles étaient de bonne augure pour créer une alliance entre "+msg.author.username+" et "+msg_precedent.author.username+". Quel nom allait-on donner à cette équipe ? [nom : <Nom d'équipe>]");
 		msg_team_a=msg;
 		msg_team_b=msg_precedent;
 		event_team=true;
