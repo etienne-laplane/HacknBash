@@ -183,7 +183,7 @@
 			"prison":0
 		},
 		"Clef Magique":{
-			"desc":"PLACEHOLDER",
+			"desc":"Un objet mystérieux... Il faudra attendre un marchand pour pouvoir l'identifier...",
 			"atk":0,
 			"def":0,
 			"mad":0,
@@ -265,7 +265,7 @@
 			"prison":1
 		},
 		"Falchion Divin":{
-			"desc":"PLACEHOLDER",
+			"desc":"Un objet mystérieux... Il faudra attendre un marchand pour pouvoir l'identifier...",
 			"atk":3,
 			"def":1,
 			"mad":2,
@@ -275,7 +275,7 @@
 			"prison":0
 		},
 		"Clef Parfaite":{
-			"desc":"PLACEHOLDER",
+			"desc":"Un objet mystérieux... Il faudra attendre un marchand pour pouvoir l'identifier...",
 			"atk":0,
 			"def":0,
 			"mad":1,
@@ -285,7 +285,7 @@
 			"prison":5
 		},
 		"Trident de Nehma":{
-			"desc":"PLACEHOLDER",
+			"desc":"Un objet mystérieux... Il faudra attendre un marchand pour pouvoir l'identifier...",
 			"atk":2,
 			"def":2,
 			"mad":2,
@@ -397,7 +397,7 @@
 			"prison":0
 		},
 		"Oeil du Griffon":{
-			"desc":"PLACEHOLDER",
+			"desc":"Un objet mystérieux... Il faudra attendre un marchand pour pouvoir l'identifier...",
 			"atk":5,
 			"def":5,
 			"mad":3,

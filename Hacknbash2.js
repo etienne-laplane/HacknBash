@@ -1575,7 +1575,11 @@ function winheros(msg){
 	});
 	neutres = "";
 	players.forEach(function(element){
-		if (!fous.includes(element[0])&&!heros.includes(element[0])&&element[0]!=dieu_id){
+		if(fous.findIndex(x=>x["id"]==element[0])){
+		}
+		else if(heros.findIndex(x=>x["id"]==element[0])){
+		}
+		else if (element[0]!=dieu_id){
 			neutres=neutres+element[1]+"\n";
 		}
 	});
@@ -2053,9 +2057,9 @@ function minijeu(msg){
 			if(piege_safe.indexOf(msg.author.id)<0){
 				leveldown(msg);
 				msg.channel.send(msg.author.username + " se prend la "+ miniboss_nom +" de plein fouet et perd un niveau");
+				inac = true;
 				piege_safe=Array();
-				minijeu_status=false;		
-				minijeu_type="";				
+				minijeu_status=false;						
 			}
 		}
 	}
@@ -2314,6 +2318,7 @@ function initminijeu(msg){
 					console.error(error);
 				}
 			}
+				inac=false;
 				channel_id=0;
 				minijeu_status=false;
 				minijeu_type="";
@@ -2325,7 +2330,6 @@ function startminijeu(msg){
 	var r = Math.random();
 	if(r<proba_minijeu(msg)&&channel_id==0){
 		initminijeu(msg);
-		inac=true;
 		return true;
 	}
 	return false;
