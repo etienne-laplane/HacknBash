@@ -1585,12 +1585,8 @@ function winheros(msg){
 	});
 	neutres = "";
 	players.forEach(function(element){
-		if(fous.findIndex(x=>x["id"]==element[0])){
-		}
-		else if(heros.findIndex(x=>x["id"]==element[0])){
-		}
-		else if (element[0]!=dieu_id){
-			neutres=neutres+element[1]+"\n";
+		if(get_faction_byid(element[0])=="neutre"){
+			neutres=neutres+element.username+"\n";
 		}
 	});
 	msg.channel.send("VICTOIRE PARFAITE CONTRE LE CHAOS ! Le groupe a vaincu "+nom_boss+", et ainsi rétabli l'ordre de l'univers.");
@@ -1638,6 +1634,34 @@ function get_faction(msg){
 	}
 	for (var exKey in dechu){
 	if (dechu[exKey]==msg.author.id){
+			return "déchu";
+		}
+	}
+	return "neutre";
+}
+
+//heros, fanatique, chaos, dieu, neutre
+function get_faction_byid(id){
+	for (var exKey in heros){
+		if (heros[exKey]["id"]==id){
+			return "heros";
+		}
+	}
+	for (var exKey in fous){
+		if (fous[exKey]["id"]==id){
+			return "fanatique";
+		}
+	}
+	for (var exKey in chaos){
+	if (chaos[exKey]["id"]==id){
+			return "chaos";
+		}
+	}
+	if(dieu_id==id){
+		return "dieu";
+	}
+	for (var exKey in dechu){
+	if (dechu[exKey]==id){
 			return "déchu";
 		}
 	}
