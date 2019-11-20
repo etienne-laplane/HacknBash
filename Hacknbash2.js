@@ -422,7 +422,7 @@ bot.on('message', msg => {
 	//LUNATICS-HEROS
 	canMP=true;
 	MP.forEach(function(element){
-		if(element["channelid"]==msg.author.id){
+		if(element["authorid"]==msg.author.id){
 			canMP=false;
 		}
 	});
@@ -444,12 +444,12 @@ bot.on('message', msg => {
 	//DIEU-CHAOS
 	canMP=true;
 	MP.forEach(function(element){
-		if(element["channelid"]==msg.author.id){
+		if(element["authorid"]==msg.author.id){
 			canMP=false;
 		}
 	});
 	MP.forEach(function(element){
-		if(element["channelid"]==msg_precedent.author.id){
+		if(element["authorid"]==msg_precedent.author.id){
 			canMP=false;
 		}
 	});
