@@ -308,11 +308,21 @@ bot.on('message', msg => {
 	}
 	if(msg.member==null) return;//les gens offline ne jouent pas.
 	if(combat_final==true){
-		if(get_spe(msg)==""+vul+""+vul+""+vul+""+vul){
-			msg.channel.send("Les mots de "+msg.author.username+" le "+raceplayer(msg)+", "+vulstring(vul)+" retentirent dans tout l'univers ! \""+msg.cleanContent+"\", par ces mots, que le chaos disparaisse !");
-			victoire = true;
-			combat_final=false;
-		} else {
+		if (hard){
+			if(get_spe(msg)==spe_hard){
+				msg.channel.send("Les mots de "+msg.author.username+" le "+raceplayer(msg)+", "+vulstring(vul)+" retentirent dans tout l'univers ! \""+msg.cleanContent+"\", par ces mots, que le chaos disparaisse !");
+				victoire = true;
+				combat_final=false;
+			} else {
+			}
+		}
+		else {
+			if(get_spe(msg)==""+vul+""+vul+""+vul+""+vul){
+				msg.channel.send("Les mots de "+msg.author.username+" le "+raceplayer(msg)+", "+vulstring(vul)+" retentirent dans tout l'univers ! \""+msg.cleanContent+"\", par ces mots, que le chaos disparaisse !");
+				victoire = true;
+				combat_final=false;
+			} else {
+			}
 		}
 	}
 	if(commande(msg)){
