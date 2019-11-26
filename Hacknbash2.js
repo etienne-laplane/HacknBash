@@ -1586,7 +1586,7 @@ function winheros(msg){
 	neutres = "";
 	players.forEach(function(element){
 		if(get_faction_byid(element[0])=="neutre"){
-			neutres=neutres+element.username+"\n";
+			neutres=neutres+element[1]+"\n";
 		}
 	});
 	msg.channel.send("VICTOIRE PARFAITE CONTRE LE CHAOS ! Le groupe a vaincu "+nom_boss+", et ainsi rétabli l'ordre de l'univers.");
