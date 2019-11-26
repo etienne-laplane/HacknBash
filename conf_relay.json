@@ -1,5 +1,5 @@
 {
-   "delay": "1250",
+   "delay": "250",
    "resultchannels" : "race_results",
    "emptyracetimeout" :"300000",
    "finishedracetimeout" : "60000",
