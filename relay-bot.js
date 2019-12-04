@@ -93,4 +93,33 @@ function countdown_user(msg,counter,user){
   }
 }
 
+function register_team_us(msg){
+	//msg = @user1 @user2 @user3 @user4 @user5
+	var toparse = msg.cleanContent;
+	table=toparse.replace(" ","").split("@");
+	runners_us=table.shift();
+}
+
+function print_team_us(msg){
+	toprint="";
+	runners_us.forEach(function(element){
+		toprint=toprint+element+"\n";
+	});
+	msg.reply(toprint);
+}
+
+function register_team_fr(msg){
+	//msg = @user1 @user2 @user3 @user4 @user5
+	var toparse = msg.cleanContent;
+	table=toparse.replace(" ","").split("@");
+	runners_fr=table.shift();
+}
+
+function print_team_fr(msg){
+	toprint="";
+	runners_us.forEach(function(element){
+		toprint=toprint+element+"\n";
+	});
+	msg.reply(toprint);
+}
 bot.login(auth.token);
