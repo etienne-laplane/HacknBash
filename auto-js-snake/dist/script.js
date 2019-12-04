@@ -5,7 +5,7 @@ var TILE,
 	FOOD;
 
 var i=0;
-
+var possible=false;
 TILE = function (k, x, y) {
 	this.kind = k;
 	this.x = x;
@@ -16,6 +16,80 @@ TILE.NONE = 0;
 TILE.SNAKE = 1;
 TILE.WALL = 2;
 TILE.SIZE = 20;
+
+var brain= [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]];
+
+var score=0;
+var bestscore=-100000000000000;
+var best_brain=[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]];
+
+var cur_gen_brain=[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]];
+var mutant=0;
+var limit_mutant=20;
+var gen=0;
+
+function mutate(brai){
+	var toreturn = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]];
+	for(var p=0;p<11;p++){
+		for(var m=0;m<25;m++){
+			if(Math.random()<0.5){
+			if(brai[p][m]!=0||p>1&&brai[p-1][m]!=0||m>1&&brai[p][m-1]!=0||p<10&&brai[p+1][m]!=0||m<24&&brai[p][m+1]!=0)
+				if(Math.random()<0.5){
+					toreturn[p][m]=brai[p][m]-0.1;
+				} else 	{
+					toreturn[p][m]=brai[p][m]+0.1;
+				}
+			}else if(brain[p][m]!=0){
+				toreturn[p][m]=brai[p][m];
+			}
+		}
+		
+	}
+	return toreturn;
+}
+	
+
+		 
 TILE.prototype.clone = function () {
 	return new TILE(this.kind, this.x, this.y);
 };
@@ -24,6 +98,7 @@ TILE.prototype.setKind = function (k) {
 };
 TILE.prototype.draw = function (ctx) {
 	switch (this.kind) {
+
 		case TILE.FOOD:
 			ctx.fillStyle = "#008000";
 			ctx.fillRect(this.x * TILE.SIZE, this.y * TILE.SIZE, TILE.SIZE, TILE.SIZE);
@@ -49,6 +124,9 @@ TILE.prototype.draw = function (ctx) {
 			ctx.fillRect(this.x * TILE.SIZE, this.y * TILE.SIZE, TILE.SIZE, TILE.SIZE);
 			break;
 	}
+		ctx.font = "8px Georgia";
+		ctx.fillStyle = "#000";
+		ctx.fillText(Math.trunc(100*brain[this.y][this.x]),this.x * TILE.SIZE+5, this.y * TILE.SIZE+15);
 };
 
 FOOD = function (x, y) {
@@ -95,7 +173,7 @@ SNAKE.LEFT = 0;
 SNAKE.UP = 1;
 SNAKE.RIGHT = 2;
 SNAKE.DOWN = 3;
-SNAKE.updatetime = 5;
+SNAKE.updatetime = 6;
 SNAKE.prototype.clone = function () {
 	var s = new SNAKE(this.direction);
 	s.queue = this.queue.slice();
@@ -123,7 +201,13 @@ SNAKE.prototype.distTo = function (x, y) {
 	}
 
 	var head = this.head();
+	for(var n=0;n<Math.abs(head.y - y);n++){
+		for (var m=0;m<Math.abs(head.x - x);m++){
+			
+		}
+	}
 	return Math.abs(head.x - x) + Math.abs(head.y - y);
+	
 };
 SNAKE.prototype.distFrom = function (x, y) {
 	if (y === undefined) {
@@ -135,7 +219,21 @@ SNAKE.prototype.distFrom = function (x, y) {
 	return Math.abs(tail.x - x) + Math.abs(tail.y - y);
 };
 
+function cycle(){
+	console.log(bestscore+" - CURRENT - "+score);
+		score=0;
+	mutant++;
+	if(mutant==limit_mutant){
+		mutant=0;
+		gen++;
+		cur_gen_brain=best_brain;
+	}
+	brain=cur_gen_brain;
+	brain=mutate(brain);
+	console.log(brain[1][1]);
+}
 BOARD = function (mx, my) {
+	possible=false;
 	this.allfood=[];
 	this.mx = 25;
 	this.my = 11;
@@ -146,18 +244,35 @@ BOARD = function (mx, my) {
 			this.matrix[x].push(new TILE(TILE.NONE, x, y));
 		}
 	}
-	var LD= [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-		 [0,1,1,1,1,1,0,1,1,1,1,1,0,1,0,0,0,1,0,1,1,1,1,1,0],
-		 [0,1,0,0,0,1,0,1,0,0,0,1,0,1,0,0,0,1,0,1,0,0,0,1,0],
-		 [0,0,0,0,0,1,0,1,0,0,0,1,0,1,0,0,0,1,0,1,0,0,0,0,0],
-		 [0,2,2,2,0,0,0,1,0,0,0,1,0,1,1,1,1,1,0,0,0,0,0,0,0],
+	var LD;
+	var LD1= [
+	     [0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0],
+		 [0,0,0,0,0,0,1,0,1,1,1,0,0,0,1,1,1,0,1,0,0,0,0,0,0],
+		 [0,0,0,0,0,0,1,0,1,1,1,0,0,0,1,1,1,0,1,0,0,0,0,0,0],
+		 [0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0],
+		 [0,2,2,2,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0],
+		 [0,2,2,2,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0],
+		 [0,2,2,2,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0],
+		 [0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0],
+		 [0,0,0,0,0,0,1,0,1,1,1,0,0,0,1,1,1,0,1,0,0,0,0,0,0],
+		 [0,0,0,0,0,0,1,0,1,1,1,0,0,0,1,1,1,0,1,0,0,0,0,0,0],
+		 [0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0]];
+		var LD2= [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+		 [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+		 [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+		 [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
 		 [0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-		 [0,2,2,2,0,0,0,1,1,1,1,1,0,1,0,0,0,1,0,0,0,0,0,0,0],
-		 [0,0,0,0,0,1,0,1,0,0,0,1,0,1,0,0,0,1,0,0,0,0,0,0,0],
-		 [0,1,0,0,0,1,0,1,0,0,0,1,0,1,0,0,0,1,0,1,0,0,0,1,0],
-		 [0,1,1,1,1,1,0,1,0,0,0,1,0,1,1,1,1,1,0,1,1,1,1,1,0],
+		 [0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+		 [0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+		 [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+		 [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+		 [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
 		 [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]];
-		 
+		
+			if (gen<10){
+				LD=LD1;
+			}
+			else{ LD=LD1;}
 	for(var i=0;i<25;i++){
 		for(var j=0;j<11;j++){
 			var foods = new FOOD(i,j);
@@ -172,12 +287,14 @@ BOARD = function (mx, my) {
 			this.allfood.push(foods);
 		}
 	}
+
 	this.food = this.allfood[i];
 	this.set(TILE.SNAKE, 3,5);
 	this.snake = new SNAKE(SNAKE.PAUSE, 3, 5);
 	this.score = 0;
 };
 BOARD.prototype.clone = function () {
+	possible=true;
 	var b = new BOARD();
 	b.mx = this.mx;
 	b.my = this.my;
@@ -190,17 +307,41 @@ BOARD.prototype.clone = function () {
 		}
 	}
 	b.snake = this.snake.clone();
+	try {
 	b.food = closest_food(this);
+	} catch(err){
+		b = new BOARD(23,10);
+	}
 	b.score = this.score;
 	return b;
 };
 
-function closest_food(b){
-	var p=0;
-	while(b.get(b.allfood[p].x,b.allfood[p].y).kind!=TILE.FOOD){
-		p++;
+function count_food(b){
+	toreturn=0;
+	for (var x = 0; x < b.mx; x++) {
+		for (var y = 0; y < b.my; y++) {
+			if(b.matrix[x][y].kind==TILE.FOOD)toreturn++;
+		}
 	}
-	return b.allfood[p];
+	return toreturn==0;
+}
+
+function closest_food(b){
+	var p=0;//tiebreaker
+	var fit=-100000;
+	toreturn = b.allfood[p];
+	for (var x = 0; x < b.mx; x++) {
+		for (var y = 0; y < b.my; y++) {
+			if(b.matrix[x][y].kind==TILE.FOOD){
+				if(brain[y][x]>fit){
+					fit=brain[y][x];
+					toreturn=b.matrix[x][y];
+					
+				}
+			}
+		}
+	}
+	return toreturn;
 }
 
 function newfood(b,food,l){
@@ -215,7 +356,7 @@ BOARD.prototype.get = function (x, y) {
 	return this.matrix[x][y];
 };
 BOARD.prototype.updatesnake = function () {
-	if (this.snake.direction !== SNAKE.PAUSE) {
+	if (this.snake.direction !== SNAKE.PAUSE||true) {
 		var head = this.snake.head(),
 			nx = head.x,
 			ny = head.y;
@@ -257,23 +398,24 @@ BOARD.prototype.updatesnake = function () {
 			//remove_from_allfoods(this,nx,ny);	
 			//this.food.randFood(this);
 			//tail = this.snake.pop();
-			if(this.snake.queue.length>3){
+			if(this.snake.queue.length>0){
 				tail = this.snake.pop();
 				this.set(TILE.NONE, tail.x, tail.y);
 			}
+			score+=10;
 		} else if (kind===TILE.SNAKE){
 			this.snake.direction = SNAKE.PAUSE;
 			return;
 		
 		} else if (kind===TILE.FLOWER){
-			this.snake.direction = SNAKE.PAUSE;
-			return;
+			score-=14;
 		}
 		else {
-			 if(this.snake.queue.length>3){
+			 if(this.snake.queue.length>0){
 				tail = this.snake.pop();
 				this.set(TILE.NONE, tail.x, tail.y);
 			}
+			score--;
 		}
 		this.set(TILE.SNAKE, nx, ny);
 		this.snake.push(nx, ny);
@@ -296,6 +438,7 @@ BOARD.prototype.draw = function (ctx) {
 	}
 	this.get(this.snake.head().x, this.snake.head().y).setKind(TILE.SNAKE);
 };
+
 BOARD.prototype.sameas = function (b) {
 	if (b.food.x !== this.food.x || b.food.y !== this.food.y) return false;
 	if (b.snake.queue.length !== this.snake.queue.length) return false;
@@ -523,6 +666,7 @@ window.onresize = function () {
 };
 
 init = function () {
+	possible=false;
 	canvas = document.createElement("canvas");
 		frames = 0;
 	canvas.height = 800;
@@ -533,15 +677,16 @@ init = function () {
 	document.addEventListener("keyup", function (evt) {
 		state[evt.keyCode] = true;
 	});
-
-	window.onresize();
-
 	loop();
+    
 };
 paused=false;
+done=false;
+var phys=0;
 loop = function () {
+	"coucou";
 	frames++;
-
+	phys++;
 	if (state[37 + SNAKE.LEFT]) {
 		state[37 + SNAKE.LEFT] = false;
 		mainboard.snake.direction = SNAKE.LEFT;
@@ -560,13 +705,27 @@ loop = function () {
 	}
 
 	if (frames % SNAKE.updatetime === 0) {
-		if (!paused) mainboard.updatesnake();
+		mainboard.updatesnake();
 		frames = 0;
 	}
-
+	if(count_food(mainboard)){
+		//console.log(score);
+		//console.log(bestscore);
+		//console.log(gen);
+		//console.log(mutant);
+		if(score>bestscore){
+			
+			best_brain=brain;
+			bestscore=score;
+		}
+		cycle();
+		mainboard = new BOARD((24) - 1, Math.floor(11) - 1);
+		
+	}
 	mainboard.draw(ctx);
-
 	window.requestAnimationFrame(loop, canvas);
+	possible=true;
+	
 };
 
 window.onload = init;
@@ -631,12 +790,12 @@ STATE.prototype.coolmoves = function() {
 		return Math.random()-.5;
 	}).sort(function(a,b){ // amount of moves
 		return moves[a] - moves[b];
-	}).sort(function(a,b){ // min farthest from tail
-		return - maxdttail[a] + maxdttail[b];
+	}).sort(function(a,b){
+	return -brain[me.clones[a].snake.head().y][me.clones[a].snake.head().x]+brain[me.clones[b].snake.head().y][me.clones[b].snake.head().x];
 	}).sort(function(a,b){ // Shortest path to food
 		return Math.abs(me.clones[a].snake.head().x-aim.x) + Math.abs(me.clones[a].snake.head().y-aim.y)
 			 - Math.abs(me.clones[b].snake.head().x-aim.x) - Math.abs(me.clones[b].snake.head().y-aim.y)
-	})
+	});
 	
 	return ret.sort(function (a, b) { // highest of scores
 		return -me.clones[a].score + me.clones[b].score
@@ -645,12 +804,13 @@ STATE.prototype.coolmoves = function() {
 
 AI = function () {
  	var s = new STATE(mainboard.clone());
+	
 	if (s.moves.length === 1) {
 		mainboard.snake.direction = s.moves[0];
 	} else if (s.moves.length > 1) {
 		var aim = false;//mainboard.foodmagic();
 
-		if (aim) {
+		if (false) {
 			mainboard.snake.direction = aim;
 		} else {
 			mainboard.snake.direction = s.coolmoves()[0];
@@ -658,4 +818,5 @@ AI = function () {
 	}
 };
 
-setInterval(AI, 50);
+
+setInterval(AI, 100);
