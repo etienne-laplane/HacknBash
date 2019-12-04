@@ -3,8 +3,8 @@ var auth = require('./auth_relay.json');
 var conf = require('./conf_relay.json');
 const bot = new Discord.Client();
 var fs = require('fs');
-var runners_fr=["Djodjino","Djodjino","Djodjino","Djodjino","Djodjino"];
-var runners_us=["Twyn","Twyn","Twyn","Twyn","Twyn"];
+var runners_fr=["GHOSTDEATH","JyKin","KTH","Moliman","Seij"];
+var runners_us=["NickBGoHard","sYn","SubStylee","FCJ2000","jimmypoopins"];
 var current_runner_fr;
 var current_runner_us;
 var us_i=0;
@@ -16,8 +16,9 @@ var blocked=false;
 //https://discordapp.com/oauth2/authorize?client_id=648845529647808512&scope=bot&permissions=2048
 
 bot.on('message', msg => {
+	console.log(msg.author.username);
 	console.log("start");
-	if(msg.content=="reset"&&msg.author.id==98810512950726656){
+	if(msg.content=="reset"){
 		 current_runner_fr;
  current_runner_us;
  us_i=0;
@@ -27,11 +28,13 @@ bot.on('message', msg => {
  blocked=false;
 
 	}
-	if(msg.content.startsWith("register_us ")){
+	if(msg.content.startsWith("NONregister_us ")){
 		register_team_us(msg);
+		return;
 	}
-	if(msg.content.startsWith("register_fr ")){
+	if(msg.content.startsWith("NONregister_fr ")){
 		register_team_fr(msg);
+		return;
 	}
 	if(msg.content=="team fr"){
 		print_team_fr(msg);
@@ -44,11 +47,18 @@ bot.on('message', msg => {
 			started=true;
 			console.log("start");
 			current_runner_fr=bot.users.find("username",runners_fr[fr_i]);
+			if (current_runner_fr==null){
+				current_runner_fr=new Dog(runners_fr[fr_i]);
+				msg.reply(current_runner_fr.username);
+			}
 			current_runner_us=bot.users.find("username",runners_us[us_i]);
+			if (current_runner_us==null){
+				current_runner_us=new Dog(runners_us[us_i]);
+			}
 			msg.channel.send(current_runner_fr+" "+current_runner_us+" - LAWN MOWER USA vs FRANCE Match is starting in 30s !");
-			countdown(msg,30,true);
+			countdown(msg,31,true);
 		}
-		if((msg=="!done"||msg==".done"||msg=="done"||msg=="don")&&blocked){
+		if((msg.content=="!done"||msg.content==".done"||msg.content=="done"||msg.content=="don")&&blocked){
 			if(msg.author.username==current_runner_fr.username){
 				fr_i++;
 				if(fr_i==5){
@@ -160,6 +170,13 @@ function print_team_fr(msg){
 	msg.reply(toprint);
 }
 
+function Dog(name) {
+  this.username = name;
+}
+
+Dog.prototype.toString = function dogToString() {
+  return '' + this.username;
+}
 
 bot.on("error", (e) => console.error(e));
 bot.on("warn", (e) => console.warn(e));
