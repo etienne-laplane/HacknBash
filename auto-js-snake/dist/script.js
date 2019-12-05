@@ -79,6 +79,8 @@ function mutate(brai){
 				} else 	{
 					toreturn[p][m]=brai[p][m]+0.1;
 				}
+			} else if (Math.random()<0.1){
+				toreturn[p][m]=brai[p][m]-Math.random()/10;
 			}else if(brain[p][m]!=0){
 				toreturn[p][m]=brai[p][m];
 			}
